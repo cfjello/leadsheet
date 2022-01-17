@@ -1,0 +1,22 @@
+{
+  "name": "sheet-parser",
+  "version": "1.0.0",
+  "description": "Parse a chord sheet",
+  "main": "index.js",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "moo": "^0.5.1",
+    "nearley": "^2.20.1",
+    "xregexp": "^5.1.0"
+  },
+  "devDependencies": {
+    "json-circular-stringify": "^1.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "html": "nearley-railroad grammer.ne -o grammer.html",
+    "compile": "nearleyc ./grammer.ne -o grammer.js"
+  },
+  "author": "Claus Fjellø-Jensen",
+  "license": "ISC"
+}
