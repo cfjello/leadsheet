@@ -19,9 +19,9 @@ export const tmplFac = ( _tmpl: string, debug = true ): (a: ArgsObject )=>string
 
     return ( a: ArgsObject ) => { 
         let tmplRes = tmpl
-        if ( debug )  console.log(`tmplFac func got: ${JSON.stringify(a)}`)
+        // if ( debug )  console.log(`tmplFac func got: ${JSON.stringify(a)}`)
         for ( const [name, value] of Object.entries(a) ) {
-            if ( debug ) console.log(`tmplFac checks "${name}" against ${JSON.stringify(vars)}`)
+            // if ( debug ) console.log(`tmplFac checks "${name}" against ${JSON.stringify(vars)}`)
             if ( vars.includes(name) )
                 tmplRes = XRegExp.replace(tmplRes, `§\{${name}\}`, value, 'all')
             else 

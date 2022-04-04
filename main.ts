@@ -1,4 +1,5 @@
 import { angie } from "./test/Angie.ts"
+import { river } from "./test/BornByTheRiver.ts"
 import { Parser } from "https://deno.land/x/parlexa@v1.0.3/mod.ts"
 import  LR  from "./lexerRules.ts"
 import  PR from "./parserRules.ts"
@@ -9,7 +10,8 @@ import Vextab from "./Vextab.ts";
 
 const parser = new Parser( LR, PR, 'reset')
 parser.debug = false
-parser.reset(angie)
+// parser.reset(angie)
+parser.reset(river)
 const tree = parser.getParseTree()
 align(tree)
 

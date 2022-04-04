@@ -75,6 +75,8 @@ export class Vextab {
         const handled = new Map<string, boolean>()
         let currElem: any
         let barNotes: string[] = []
+        let firstChord = true
+        let prevChord = 'unset'
         let barText: string[] = []
         let barsInLastLine = false
         this.html = []
@@ -88,6 +90,7 @@ export class Vextab {
                                             this.html.push('notes ' + barNotes.join(' '))
                                             barNotes = []
                                             barsInLastLine = true
+                                            firstChord = true
                                         }
                                         if ( barText.length > 0 ) {
                                             this.html.push('text ' + barText.join(' '))
@@ -125,7 +128,7 @@ export class Vextab {
                                                 barsInLastLine = false
                                             }
                                             const timeSig = `${this.conf.currMeter.counter}/${this.conf.currMeter.denominator}`
-                                            this.html.push( getTmpl('vextabHeader', { fontSize: '12', space: '18', timeSig: timeSig, width: '860' }) )
+                                            this.html.push( getTmpl('vextabHeader', { fontSize: '16', space: '20', timeSig: timeSig, width: '1200' }) )
                                         }
                                         if ( e.REPEAT_COUNT !== undefined ) 
                                             barNotes.push( '=|:')
@@ -135,36 +138,67 @@ export class Vextab {
                                         break
                         case 'CHORD_NOTE': {
                                         const chord = e.fullChord.join('')
-                                        // if ( debug ) console.log( `${chord}: duration:  ${e.duration}, currBarSize: ${this.conf.currBarSize }`)
-                                        //barNotes.push(`:${e.duration === 1 ? 'w' : e.duration}S B/4 $.top.${chord}$`) 
-                                        barNotes.push(`:${e.duration === 1 ? 'w' : e.duration}S B/4 $.top.${chord}$`) 
+                                        const comment = e.comment !== '' ? ' (' + e.comment + ')' : e.comment
+                                        // set the chord position
+                                        if ( firstChord ) {
+                                            barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 $.top.$ $.big.${chord}${comment}$`) 
+                                            firstChord = false
+                                        }
+                                        else if ( chord !== prevChord ) {
+                                            barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 $.big.${chord}${comment}$`)
+                                        } 
+                                        else {
+                                            barNotes.push(`:${e.duration[0]}S ${e.tie}B/4`)
+                                        }
+                                        // add any tied note lengths
+                                        for( let i = 1 ; i < e.duration.length; i++ ) {
+                                            barNotes.push(` :${e.duration[i]}S tB/4 `)
+                                        }
+                                        prevChord = chord
                                         handled.set(e.id, true)                                                            
                                         break
                                         }
                         case 'REST':    {
-                                        barNotes.push(`:${e.duration} ##`)
+                                        barNotes.push(`:${e.duration} ${e.tie}##`)
+                                        // add any tied note lengths
+                                        for( let i = 1 ; i < e.duration.length; i++ ) {
+                                            barNotes.push(` :${e.duration[i]}S t## `)
+                                        }
                                         handled.set(e.id, true)
                                         break
                                         }
+                        /*
+                        case 'SCALE':    {
+                                        const mode = e.mode && e.mode.length > 0 ? ` ${e.mode}` : ''
+                                        const modifier = e.modifier && e.modifier.length > 0 ? ` ${e.modifier}` : ''
+                                        barNotes.push(`$<${e.note}${e.sh_fl ?? ''}${modifier}${mode}>$`) 
+                                        handled.set(e.id, true)
+                                        break
+                                        }
+                        */
                         case 'TEXT': {
                                         const textParts = []
-                                        let prevDuration = ''
                                         for ( let i = 0 ; i < e.textParts.length ; i++ ) {
-                                            const duration = `:${e.textDurations[i] === 1 ? 'w' : e.textDurations[i]}`
+                                            const duration = `:${e.textDurations[i][0] === 1 ? 'w' : e.textDurations[i][0]}`
                                             const text     = e.textParts[i].trim().replace(/,/g, '')
                                             if ( i == 0 ) {
                                                 textParts.push(duration + ',.10,' + text) 
-                                                prevDuration = duration
-                                            }
-                                            else if ( duration !== prevDuration ) {
-                                                textParts.push(duration + ',' + text) 
-                                                prevDuration = duration
+                                                // prevDuration = duration
                                             }
                                             else {
-                                                textParts.push(text)  
+                                                if ( text.length > 0 )
+                                                    textParts.push(duration + ',' + text) 
+                                                else 
+                                                    textParts.push(duration) 
+                                                // prevDuration = duration
+                                            }
+                                            // Add any additional tied durations
+                                            for( let j = 1 ; j < e.textDurations[i].length; j++) {
+                                                textParts.push(e.textDurations[i][j] )
                                             }
                                         }
                                         this.html.push('text ' + textParts.join(',') )
+                                        console.log(`push TEXT: ` + textParts.join(',') )
                                         handled.set(e.id, true)                                                            
                                         break
                                         }
@@ -173,7 +207,7 @@ export class Vextab {
             })
 
             if ( barNotes.length > 0 ) {
-                this.html.push(barNotes.join(' '))
+                this.html.push('notes ' + barNotes.join(' '))
             }
         }
         catch(err) {
@@ -181,7 +215,7 @@ export class Vextab {
         }
         if ( barsInLastLine || barNotes.length > 0 || barText.length > 0 ) {
             if ( barNotes.length > 0 ) {
-                this.html.push(barNotes.join(' '))
+                this.html.push('notes ' + barNotes.join(' '))
             }
             if ( barText.length > 0 ) {
                 this.html.push('text ' + barText.join(' '))

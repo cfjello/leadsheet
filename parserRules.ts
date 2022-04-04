@@ -26,7 +26,7 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
     SECTION: { 
         expect: [
             LR.BAR,
-            LR.SQ_BRACKET
+            // LR.SQ_BRACKET
         ]
     },
     header: {
@@ -67,11 +67,12 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             LR.MODE,
             LR.TEXT_NOTE,
             LR.TEXT_NOTE2,
-            LR.SCALE,
+            [ LR.SCALE, '0:1' ],
             LR.SWING,
             LR.USE
         ]
     },
+    /*
     SQ_BRACKET: {
         expect: [ 
             [ 'commonList', '0:m'],
@@ -79,6 +80,7 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             [ LR.SQ_BRACKET_END]
         ]
     },
+    */
     BAR: {
         multi: '1:m',
         expect: [
@@ -86,7 +88,7 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             [ LR.CHORD_NOTE , '1:1', 'xor'],
             [ LR.REST,        '1:1', 'xor'],
             [ LR.REPEAT_LAST, '1:1', 'xor'],
-            [ LR.SQ_BRACKET,  '1:1', 'xor'],
+            // [ LR.SQ_BRACKET,  '1:1', 'xor'],
             [ LR.REPEAT_END,  '1:1' ]
         ]
     },
@@ -95,10 +97,11 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             LR.CHORD_TYPE,
             LR.CHORD_EXT,
             LR.CHORD_EXT2,
-            LR.SQ_BRACKET,
+            // LR.SQ_BRACKET,
             LR.CHORD_BASS,
             LR.CHORD_MINUS_NOTE,
             [ 'duration', '0:1' ],
+            LR.CHORD_COMMENT,
             LR.GROOVE_ADJUST
         ]
     },
