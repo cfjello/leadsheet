@@ -4,7 +4,9 @@ import LR from "./lexerRules.ts";
 //
 // User defined group-tokens for this set of parser rules
 //
-export type ParserTokens = 'reset' | 'header' | 'space' | 'form' |'allways' | 'duration' | 'chord' | 'common' | 'commonList' 
+export type ParserTokens = 'reset' | 'header' | 'space' | 'form' |
+        'allways' | 'duration' | 'chord' | 'common' | 'commonList'| 
+        'inline' | 'note' | 'scale' | 'scaleMode' | 'minor'
 //
 // ParserRules groups (key tokens below) are typed as the combination of the user defined  
 // ParserTokens (above) and the LexerRules instanse (LR) keys
@@ -55,8 +57,8 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
     commonList : {
         multi: '1:m',
         expect: [
+            [ LR.COMMA, '1:1'  ],
             [ 'common', '1:1' ],
-            [ LR.COMMA, '1:1'  ]
         ]
     }, 
     common: {
@@ -69,18 +71,17 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             LR.TEXT_NOTE2,
             [ LR.SCALE, '0:1' ],
             LR.SWING,
-            LR.USE
+            LR.USE,
+            ['commonList', '0:m']
         ]
     },
-    /*
-    SQ_BRACKET: {
-        expect: [ 
-            [ 'commonList', '0:m'],
-            [ 'common',     '1:1'],
-            [ LR.SQ_BRACKET_END]
+    inline: {
+        expect: [
+            [ LR.SQ_BRACKET, '1:1'],
+            ['common', '1:1'],
+            [ LR.SQ_BRACKET_END, '1:1']
         ]
     },
-    */
     BAR: {
         multi: '1:m',
         expect: [
@@ -97,19 +98,57 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             LR.CHORD_TYPE,
             LR.CHORD_EXT,
             LR.CHORD_EXT2,
-            // LR.SQ_BRACKET,
-            LR.CHORD_BASS,
+            'inline',
+            [LR.CHORD_BASS, '0:1'],
             LR.CHORD_MINUS_NOTE,
             [ 'duration', '0:1' ],
             LR.CHORD_COMMENT,
-            LR.GROOVE_ADJUST
+            [LR.GROOVE_ADJUST, '0:1']
         ]
     },
     REST: {
         expect: [
             [ 'duration', '0:1']
         ]
-    }
+    },
+    note: {
+        expect: [
+            [LR.NOTE_UPPER, 'xor'],
+            [LR.NOTE_LOWER, 'xor'],
+            [LR.NOTE_BOTH]
+        ]
+    },
+    minor: {
+        expect: [
+            [LR.MINOR_MOD, '0:1'],
+            [LR.MINOR, '1:1']
+        ]
+
+    },
+    scaleMode: {
+        multi: '1:1',
+        expect: [
+            [LR.MODE, 'xor'],
+            ['minor', 'xor'],
+            [LR.MAJOR]
+        ]
+    },
+    scale: {
+        expect: [
+            [LR.NOTE_BOTH, '1:1'],
+            ['scaleMode', '1:1']
+        ]
+    },
+    SCALE: {
+        expect: [
+            ['scale', '1:1']
+        ]
+    },
+    KEY: {
+        expect: [
+            ['scale', '1:1']
+        ]
+    },
 }
 
 export default PR

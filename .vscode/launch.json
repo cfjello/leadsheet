@@ -20,6 +20,21 @@
             "attachSimplePort": 9229
         },
         {
+            "request": "launch",
+            "name": "RUN main.ts",
+            "type": "pwa-node",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "C:\\Users\\claus\\.deno\\bin\\deno.exe",
+            "runtimeArgs": [
+                "run",
+                "--unstable",
+                "--inspect-brk",
+                "--allow-all",
+                "./main.ts"
+            ],
+            "attachSimplePort": 9229
+        },
+        {
             "name": "Deno TEST <file>",
             "type": "pwa-node",
             "request": "launch",
@@ -29,7 +44,7 @@
                 "--inspect-brk",  
                 "-A", 
                 "--unstable", 
-                "${file}"
+                "${workspaceFolder}/test/leadsheet.test.ts"
             ],
             "attachSimplePort": 9229
         },

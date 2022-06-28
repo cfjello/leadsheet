@@ -1,3 +1,3 @@
-export  { PR } from "./parserRules.ts"
+export  { PR } from "./rules/parserRules.ts"
 export  { align } from "./align.ts"
 export  { Vextab } from "./Vextab.ts";

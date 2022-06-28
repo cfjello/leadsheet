@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description"
+        content="Vextab is a JavaScript library for rendering standard music notation and guitar tab.">
+    <meta charset="UTF-8" />
+    <link href='https://fonts.googleapis.com/css?family=Barlow|Tangerine' rel='stylesheet' type='text/css'>
+    <link href="https://www.vexflow.com/style.css" media="screen" rel="Stylesheet" type="text/css" />
+    <!-- Support Sources -->
+    <script src="https://unpkg.com/vextab/releases/div.prod.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script type="module">
+        import { createApp } from 'https://unpkg.com/petite-vue?module'
+        createApp().mount()
+    </script>
+    <!--Style CSS-->
+    <style>
+        p.vexform {
+            font-size: 24px;
+            margin: 10px;
+            padding: 2px;
+            color: black;
+        }
+
+        .vexformentry {
+            font-style: italic;
+            font-size: 20px;
+            margin: 10px;
+            padding: 2px;
+            color: black;
+        }
+
+        body {
+            margin-top: 100px;
+            margin-bottom: 100px;
+            margin-right: 100px;
+            margin-left: 10px;
+        }
+    </style>
+    <title>LeadSheet</title>
+</head>
+
+
+<body>
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <style>
+        #sidebar-nav {
+            width: 160px;
+        }
+    </style>
+
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto px-0">
+                <div id="sidebar" class="collapse collapse-horizontal show border-end">
+                    <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
+                        <a href="#" class="list-group-item border-end-0 d-inline-block text-truncate"
+                            data-bs-parent="#sidebar"><i class="bi bi-bootstrap"></i> <span>Item</span> </a>
+                        <a href="#" class="list-group-item border-end-0 d-inline-block text-truncate"
+                            data-bs-parent="#sidebar"><i class="bi bi-film"></i> <span>Item</span></a>
+                        <a href="#" class="list-group-item border-end-0 d-inline-block text-truncate"
+                            data-bs-parent="#sidebar"><i class="bi bi-heart"></i> <span>Item</span></a>
+                        <a href="#" class="list-group-item border-end-0 d-inline-block text-truncate"
+                            data-bs-parent="#sidebar"><i class="bi bi-bricks"></i> <span>Item</span></a>
+                        <a href="#" class="list-group-item border-end-0 d-inline-block text-truncate"
+                            data-bs-parent="#sidebar"><i class="bi bi-clock"></i> <span>Item</span></a>
+                        <a href="#" class="list-group-item border-end-0 d-inline-block text-truncate"
+                            data-bs-parent="#sidebar"><i class="bi bi-archive"></i> <span>Item</span></a>
+                        <a href="#" class="list-group-item border-end-0 d-inline-block text-truncate"
+                            data-bs-parent="#sidebar"><i class="bi bi-gear"></i> <span>Item</span></a>
+                        <a href="#" class="list-group-item border-end-0 d-inline-block text-truncate"
+                            data-bs-parent="#sidebar"><i class="bi bi-calendar"></i> <span>Item</span></a>
+                        <a href="#" class="list-group-item border-end-0 d-inline-block text-truncate"
+                            data-bs-parent="#sidebar"><i class="bi bi-envelope"></i> <span>Item</span></a>
+                    </div>
+                </div>
+            </div>
+            <main class="col ps-md-2 pt-2">
+                <a href="#" data-bs-target="#sidebar" data-bs-toggle="collapse"
+                    class="border rounded-3 p-1 text-decoration-none"><i class="bi bi-list bi-lg py-2 p-1"></i> Menu</a>
+                <div class="page-header pt-3">
+                    <h2>Bootstrap 5 Sidebar Menu - Simple</h2>
+                </div>
+                <p class="lead">A offcanvas "push" vertical nav menu example.</p>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <p>This is a simple collapsing sidebar menu for Bootstrap 5. </p>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 vexbody">
+                            <h3 class="vexsection" id="Intro"> Intro:</h3>
+                            <div style="width: 1140px; margin-left: auto; margin-right: auto;"> 
+                                <div class="vextab-auto"  scale=1>
+                                options font-size=16 space=20 width=1200
+                                tabstave notation=true tablature=false time=4/4 clef=percussion
+                                notes | :2S B/4 $.top.$ $.big.Gadd9$ :2S B/4 $.big.Am79$ | :2S B/4 $.big.Cmaj79$ :2S B/4 $.big.Bm7$ | :2S B/4 $.big.Gadd9$ :2S B/4 $.big.Am79$ | :8S B/4 $.big.Cmaj79/D#$ :4S B/4 :8S B/4 $.big.D7sus4$ :2S tB/4 |
+                            </div><!---end vextab --->
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+</body>
+
+</html>

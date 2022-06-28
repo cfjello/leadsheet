@@ -1,0 +1,10 @@
+Title: I'm Your LeadSheet
+Author: LeadSheet
+Form:  
+  - Intro 
+Key    : G
+Meter  : 4/4
+Tempo  : 86           
+ 
+Intro:  
+|| Gadd9  Am79 | Cmaj79  Bm7 | Gadd9  Am79 | Cmaj79/D#,8 Cmaj79/D#,4 D7sus4,8 D7sus4,t2 ||
