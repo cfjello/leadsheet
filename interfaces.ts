@@ -51,9 +51,17 @@ export type VextabHeaderType = {
 
 export type VextabSectionType = Map<string, string[]>
 
+export type VextabSectionArrType  = { name: string, value: string[]}
+// export type VextabSectionRestType = VextabSectionArrType[]
+
 export type VextabSheetType = {
   header:   VextabHeaderType, 
   sections: VextabSectionType
+}
+
+export type VextabRestSheetType = {
+  header:   VextabHeaderType, 
+  sections: VextabSectionArrType[]
 }
 
 export type ChordOrNoteType = {

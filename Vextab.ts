@@ -1,40 +1,48 @@
-import { VextabDefaults } from "./interfaces.ts"
-import { reserved, Templating } from "./Templating.ts";
+import { VextabHeaderType, VextabDefaults, VextabSectionType, VextabSheetType } from "./interfaces.ts"
+// import { reserved, Templating } from "./Templating.ts";
+import { _ } from './lodash.ts';
 
 export class Vextab {
 
     debug = false
     html: string[] = []
-    header: string[] = []
-
-    getHtml = (): string => {
-        return this.html.join('\n')
-    }
-
-    getHeader = (): string => {
-        return this.header.join('\n')
-    }
-
-    getSinglePage = (): string => {
-        let page = '<html>\n'
-        const vextabHeader = this.tp.getTmpl('vebtabHtmlHeader', {})
-        page += vextabHeader
-        // page += '\n<body class="vexbody">'
-        const html = this.getHtml()
-        page += '\n' + html
-        page += '\n</body></html>'
-        return page
-    }
+    sheet: VextabSheetType
+    // sections   = new Map<string, string[]>()
+    currSection = ''
 
     // deno-lint-ignore no-explicit-any
-    constructor( public cmds: any[], public tp: Templating, public conf = { 
+    constructor( public cmds: any[], public conf = { 
         quaterNoteTicks:  420, 
         currTicks:        0,
         currBarSize:      4 * 420 ,
         currBaseUnit:     420,
         currTempo:        120,
         currMeter:        { counter: 4, denominator: 4},
-    } as VextabDefaults) {}
+
+    } as VextabDefaults) {
+        this.sheet = {
+            header: {
+                title:  'Unknown',
+                author: 'Unknown',
+                tempo:  conf.currTempo ?? 120,
+                meter:  conf.currMeter ?? { counter: 4, denominator: 4},
+                form: []
+            },
+            sections: new Map() as VextabSectionType
+        }
+    }
+
+    getHeader = (): Required<VextabHeaderType> => {
+        return this.sheet.header as Required<VextabHeaderType>
+    }
+
+    getSheet(): Required<VextabSheetType>  {
+        return _.cloneDeep(this.sheet as Required<VextabSheetType>)
+    }
+
+    getSections = () => {
+        return this.sheet.sections
+    }
 
     // deno-lint-ignore no-explicit-any
     withinStave = ( e: any ) => {
@@ -106,52 +114,32 @@ export class Vextab {
 
     pushNotes = ( barNotes: string[] = [] ) => {
         let ret = false
-        // if text ahead, we should wait 
-        /*
-        const textAhead = ( this.lookAhead(
-            'TEXT',
-            idx,
-            ['WS','Token','NL'],
-            ['SECTION','BAR','TITLE', 'AUTHOR', 'FORM', 'CHORD_NOTE', 'SCALE']
-            ) !== undefined )
-        */
         if ( barNotes.length > 0 ) {
-            const timeSig = `${this.conf.currMeter.counter}/${this.conf.currMeter.denominator}`
-            const vextabNotes  = this.tp.getTmpl('vextabOptions', { fontSize: '16', space: '20', timeSig: timeSig, width: '1200', barNotes: 'notes ' + barNotes.join(' ') }) 
-            this.html.push(vextabNotes)
+            if ( ! this.sheet.sections.has(this.currSection) ) this.sheet.sections.set(this.currSection, [])
+            this.sheet.sections.get(this.currSection)!.push('notes ' + barNotes.join(' '))
             ret = true
         }
-        /*
-            // const tmplName =  textParts.length > 0 ?  : 'vextabDivHeader2'
-            if (this.debug ) console.log(`push NOTES: ${ barNotes.join(' ') }`)
-            const timeSig = `${this.conf.currMeter.counter}/${this.conf.currMeter.denominator}`
-            const vextabOptions  = this.tp.getTmpl('vextabOptions', { fontSize: '16', space: '20', timeSig: timeSig, width: '1200' }) 
-            const vextabDiv =  this.tp.getTmpl(
-                'vextabDivHeader', 
-                {
-                    vextabOptions: vextabOptions, 
-                    vextabNotes: 'notes ' + barNotes.join(' '), 
-                    vextabText:  textParts.length > 0 ? 'text '  + textParts.join(',') : ''
-                } 
-            ) 
-            this.html.push(vextabDiv)
+        return ret
+    }
+
+    
+    pushText = ( textNotes: string[] = [] ) => {
+        let ret = false
+        if ( textNotes.length > 0 ) {
+            if ( ! this.sheet.sections.has(this.currSection) ) this.sheet.sections.set(this.currSection, [])
+            this.sheet.sections.get(this.currSection)!.push('text ' + textNotes.join(' '))
             ret = true
         }
-        */
         return ret
     }
     
     render = () => {
         const handled = new Map<string, boolean>()
          // deno-lint-ignore no-explicit-any
-        let currElem: any
-        let currSection = ''
+        let currElem: any 
         let barNotes:  string[] = []
-        let textParts: string[] = []
-        let firstBarInSection = true
         let firstChord = true
         let prevChord = 'unset'
-        let barText: string[] = []
         let barsInLastLine = false
         this.html = []
         try {
@@ -161,61 +149,49 @@ export class Vextab {
                     switch ( e.type ) {
                         case 'NL':      if ( this.pushNotes(barNotes) ) { 
                                             barNotes  = []
-                                            textParts = []
                                             barsInLastLine = true
                                             firstChord = true
                                         }
                                         handled.set(e.id, true)
                                         break
-                        case 'TITLE':   if ( barsInLastLine ) {
-                                            this.html.push( this.tp.getTmpl( 'vextabEndDiv', {name: 'vextab' } ) )     
+                        case 'TITLE':   if ( barsInLastLine ) {    
                                             barsInLastLine = false
                                         } 
-                                        this.header.push( this.tp.getTmpl('H2', {name: e.token, value: e.value }) )
+                                        this.sheet.header.title = e.value
                                         handled.set(e.id, true)
                                         break
-                        case 'AUTHOR':  if ( barsInLastLine ) {
-                                            this.html.push( this.tp.getTmpl( 'vextabEndDiv', {name: 'vextab' } ) )     
+                        case 'AUTHOR':  if ( barsInLastLine ) {    
                                             barsInLastLine = false
                                         }
-                                        this.header.push( this.tp.getTmpl('H3', {name: e.token, value: e.value }) )
+                                        this.sheet.header.author = e.value
                                         handled.set(e.id, true)
                                         break
                         case 'FORM':    {
-                                        if ( barsInLastLine ) {
-                                            this.html.push( this.tp.getTmpl( 'vextabEndDiv', {name: 'vextab' } ) )     
+                                        if ( barsInLastLine ) { 
                                             barsInLastLine = false
                                         }
-                                        const listEntries: string[] = []
-                                        e.formEntries.forEach( ( entry: string ) => {
-                                            listEntries.push( this.tp.getTmpl('formListEntry', {name: entry } ) )
-                                        })
-                                        this.header.push(this.tp.getTmpl('H3' , { name: 'Form', value: listEntries.join(',') } ) )
+                                        this.sheet.header.form =  e.formEntries
                                         handled.set(e.id, true)
                                         break
                                         }
-                        case 'SECTION': if ( barsInLastLine ) {
-                                            this.html.push( this.tp.getTmpl( 'vextabEndDiv', {} ) )     
+                        case 'SECTION': if ( barsInLastLine ) {    
                                             barsInLastLine = false
-                                            firstBarInSection = true
                                         }
-                                        currSection = e.value
-                                        this.html.push( this.tp.getTmpl('vextabSection', {name: e.value }) )
+                                        this.currSection = e.value
                                         handled.set(e.id, true)
                                         break
-                        case 'BAR':     if ( ! barsInLastLine && firstBarInSection )  this.html.push( this.tp.getTmpl('vextabDivHeader2', {name: e.value }) )
-                                        if ( e.REPEAT_COUNT !== undefined ) 
-                                            barNotes.push( '=|:')
-                                        else 
-                                            barNotes.push( '|')  
-                                        firstBarInSection = false
-                                        handled.set(e.id, true)                                
+                        case 'BAR':     {
+                                            const bar = e.REPEAT_COUNT !== undefined ? '=|:' : '|'
+                                            barNotes.push(bar)
+                                            handled.set(e.id, true)  
+                                        }                              
                                         break
+                                    
                         case 'CHORD_NOTE': {
                                         const chord = e.fullChord.join('')
-                                        const comment = e.comment !== '' ? ' (' + e.comment + ')' : e.comment
+                                        const comment = ( e.comment !== '' ? ' (' + e.comment + ')' : e.comment).replace(',', ';')
                                         // set the chord position
-                                        const encoding = reserved[reserved.indexOf('$') + 1 ]
+                                        const encoding = '$' // encoding not needed for petite vue
                                         if ( firstChord ) {
                                             barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
                                             firstChord = false
@@ -253,7 +229,7 @@ export class Vextab {
                                         }
                         */
                         case 'TEXT': {
-                                        textParts = []
+                                        const textParts = []
                                         for ( let i = 0 ; i < e.textParts.length ; i++ ) {
                                             const duration = `:${e.textDurations[i][0] === 1 ? 'w' : e.textDurations[i][0]}`
                                             const text     = e.textParts[i].trim().replace(/,/g, '')
@@ -263,9 +239,9 @@ export class Vextab {
                                             }
                                             else {
                                                 if ( text.length > 0 )
-                                                    textParts.push(duration + ',' + text) 
+                                                    textParts.push(',' + duration + ',' + text) 
                                                 else 
-                                                    textParts.push(duration) 
+                                                    textParts.push(',' + duration) 
                                                 // prevDuration = duration
                                             }
                                             // Add any additional tied durations
@@ -281,8 +257,7 @@ export class Vextab {
                                             firstChord = true
                                         }
                                         */
-                                        this.html.push('text ' + textParts.join(',') )
-                                        // console.log(`push TEXT: ` + textParts.join(',') )
+                                        this.pushText( textParts )
                                         handled.set(e.id, true)                                                            
                                         break
                                         }
@@ -294,8 +269,7 @@ export class Vextab {
             console.log(`Error: at ${JSON.stringify(currElem)} - ${err}`)
         }
         if ( barNotes.length > 0 ) {
-            this.pushNotes(barNotes)
-            this.html.push( this.tp.getTmpl( 'vextabEndDiv', {} ) )    
+            this.pushNotes(barNotes) 
         }
     }
 }

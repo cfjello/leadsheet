@@ -1,13 +1,16 @@
 import { ArgsObject } from "https://deno.land/x/parlexa@v1.0.3/interfaces.ts";
-import { ArgsObjectArray, VextabDefaults } from "./interfaces.ts";
-import { decodeTmpl, encodeTmpl, Templating } from "./Templating.ts";
+import { ArgsObjectArray, VextabDefaults, VextabHeaderType, VextabRestSheetType, VextabSectionArrType, VextabSheetType } from "./interfaces.ts";
 import { WalkEntryExt } from "./fileWalk.ts";
 import { fileWalk } from "./fileWalk.ts";
+import { _ } from './lodash.ts';
 import { Parser } from "https://deno.land/x/parlexa/mod.ts";
 import LR from "./rules/lexerRules.ts";
 import PR from "./rules/parserRules.ts";
 import align from "./align.ts";
-import Vextab from "./Vextab.ts";
+import * as path from "https://deno.land/std/path/mod.ts";
+import VextabAlpine from "./Vextab.ts";
+
+const __dirname = path.dirname( path.fromFileUrl(new URL('./leadsheet', import.meta.url)) )
 
 export class LeadSheet {   
    private _debug = false;
@@ -23,141 +26,126 @@ export class LeadSheet {
     songs  = new Map<string, WalkEntryExt>()
     sheets = new Map<string, string>()
     parsed = new Map<string, any>()
-    vexed  = new Map<string, Vextab>()
-
-    // Parser & Templating
-    parser = new Parser( LR, PR, 'reset')
-    tp: Templating     
-    
-    menuNames: string[] = []
+    vexed  = new Map<string, VextabSheetType>()
+    fileEntries = new Map<string, WalkEntryExt>()
     menuList: ArgsObjectArray = []
 
-    constructor( public sheetsDir = "./sheets", public templateDir = "./templates", public matchPattern = '.txt' , public conf = { 
+    // Parser
+    parser = new Parser( LR, PR, 'reset')   
+
+    constructor( public sheetsDir = `${__dirname}/sheets`, public templateDir = `${__dirname}/templates`, public matchPattern = '.txt' , public conf = { 
         quaterNoteTicks:  420, 
         currTicks:        0,
         currBarSize:      4 * 420 ,
         currBaseUnit:     420,
         currTempo:        120,
         currMeter:        { counter: 4, denominator: 4},
-    } as VextabDefaults) {
-        this.tp = new Templating(this.templateDir, '.tmpl')
-        this.tp.addTemplate('H2', '<h2 class="vextitle">§{name}: §{value}</h2>')
-        this.tp.addTemplate('H3', '<h3 class="vextitle">§{name}: §{value}</h3>')
-        // this.tp.addTemplate('menuItems', '<a href="#" class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar"><i class="bi bi-bootstrap"></i> <span>§{menuItem}</span> </a>')
-        this.loadAllSheets()
+    } as VextabDefaults) {}
+
+    // Menu Items
+    getMenuItems = ( force = false ): ArgsObject[] => {
+        if ( this.menuList.length === 0 || force ) {
+            for ( let [ key, entry] of this.fileEntries ) 
+                this.menuList.push({ menuItem: entry.name, menuRef: entry.baseName} as ArgsObject)
+        }
+        return this.menuList
     }
 
-    addMenuItem = ( name: string , href = '#') => {
-        this.menuList.push({ menuItem: name, menuRef: href} as ArgsObject)
-    }
-
-    getMenuItems = (): string[] => {
+    getMenuItemNames = (): string[] => {
         return Object.keys(this.menuList)
     }
 
-    loadSheetList = () => {
+    loadSheetList = (): Map<string,WalkEntryExt> => {
         let entry: WalkEntryExt = {} as WalkEntryExt
         try {
             for (entry of fileWalk(this.sheetsDir, this.matchPattern)) {
                 if ( entry.isFile && ! entry.isDirectory ) {
-                    this.menuNames.push(entry.baseName.replace('.txt', ''))
-                    this.addMenuItem(entry.baseName.replace('.txt', ''), entry.baseName) 
+                    this.fileEntries.set(entry.baseName, entry)
                 }
             }
         }
         catch( err ) { console.error(`Cannot read file: ${entry} - ${err}`) }
+        return this.fileEntries
     }
 
-    getHeaderHtml(sheet: string): string {
-        return this.vexed.get(sheet)!.getHeader()
+    // Sheet header
+    getHeader(sheetName: string): VextabHeaderType {
+        return this.vexed.get(sheetName)!.header
     }
 
-    getVextabSheet = ( entry: WalkEntryExt, force = false ): string => {
+    // Sheet header
+    getSheet(sheetName: string): VextabSheetType {
+        if ( ! this.vexed.has(sheetName) ) this.renderVextab( sheetName )
+        return this.vexed.get(sheetName)!
+    }
+
+    getSheetRest(sheetName: string): VextabRestSheetType {
+        if ( ! this.vexed.has(sheetName) ) this.renderVextab( sheetName )
+        const header = this.vexed.get(sheetName)!.header
+        const sections = Array.from(this.vexed.get(sheetName)!.sections, ([name, value]) => ({ name, value })) 
+        return { header: header, sections: sections }
+    }
+
+    loadSheet = ( entry: WalkEntryExt, force = false ): string => {
         let sheet = ''
         if ( entry.isFile  && ( ! this.sheets.has(entry.baseName) || force ) ) {
             sheet = Deno.readTextFileSync(entry.path).replace(/\r/mg, '')  
-            this.sheets.set(entry.baseName, sheet)
-                this.sheets.set(entry.baseName, sheet)
-                this.menuNames.push(entry.baseName.replace('.txt', ''))
-                sheet = this.sheets.get(entry.baseName)!
-                // this.addMenuItem(entry.baseName.replace('.txt', ''), '#')  //TODO Add the link item
+            this.sheets.set( entry.baseName, _.cloneDeep(sheet) )
+            sheet = this.sheets.get(entry.baseName)!
         }
         return sheet
     }
 
-    loadAllSheets = () => {
-        let entry: WalkEntryExt = {} as WalkEntryExt
+    loadAllSheets = (force = false) => {
+        if ( this.fileEntries.size === 0 || force ) this.loadSheetList()  
+        let currEntry: WalkEntryExt | undefined = undefined 
         try {
-            for (entry of fileWalk(this.sheetsDir, this.matchPattern)) {
+            for ( let [key, entry] of this.fileEntries) {
+                currEntry = entry
                 if ( entry.isFile && ! entry.isDirectory ) {
                     const sheet = Deno.readTextFileSync(entry.path).replace(/\r/mg, '')  
-                    this.sheets.set(entry.baseName, sheet)
-                    this.menuNames.push(entry.baseName.replace('.txt', ''))
-                    this.addMenuItem(entry.baseName.replace('.txt', ''), entry.baseName) 
+                    this.sheets.set(entry.baseName, _.cloneDeep(sheet))
                 }
             }
         }
-        catch( err ) { console.error(`Cannot read file: ${entry} - ${err}`) }
+        catch( err ) { console.error(`Cannot read file: ${currEntry} - ${err}`) }
     }
 
-    parseSheet( sheet: string ): boolean {
+    parseSheet( sheetName: string ): boolean {
         let ret = false
         try {
-            this.parser.reset(this.sheets.get(sheet)!)
+            this.parser = new Parser( LR, PR, 'reset')  
+            this.parser.reset(this.sheets.get(sheetName)!)
             const tree = this.parser.getParseTree()
             align(tree) 
-            this.parsed.set(sheet, tree)
+            this.parsed.set(sheetName, _.cloneDeep(tree))
             ret = true
         }
         catch(err) { console.error(err) }
         return ret
     }
 
-    renderVextab(sheet: string, force = false) {
-        if ( ! this.vexed.has(sheet) || force ) {
-            if ( ! this.parsed.has(sheet) ) {
-                console.log(`Parsing: ${sheet}`)
-                this.parseSheet(sheet)
-            }
-            console.log(`Vextab rendering: ${sheet}`)
-            const vextab = new Vextab( this.parsed.get(sheet), this.tp )
-            console.log(vextab.getHtml())
-            vextab.render()
-            this.vexed.set(sheet, vextab) 
+    parseAllSheets(): boolean {
+        let ret = false
+        try {
+           for ( const key of this.sheets.keys() ) {
+                ret = true
+                this.parseSheet(key)
+           }
         }
+        catch(err) { console.error(err) }
+        return ret
     }
 
-
-    getMainPage = (sheet = 'Default', force = false): string => {
-        const html: string[]        = []
-        if ( ! this.vexed.has(sheet) || force ) {
-            this.renderVextab(sheet, force)
+    renderVextab(sheetName: string, force = false) {
+        if ( ! this.vexed.has(sheetName) || force ) {
+            if ( ! this.parsed.has(sheetName) ) {
+                this.parseSheet(sheetName)
+            }
+            const vextab = new VextabAlpine( this.parsed.get(sheetName) )
+            vextab.render()
+            this.vexed.set( sheetName, _.cloneDeep(vextab.getSheet()) ) 
         }
-        const headerHtml = this.vexed.get(sheet)!.getHeader()
-        if ( this.debug ) { 
-            console.log(`=========================>`)
-            console.log(`headerHtml: ${headerHtml}`)
-        }
-        const vextabHtml = this.vexed.get(sheet)!.getHtml()
-        // if ( this.debug ) { console.log(`vextabHtml: ${vextabHtml}`)}
-
-        const menuItemsHtml = this.tp.getTmpl('menuItems', this.menuList, false)
-        if ( this.debug ) { 
-            console.log(`menuItemsHtml: ${menuItemsHtml}`)
-            console.log(`<----------------------------`)
-        }
-        html.push( 
-            this.tp.getTmpl(
-                'leadSheet', 
-                { 
-                    titleHtml:      'Lead Sheet', 
-                    headerHtml:     encodeTmpl(headerHtml),
-                    menuItemsHtml:  encodeTmpl(menuItemsHtml), 
-                    vextabHtml:     encodeTmpl(vextabHtml)
-                }
-            ) 
-        )
-        return decodeTmpl(html.join('\n'))
     }
 }
 export default LeadSheet

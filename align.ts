@@ -12,15 +12,12 @@ export const align = (cmds: any[]) => {
     let barUnitsLeft    = currBarUnits
     let barCount        = 0 
  
-
-
     // Remember chord durations in barline scope
     let barLineIdx  = 0 
     const barGrid: any[][] = []
     barGrid[barLineIdx] = []
     const barLines: number[][] = []
     barLines[barLineIdx] = []
-    
     let currChordsLeft = 1
 
 // deno-lint-ignore no-explicit-any
@@ -35,7 +32,6 @@ export const align = (cmds: any[]) => {
     const getDefaultDuration = () => {
         const divisor  = Math.round( barUnitsLeft / currChordsLeft)
         const duration = Math.round( currBarUnits / divisor )  
-        // console.log(`getDefaultDuration - barUnitsLeft: ${barUnitsLeft}, divisor: ${divisor}, duration: ${duration}`)
         return duration
     }
 
@@ -172,7 +168,7 @@ export const align = (cmds: any[]) => {
                 break
                 }
             case 'TEXT': {
-                const textParts = e.value.replace(/_[ \t]+/g, '_').replace(/[ \t]+/g, ' ').split('_').slice(1)
+                const textParts = e.value.replace(/_[ \t]+/g, '_').replace(/[ \t]+/g, ' ').split('_') // .slice(1)
                 const idx = barLineIdx - 1
                 if ( ! barGrid[idx] || barGrid[idx].length < textParts.length ) {
                     throw Error( `Text alignment Error. Missing chords to match text line underscores, '_': ${e.value}`)
