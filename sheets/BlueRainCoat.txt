@@ -1,0 +1,61 @@
+Title: Famous Blue Raincoat 
+Author: Leonard Cohen
+Form:
+  - Intro
+  - Verse 1
+  - Chorus
+  - Verse 2
+  - Chorus
+  - Synth Solo over Verse
+  - Guitar Solo over Chorus
+  - Verse 3 
+  - Chorus 3
+Key: Gm
+Meter: 6/8
+Tempo: 78
+
+Intro:
+|| Dm79 [Note: ad hoc] ||
+
+Verse 1:
+    | Gm7                            | Ebmaj79
+_It's four in the morning, the _end of December. I'm
+| Cm79                             | Dm7
+_writing you now just to see if you're _better
+| Gm7                          | Ebmaj79
+_New York is cold, but I _like where I'm living. There's
+| Cm79                          | Dm7
+_music on Clinton Street _all through the evening. I
+| Gm7 Abmaj79| Am7                  
+_hear _that you're _building your little 
+| Gm7 Abmaj79| Fsus4/Db            
+_house _deep in the _desert
+| Cmadd2         | Dm7
+_You're living for _nothing now. I hope you're
+| Ebmaj79  Em7b5        | F           |   Eb/F  
+_keeping      _some kind of _record. _ Yes, and  
+
+
+Chorus:
+| Bbmaj7  | Ebmaj7   Dm7           | F
+_Jane came _by with a _lock of your _hair. She
+| F#dim7                     | Gm7
+_said that you gave it to _her. That
+| Abmaj7                                     | Am7 
+_night that you planned to go _clear
+| Eb69              | Dm79 | Dm79
+_Did you ever go _clear?
+
+Chorus 3:
+| Bbmaj7   | Ebmaj7   Dm7              | F
+_ Yes, and thanks for, _the _trouble you _took from her eyes, I
+| F#dim7        | Gm7     | Abmaj79          | Am7   F7
+_thought it was _there for _good, so I never _ tried. _ And
+| Bbmaj7  | Ebmaj7   Dm7           | F
+_Jane came _by with a _lock of your _hair. She
+| F#dim7                | Gm7     
+_said that you gave it to _her, that
+| Abmaj79                     | Am7
+_night that you planned to go _clear 
+| Eb69 [N:break] | Dm7 [N:break]
+_Sincerely,       L. _Cohen

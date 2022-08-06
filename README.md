@@ -15,7 +15,8 @@ Key    : A Minor
 Meter  : 4/4
 Tempo  : 120                
 
-Intro : |: Am |  E7 |  Gsus4 G Fsus4 F | Csus4,4 C,2 C/B,4 :|
+Intro : 
+| Am |  E7 |  Gsus4 G Fsus4 F | Csus4,4 C,2 C/B,4 |
 Verse 1 :
 |Am	 |E7         |  Gsus4 G Fsus4 F | Csus4,2 C,4 C/B,4
 _ Angie, _ Angie._ When _will _those _dark _clouds all _disap-_peer?

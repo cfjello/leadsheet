@@ -4,7 +4,7 @@ new Vue({
         return  {
             baseUrl:  "http:localhost:3000/api/v1",  
             vexHeader: [ 
-                'options font-size=14 space=15, width=1280', 
+                'options font-size=14 space=15, width=840', 
                 `tabstave notation=true tablature=false time=4/4 clef=percussion`
             ],
             menu: [{ menuItem: 'Dummy', menuRef: 'Dummy' }],
@@ -69,10 +69,10 @@ new Vue({
                 const Renderer = Vex.Flow.Renderer;
                 // Create VexFlow Renderer from canvas element with id #boo
                 const target = document.getElementById(key)
-                const child = target.lastElementChild; 
+                let child = target.lastElementChild; 
                 let i = 0
                 while (child) {
-                    if ( i++ !== 0 ) target.removeChild(child);
+                    target.removeChild(child);
                     child = target.lastElementChild;
                 }
                 const renderer = new Renderer(

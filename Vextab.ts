@@ -219,15 +219,15 @@ export class Vextab {
                                         handled.set(e.id, true)
                                         break
                                         }
-                        /*
-                        case 'SCALE':    {
+                                        /*
+                        case 'SCALE':   {
                                         const mode = e.mode && e.mode.length > 0 ? ` ${e.mode}` : ''
                                         const modifier = e.modifier && e.modifier.length > 0 ? ` ${e.modifier}` : ''
                                         barNotes.push(`$<${e.note}${e.sh_fl ?? ''}${modifier}${mode}>$`) 
                                         handled.set(e.id, true)
                                         break
                                         }
-                        */
+                                    */
                         case 'TEXT': {
                                         const textParts = []
                                         for ( let i = 0 ; i < e.textParts.length ; i++ ) {

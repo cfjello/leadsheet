@@ -115,6 +115,7 @@ export class LeadSheet {
         let ret = false
         try {
             this.parser = new Parser( LR, PR, 'reset')  
+            this.parser.debug = true
             this.parser.reset(this.sheets.get(sheetName)!)
             const tree = this.parser.getParseTree()
             align(tree) 

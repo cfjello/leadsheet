@@ -3,15 +3,15 @@ import XRegExp from  'https://deno.land/x/xregexp/src/index.js'
 import { LexerRules } from "https://deno.land/x/parlexa/mod.ts";
 
 const LR: LexerRules = {
-    TITLE:      XRegExp( '(?<token>Title)[ \\t]*(?<colon>:)[ \\t]*(?<value>[\\p{L}0-9\\-\'’ \\t]+?)[ \\t]*(?=$|\\n)', 'xuig' ),
-    AUTHOR:     XRegExp( '(?<token>Author)[ \\t]*(?<colon>:)[ \\t]*(?<value>[\\p{L}0-9\\-\'’ \\t]+?)[ \\t]*(?=$|\\n)', 'xuig' ),
+    TITLE:      XRegExp( '(?<token>Title)[ \\t]*(?<colon>:)[ \\t]*(?<value>[\\p{L}0-9\\-\\.\'’ \\t]+?)[ \\t]*(?=$|\\n)', 'xuig' ),
+    AUTHOR:     XRegExp( '(?<token>Author)[ \\t]*(?<colon>:)[ \\t]*(?<value>[\\p{L}0-9\\-\\.\'’ \\t]+?)[ \\t]*(?=$|\\n)', 'xuig' ),
     FORM:       XRegExp( '(?<token>Form)[ \\t]*(?<colon>:)[ \\t]*(?=$|\\n)', 'gi' ),
     LIST_ENTRY: {
-        match:  XRegExp( '(?<token>\-)[ \\t]*(?<value>[\\p{L}0-9\\- \\t]+?)[ \\t]*(?=$|\\n)', 'xuig'),
+        match:  XRegExp( '(?<token>\-)[ \\t]*(?<value>[\\p{L}0-9\\-\\. \\t]+?)[ \\t]*(?=$|\\n)', 'xuig'),
         multi: '1:m'
     },
     BAR:        XRegExp('(?<value>\\|{1,2})','xug'),
-    SECTION:    XRegExp( '(?<value>[\\p{L}0-9\\- \\t]+?)[ \\t]*(?<colon>:)', 'xug' ),
+    SECTION:    XRegExp( '(?<value>[\\p{L}0-9\\-\\. \\t]+?)[ \\t]*(?<colon>:)', 'xug' ),
     TEXT:    { 
         match: XRegExp( '(?<value0>_)[ \\t]*(?<value>[\\p{L}0-9\\-\'’ \\t\\p{P}]+)[ \\t]*(?=$|\\n)', 'xug' ),
         // deno-lint-ignore no-explicit-any
@@ -92,8 +92,8 @@ const LR: LexerRules = {
         }
     },
     CHORD_TYPE: XRegExp('(?<value>[S|s]us2|[S|s]us4|[D|d]im|[A|a]ug|[M|m]ajor|[M|m]aj|[M|m]inor|[Q|q]uatal|[M|m]in|M|m|Q|q|5)', 'xg'),
-    CHORD_EXT:  XRegExp('(?<value>b5|6|7|9|b9|#9|11|#11|b13|13)', 'g'),
-    CHORD_EXT2: XRegExp('(?<value>add9|add11|add#11|add13)', 'g'),
+    CHORD_EXT:  XRegExp('(?<value>b5|#5|6|7|9|b9|#9|11|#11|b13|13)', 'g'),
+    CHORD_EXT2: XRegExp('(?<value>add2|add9|add11|add#11|add13)', 'g'),
     CHORD_BASS: XRegExp('(?<token>\/)(?<value>[A|B|C|D|E|F|G|a|b|c|d|e|f|g][#|b]{0,1})', 'xg'),
     CHORD_INVERSION: XRegExp('(?<token>[\\^|v])(?<value>[0-5])', 'xg'),
     CHORD_MINUS_NOTE:XRegExp('(?<value>\\-1|\\-3|\\-5)', 'xg'),

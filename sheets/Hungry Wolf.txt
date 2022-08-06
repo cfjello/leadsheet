@@ -1,0 +1,42 @@
+Title: Hungry Wolf
+Author: J. T. Funny Paper Smith 
+Form: 
+    - Intro
+    - Verse 1
+    - Verse 2 Mod.
+    - Verse 3
+    - Verse 4 Mod.
+    - Solo
+    - Verse 5 Mod.
+    - Verse 6
+    - Verse 7 Mod.
+Key: G 
+Tempo: 113 
+Meter: 4/4
+
+Intro: 
+|: Gm7      D7sus4/A   | Bb6  D7sus4/A :|      
+
+Verse 1:
+|| Gm7             D7sus4/A   | Bb6                  D7sus4/A        
+_I'm that hungry _wolf in the _ground is where I _dug my 
+| Gm7          D7sus4/A   |   Bb6          G7/B
+_cave
+| Cm7   Bb6/D   | Eb79                          D7sus4
+_I'm that hungry _wolf and the _ground is where I _dug my
+| Gm7       D7sus4/A   |   Bb6          D7sus4/A   
+_cave. _ _ _ I leave 
+| Ebmaj7                                  | Am7b5             D7#5b9           
+_prowling just at dark and get home in the _morning just a    _while ‘fore 
+| Gm              D7sus4/A     | Bb6                  D7sus4/A        
+_day
+
+Verse 2 Mod.:
+| Abmaj79                     | Fm6                 | Gm7  | Em7b5
+_ I stroll through dark places _threatening to do my _ part. _With 
+| Ebmaj7        Dm7    | Dbmaj7   Bbm6/C    
+_blood in my _eyes and _malice    _in my 
+| Gm7       D7sus4/A   |   Bb6          D7sus4/A   |  
+_heart 
+| Gm7       D7sus4/A   |   Bb6          D7sus4/A   |  
+			     

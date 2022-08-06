@@ -41,9 +41,9 @@
         }
 
         body {
-            margin-top: 100px;
-            margin-bottom: 100px;
-            margin-right: 100px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-right: 10px;
             margin-left: 10px;
         }
 
@@ -56,20 +56,18 @@
     </style>
     <title>LeadSheet</title>
 </head>
-
-
 <body>
 <noscript>You need to enable JavaScript to run this app.</noscript>
+<h1 style="text-align: center; font-family: courier; font-size: 60px;background-color:lightseagreen;">
+    LeadSheet - Alpha
+</h1>
 <div>
     <style>
         #sidebar-nav {
             width: 160px;
         }
     </style>
-    <!-- div  id="testCounter" @vue:mounted="mounted">
-        <p>{{ store.count }}</p>
-        <button @click="inc">increment</button>
-    </div -->
+    
     <div class="container-fluid" id="vueRoot">
         <div class="row flex-nowrap">
             <div class="col-auto px-0">
@@ -102,8 +100,8 @@
                 <a  href="#" 
                     data-bs-target="#sidebar" 
                     data-bs-toggle="collapse"
-                    class="border rounded-4 pt-2 text-decoration-none">
-                    <i class="bi bi-list bi-lg py-3 p-1"></i> Menu
+                    class="text-decoration-none">
+                    <i class="bi bi-list bi-lg py-3 p-1"></i> <b class="text-decoration-none">Menu </b>
                 </a>
                 <div id="vueHeader" class="page-header pt-3">
                     <h4>Title:  <span>{{sheet.header.title}}</span></h4>
