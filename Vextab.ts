@@ -28,7 +28,9 @@ export class Vextab {
                 meter:  conf.currMeter ?? { counter: 4, denominator: 4},
                 form: []
             },
-            sections: new Map() as VextabSectionType
+            sections: new Map() as VextabSectionType,
+            chords:   new Map() as VextabSectionType,
+            sectionsCP:   new Map() as VextabSectionType
         }
     }
 
@@ -112,23 +114,49 @@ export class Vextab {
         return entry.type === 'NL'
     }
 
-    pushNotes = ( barNotes: string[] = [] ) => {
+    pushNotes = ( barNotes: string[] = [], proChords: string[] ) => {
         let ret = false
         if ( barNotes.length > 0 ) {
-            if ( ! this.sheet.sections.has(this.currSection) ) this.sheet.sections.set(this.currSection, [])
+            if ( ! this.sheet.sections.has(this.currSection) ) {
+                this.sheet.sections.set(this.currSection, [])
+                this.sheet.chords.set(this.currSection, [])
+            }
             this.sheet.sections.get(this.currSection)!.push('notes ' + barNotes.join(' '))
+            this.sheet.chords.get(this.currSection)!.push( proChords.join() )
             ret = true
         }
         return ret
     }
 
     
-    pushText = ( textNotes: string[] = [] ) => {
+    pushText = ( textNotes: string[] = [], textParts: string[] = []) => {
         let ret = false
-        if ( textNotes.length > 0 ) {
-            if ( ! this.sheet.sections.has(this.currSection) ) this.sheet.sections.set(this.currSection, [])
-            this.sheet.sections.get(this.currSection)!.push('text ' + textNotes.join(' '))
-            ret = true
+        try {
+            if ( textNotes.length > 0 ) {
+                if ( ! this.sheet.sections.has(this.currSection) ) this.sheet.sections.set(this.currSection, [])
+                if ( ! this.sheet.sectionsCP.has(this.currSection) ) this.sheet.sectionsCP.set(this.currSection, [])
+      
+                this.sheet.sections.get(this.currSection)!.push('text ' + textNotes.join(' '))
+                
+                // Generate the ChordPro text 
+                const sectionChords: string[] = this.sheet.chords.get(this.currSection)!
+                const chords = sectionChords[sectionChords.length -1].split(',') 
+                let chordPro = ""
+                let offset = 0
+                textParts.forEach( ( value, index ) => {
+                    if ( chords[index + offset].startsWith('|') || chords[index + offset].endsWith('|') ) {
+                        chordPro += `[${chords[index + offset]}]`
+                        offset++
+                    }
+                    chordPro += `[${chords[index + offset]}]${value}`
+                })
+                console.log(`push CHORDPRO: ${chordPro}`)
+                this.sheet.sectionsCP.get(this.currSection)!.push(chordPro)
+                ret = true
+            }
+        }
+        catch(err) {
+            console.log(err)
         }
         return ret
     }
@@ -138,6 +166,8 @@ export class Vextab {
          // deno-lint-ignore no-explicit-any
         let currElem: any 
         let barNotes:  string[] = []
+        // let proNotes:  string[] = []
+        let proChords: string[] = []
         let firstChord = true
         let prevChord = 'unset'
         let barsInLastLine = false
@@ -147,8 +177,9 @@ export class Vextab {
                 if ( ! handled.has(e.id) ) {
                     currElem = e
                     switch ( e.type ) {
-                        case 'NL':      if ( this.pushNotes(barNotes) ) { 
+                        case 'NL':      if ( this.pushNotes(barNotes, proChords) ) { 
                                             barNotes  = []
+                                            proChords = []
                                             barsInLastLine = true
                                             firstChord = true
                                         }
@@ -182,7 +213,9 @@ export class Vextab {
                                         break
                         case 'BAR':     {
                                             const bar = e.REPEAT_COUNT !== undefined ? '=|:' : '|'
+                                            const proBar = e.REPEAT_COUNT !== undefined ? '|:' : '|'
                                             barNotes.push(bar)
+                                            proChords.push(proBar)
                                             handled.set(e.id, true)  
                                         }                              
                                         break
@@ -191,7 +224,7 @@ export class Vextab {
                                         const chord = e.fullChord.join('')
                                         const comment = ( e.comment !== '' ? ' (' + e.comment + ')' : e.comment).replace(',', ';')
                                         // set the chord position
-                                        const encoding = '$' // encoding not needed for petite vue
+                                        const encoding = '$' 
                                         if ( firstChord ) {
                                             barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
                                             firstChord = false
@@ -206,6 +239,7 @@ export class Vextab {
                                         for( let i = 1 ; i < e.duration.length; i++ ) {
                                             barNotes.push(` :${e.duration[i]}S tB/4 `)
                                         }
+                                        proChords.push(chord)
                                         prevChord = chord
                                         handled.set(e.id, true)                                                            
                                         break
@@ -216,6 +250,7 @@ export class Vextab {
                                         for( let i = 1 ; i < e.duration.length; i++ ) {
                                             barNotes.push(` :${e.duration[i]}S t## `)
                                         }
+                                        proChords.push('R')
                                         handled.set(e.id, true)
                                         break
                                         }
@@ -257,7 +292,7 @@ export class Vextab {
                                             firstChord = true
                                         }
                                         */
-                                        this.pushText( textParts )
+                                        this.pushText( textParts, e.textParts )
                                         handled.set(e.id, true)                                                            
                                         break
                                         }
@@ -269,7 +304,7 @@ export class Vextab {
             console.log(`Error: at ${JSON.stringify(currElem)} - ${err}`)
         }
         if ( barNotes.length > 0 ) {
-            this.pushNotes(barNotes) 
+            this.pushNotes(barNotes, proChords) 
         }
     }
 }

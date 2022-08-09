@@ -8,7 +8,7 @@ import LR from "./rules/lexerRules.ts";
 import PR from "./rules/parserRules.ts";
 import align from "./align.ts";
 import * as path from "https://deno.land/std/path/mod.ts";
-import VextabAlpine from "./Vextab.ts";
+import Vextab from "./Vextab.ts";
 
 const __dirname = path.dirname( path.fromFileUrl(new URL('./leadsheet', import.meta.url)) )
 
@@ -81,9 +81,10 @@ export class LeadSheet {
 
     getSheetRest(sheetName: string): VextabRestSheetType {
         if ( ! this.vexed.has(sheetName) ) this.renderVextab( sheetName )
-        const header = this.vexed.get(sheetName)!.header
-        const sections = Array.from(this.vexed.get(sheetName)!.sections, ([name, value]) => ({ name, value })) 
-        return { header: header, sections: sections }
+        const header     = this.vexed.get(sheetName)!.header
+        const sections   = Array.from(this.vexed.get(sheetName)!.sections, ([name, value]) => ({ name, value })) 
+        const sectionsCP = Array.from(this.vexed.get(sheetName)!.sectionsCP, ([name, value]) => ({ name, value })) 
+        return { header: header, sections: sections, sectionsCP: sectionsCP }
     }
 
     loadSheet = ( entry: WalkEntryExt, force = false ): string => {
@@ -143,9 +144,9 @@ export class LeadSheet {
             if ( ! this.parsed.has(sheetName) ) {
                 this.parseSheet(sheetName)
             }
-            const vextab = new VextabAlpine( this.parsed.get(sheetName) )
+            const vextab = new Vextab( this.parsed.get(sheetName) )
             vextab.render()
-            this.vexed.set( sheetName, _.cloneDeep(vextab.getSheet()) ) 
+            this.vexed.set( sheetName, vextab.getSheet() ) 
         }
     }
 }

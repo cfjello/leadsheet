@@ -59,7 +59,7 @@
 <body>
 <noscript>You need to enable JavaScript to run this app.</noscript>
 <h1 style="text-align: center; font-family: courier; font-size: 60px;background-color:lightseagreen;">
-    LeadSheet - Alpha
+    LeadSheet - Proff of Concept
 </h1>
 <div>
     <style>
@@ -69,6 +69,36 @@
     </style>
     
     <div class="container-fluid" id="vueRoot">
+        <!-- Modal -->
+        <div class="modal fade" id="CPModal" tabindex="-1" role="dialog" aria-labelledby="CPModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="CPModalLabel">{{sheet.header.title}}</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+<pre>
+{title: {{sheet.header.title}}}
+{composer: {{sheet.header.author}}}
+{key: {{sheet.header.key}}}
+{tempo: {{sheet.header.tempo}}}
+{time: {{sheet.header.meter.counter}}/{{sheet.header.meter.denominator}}}
+{comment: {{sheet.header.form.join(',')}} }
+<div v-for="sectionCP in sheet.sectionsCP" v-bind:key="sectionCP.name">
+{comment: {{sectionCP.name}} }
+{{sectionCP.value.join('\n')}}
+</div>
+</pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row flex-nowrap">
             <div class="col-auto px-0">
                 <div id="sidebar" 
@@ -82,15 +112,24 @@
                          min-vh-100">
                         <ul class="no-bullets" >
                             <li  v-for="item in Object.values(menu)" v-bind:key="item.menuRef">
-                                <button @click="fetchSheet(item.menuRef)" 
-                                    class="list-group-item 
-                                    border-end-0 
-                                    d-inline-block 
-                                    text-truncate" 
-                                    data-bs-parent="#sidebar">
-                                        <i class="bi bi-music-note-list"></i> 
+                                <div class="btn-group border-0" role="group" aria-label="song button group">
+                                    <button type="button" data-bs-toggle="modal" data-bs-target="#CPModal"
+                                        class="btn btn-secondary p-1 list-group-item 
+                                        border-end-0 
+                                        d-inline-block 
+                                        text-truncate" 
+                                        data-bs-parent="#sidebar">
+                                        <i class="bi bi-file-earmark-ppt"></i> 
+                                    </button>
+                                    <button @click="fetchSheet(item.menuRef)" 
+                                        class="btn btn-secondary p-1 btn-sm list-group-item 
+                                        border-end-0 
+                                        d-inline-block 
+                                        text-truncate" 
+                                        data-bs-parent="#sidebar">
                                         <span>{{item.menuRef}}</span> 
-                                </button>
+                                    </button>
+                                </div>
                             </li>
                         </ul>
                     </div>
@@ -112,14 +151,17 @@
                     <h4>Form: <span v-html="sheet.header.form.join(',')"/> </h4>  
                 </div>
                 <div v-for="section in sheet.sections" v-bind:key="section.name">
-                    <div>
-                        <div class="col-12"><h4><span>{{section.name}}</span></h4></div>
-                        <div v-bind:id="section.name"></div>
-                    </div>
+                    <div class="col-12"><h4><span>{{section.name}}:</span></h4></div>
+                    <div v-bind:id="section.name"></div>
                 </div>
+                <!-- div v-for="sectionCP in sheet.sectionsCP" v-bind:key="sectionCP.name + '_CP'">
+                    <div v-show="!showVextab">
+                        <div class="col-12"><h4><span>{{sectionCP.name}}:</span></h4></div>
+                        <div v-bind:id="sectionCP.name + '_CP'">{{sheet.sectionCP.join('\n')}}</div>
+                    </div>
+                </div -->
             </main>
         </div>
-        <div id="renderDiv"></div>
     </div>
     </div>
     <!-- Bootstrap -->

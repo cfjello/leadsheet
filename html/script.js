@@ -3,10 +3,11 @@ new Vue({
     data() {
         return  {
             baseUrl:  "http:localhost:3000/api/v1",  
-            vexHeader: [ 
+            /* vexHeader: [ 
                 'options font-size=14 space=15, width=840', 
                 `tabstave notation=true tablature=false time=4/4 clef=percussion`
             ],
+            */
             menu: [{ menuItem: 'Dummy', menuRef: 'Dummy' }],
             sheet:  { 
                 header: { 
@@ -17,18 +18,17 @@ new Vue({
                     meter: {counter:4, denominator: 4}, 
                     form: ['Intro'] 
                 },
-                sections: []
+                sections: [],
+                sectionsCP: []
             } ,
-            // rendered: false  
         }
     },     
     mounted() {
-        this.init()
-        
+        this.init() 
     },
     updated() {
         console.log(`Into Updated`)
-        if ( this.sheet.header.title !== 'unknown' && ! this.rendered ) this.renderSheet()
+        if ( this.sheet.header.title !== 'unknown' ) this.renderSheet()
     },
     methods: {
         dummyFunc() {
@@ -48,7 +48,7 @@ new Vue({
         },
         fetchSheet(name) {
             name = name === undefined ? 'Default' : name
-            console.log(`Alpine to request Sheet: ${name} from server`)
+            console.log(`Vue to request Sheet: ${name} from server`)
                 try {
                     fetch( `http:localhost:3000/api/v1/sheet/${name}`)
                     .then ( response => response.json() )
@@ -90,6 +90,7 @@ new Vue({
             }
         }, 
         renderSheet() {
+            // no-this-alias
             const self = this
             try {
                 console.log(`RENDER SHEET`)
@@ -97,7 +98,7 @@ new Vue({
                     const vex = []
                     elem.value.forEach(line => {
                         if ( line.startsWith('notes') ) {
-                            vex.push('options font-size=14 space=15, width=1280') 
+                            vex.push('options font-size=14 space=15, width=1040') 
                             vex.push(`tabstave notation=true tablature=false time=4/4 clef=percussion`)
                         }
                         vex.push(line)
@@ -105,6 +106,15 @@ new Vue({
                     self.renderSection(elem.name, vex.join(`\n`))
                 })
                 // this.rendered = true
+            }
+            catch (err) { console.log(err) }
+        },
+        renderCPSheet() {
+            try {
+                console.log(`RENDER CP SHEET`)
+                this.sheet.sectionsCP.forEach( function (elem) {
+                    document.getElementById(key).innerHTML = `<pre>${elem.value.join(`\n`)}</pre>`
+                })
             }
             catch (err) { console.log(err) }
         },
