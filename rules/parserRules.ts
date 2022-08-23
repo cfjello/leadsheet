@@ -6,7 +6,7 @@ import LR from "./lexerRules.ts";
 //
 export type ParserTokens = 'reset' | 'header' | 'space' | 'form' |
         'allways' | 'duration' | 'chord' | 'common' | 'commonList'| 
-        'inline' | 'note' | 'scale' | 'scaleMode' | 'minor'
+        'inline' | 'note' | 'scale' | 'scaleMode' | 'minor' | 'section' | 'sectionExt'
 //
 // ParserRules groups (key tokens below) are typed as the combination of the user defined  
 // ParserTokens (above) and the LexerRules instanse (LR) keys
@@ -25,10 +25,28 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             [ LR.DURATION_ADD, '0:m' ]
         ]
     },
+    sectionExt: {
+        multi: '0:1',
+        expect: [
+            [ LR.SECTION_HEAD, '1:1' ],
+            [ 'inline', '0:m'],
+            [ LR.COLON, '1:1' ]
+        ]
+    },
+    /*
     SECTION: { 
         expect: [
-            LR.BAR,
-            // LR.SQ_BRACKET
+            [ LR.SECTION, '1:1', 'xor'],
+            [ 'section' , '1:1'],
+            LR.BAR
+        ]
+    },
+    */
+    section: {
+        expect: [
+            [ 'sectionExt' , '1:1', 'xor'],
+            [ LR.SECTION, '1:1'],
+            LR.BAR
         ]
     },
     header: {
@@ -43,8 +61,9 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
         expect: [
            'header' ,
            'common', 
-            LR.SECTION,
+            'section',
             LR.BAR,
+            'inline',
             LR.TEXT
         ] 
     },
@@ -123,7 +142,6 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             [LR.MINOR_MOD, '0:1'],
             [LR.MINOR, '1:1']
         ]
-
     },
     scaleMode: {
         multi: '1:1',

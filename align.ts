@@ -1,7 +1,7 @@
 import { lodash as _ } from 'https://deno.land/x/deno_ts_lodash/mod.ts'
+
 // deno-lint-ignore no-explicit-any
 export const align = (cmds: any[]) => {
-
 
     const quaterNoteTicks = 420
     let currMeter       = { counter: 4, denominator: 4}
@@ -70,14 +70,15 @@ export const align = (cmds: any[]) => {
         let goOn = true
         for ( let i = idx + 1; goOn; i++ ) {
             const c =cmds[i]
-            if ( (c.text === 'CHORD_NOTE' || c.text === 'always') && c.type === 'Token') continue
+            if ( ! c.matched || (c.text === 'CHORD_NOTE' || c.text === 'always') && c.type === 'Token') continue
             if ( ['CHORD_TYPE', 'CHORD_REPEAT', 'CHORD_EXT', 'CHORD_EXT2', 'CHORD_BASS', 'CHORD_INVERSION', 'CHORD_MINUS_NOTE'].includes(c.type) )    
                 if ( c.type === 'CHORD_BASS' ) 
                     fullChord.push( `/${c.value}`)
                 else 
                     fullChord.push(c.value)
-            else 
+            else {
                 goOn = false
+            }
         } 
         return fullChord
     }

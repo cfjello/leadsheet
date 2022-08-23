@@ -11,6 +11,7 @@ const LR: LexerRules = {
         multi: '1:m'
     },
     BAR:        XRegExp('(?<value>\\|{1,2})','xug'),
+    SECTION_HEAD: XRegExp( '(?<value>[^_\\|][\\p{L}0-9\\-\\. \\t]+)[ \\t]*(?=\\[)', 'xug' ),
     SECTION:    XRegExp( '(?<value>[\\p{L}0-9\\-\\. \\t]+?)[ \\t]*(?<colon>:)', 'xug' ),
     TEXT:    { 
         match: XRegExp( '(?<value0>_)[ \\t]*(?<value>[\\p{L}0-9\\-\'’ \\t\\p{P}]+)[ \\t]*(?=$|\\n)', 'xug' ),
@@ -30,7 +31,14 @@ const LR: LexerRules = {
     KEY:    XRegExp( '(?<token>Key|K|k)[ \\t]*:[ \\t]*(?!$|\\n)', 'xig' ),
     METER:  XRegExp( '(?<token>Meter|M|m)[ \\t]*:[ \\t]*(?<counter>[0-9]{1,2})\/(?<denominator>[0-9]{1,2})[ \\t]*(?=,|\\]|$|\\n)', 'xig' ),
     TEMPO:  XRegExp( '(?<token>Tempo|T|t)[ \\t]*:[ \\t]*(?<value>[0-9]{1,3})[ \\t]*(?=,|\\]|$|\\n)', 'nxig' ),
-    USE:    XRegExp('(?<token>Use)|U|u[ \\t]*(?<colon>[\:])[ \\t]*(?<value>[\\p{L}0-9\- \\t]+?)[ \\t]*(?<=,|\\]|$|\\n)', 'xuig'),
+    USE:    {
+        match: XRegExp('(?<token>use|Use|U|u)[ \\t]*(?<colon>:)[ \\t]*(?<value>[^\\]\\n]+)(?=,|\\])', 'xuig'),
+         // deno-lint-ignore no-explicit-any
+         cb: (e: any) => {
+            e.type  = 'USE'
+            return e
+        }
+    },
     TEXT_NOTE:  XRegExp('(?<token>Note|N|n)[ \t]*\:[ \t]*(?<value>[\\p{L}0-9\- \\t]+?)[ \\t]*(?=,|\\]|$|\\n)', 'xuig'),
     TEXT_NOTE2: XRegExp('(?<token>@)(?<who>[\\p{L}0-9\- \\t]+?)[ \t]*(?<colon>[\:])[ \t]*(?<value>[\\p{L}0-9\- \\t]+?)[ \\t]*(?=,|\\]|$|\\n)', 'xuig'),
     SCALE: { 
@@ -49,6 +57,7 @@ const LR: LexerRules = {
     SQ_BRACKET:     XRegExp( '(?<token>[\\[])', 'g' ),
     SQ_BRACKET_END: XRegExp( '(?<token>[\\]])', 'g'),
     COMMA:          XRegExp('(?<value>,)', 'g'),
+    COLON:          XRegExp('(?<value>:)', 'g'),
     DURATION:   { 
         match: XRegExp('(?<token>,)(?<tie>t{0,1})(?<value>[0-9]{1,2})(?<dot>[\\.]{0,2})', 'xg'),
         // deno-lint-ignore no-explicit-any

@@ -4,10 +4,9 @@ import * as path from "https://deno.land/std@0.128.0/path/mod.ts";
 // import  { renderFileToString } from "https://deno.land/x/dejs@0.8.0/mod.ts"
 
 import { LeadSheet } from "./LeadSheet.ts";
-
+import { _ } from './lodash.ts';
 
 const __dirname = path.dirname(import.meta.url);
-
 console.log(`DIRNAME: ${__dirname}`)
 
 // Initialize main page
@@ -45,8 +44,8 @@ songRouter.get("/sheet/:name", (req, res) => {
   }
   else { // We have a song
       console.log(`Server to send ${req.params.name} sheet data`)
-      const data = LS.getSheetRest(req.params.name)
-      // Deno.writeTextFile('./log.txt',`${JSON.stringify(data, undefined, 2)}`, { append: true} )
+      const data = LS.getRestSheet(req.params.name)
+      Deno.writeTextFile('./log.txt',`${JSON.stringify(data, undefined, 2)}`, { append: true} )
       // console.log(`${JSON.stringify(data, undefined, 2)} sheet data`)
       res.setStatus(200).json({
         success: "true",

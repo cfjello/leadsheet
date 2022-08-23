@@ -90,7 +90,7 @@ new Vue({
             }
         }, 
         renderSheet() {
-            // no-this-alias
+            // deno-lint-ignore no-this-alias
             const self = this
             try {
                 console.log(`RENDER SHEET`)

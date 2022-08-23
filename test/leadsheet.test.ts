@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { assert, assertEquals, assertExists } from "https://deno.land/std/testing/asserts.ts";
 import { angie } from "./angieData.ts"
 import { Parser } from "https://deno.land/x/parlexa/mod.ts"
 import  LR  from "../rules/lexerRules.ts"
@@ -7,13 +7,14 @@ import LeadSheet from "../LeadSheet.ts";
 import { Templating } from "../Templating.ts";
 import Vextab from "../Vextab.ts";
 import align from "../align.ts";
+import * as path from "https://deno.land/std/path/mod.ts";
 
+const __dirname = path.dirname( path.fromFileUrl(new URL('./leadsheet', import.meta.url)) )
 
 // deno-lint-ignore no-explicit-any
 export interface PIndexable { [key: string]: any }
-
+const debug_hook = __dirname
 // const sheet = Deno.readTextFileSync('./sheets/Angie.txt').replace(/\r/mg, '') 
-
 /*
 let errors = 0
 for(let i = 0; i < angie.length ; i++) {
@@ -24,6 +25,7 @@ for(let i = 0; i < angie.length ; i++) {
 // const decoder = new TextDecoder('utf-8');  <Keys<ParserTokens, LexerRules>>
 // const angie = decoder.decode(Deno.readFileSync('./Angie.txt'))
 */
+/*
 Deno.test({
     name: '01 - Parser is working on .ts Angie file', 
     fn: () => {  
@@ -53,7 +55,6 @@ Deno.test({
     sanitizeOps: false
 })
 
-
 Deno.test({
     name: '03 - Parser is working on .txt BornByTheRiver file', 
     fn: () => {  
@@ -69,7 +70,6 @@ Deno.test({
     sanitizeOps: false
 })
 
-
 Deno.test({
     name: '04 - Vextab is working on .txt Angie file', 
     fn: () => {  
@@ -83,42 +83,46 @@ Deno.test({
         const encoder = new TextEncoder();
         const data = encoder.encode( JSON.stringify(tree, undefined, 2) );
         Deno.writeFile( './data.json',data )
-        const tp = new Templating('../templates', '.tmpl')
-        const vextab = new Vextab(tree, tp)
-        vextab.render()
-        const html = vextab.getHtml()
-        const encoder2 = new TextEncoder();
-        const data2 = encoder2.encode( html );
-        Deno.writeFile( './vextab.html',data2 )
-        assert(html.length > 100 )
     },
     sanitizeResources: false,
     sanitizeOps: false
 })
 
-/*
-Deno.test({
-    name: '05 - Leadsheet is reading the sheets and generating a main page', 
-    fn: () => {  
-        const ld = new LeadSheet( "../sheets", "../templates", '.txt')
-        const html = ld.getMainPage('BornByTheRiver')
-        assert(html.length > 100 )
-        assert(ld.vexed.size > 0 )
-        assert( ld.vexed.has('BornByTheRiver') )
-        const vtml = ld.vexed.get('BornByTheRiver')!.getHtml()
-        const encoder = new TextEncoder()
-        const data = encoder.encode( vtml )
-        Deno.writeFile( './vextab.html',data )
-        //
-        const encoder1 = new TextEncoder()
-        const data1 = encoder1.encode( html )
-        Deno.writeFile( './leadSheet.html',data1 )
 
+Deno.test({
+    name: '05 - Leadsheet can read the parseTree', 
+    fn: () => {  
+        const LS = new LeadSheet( "../sheets", "../templates", '.txt')
+        LS.debug = false
+        LS.loadAllSheets()
+        LS.parseAllSheets()
+        const pTree = LS.parsed.get('Default')
+        assert(pTree.length > 100 )
+        const vTree = LS.vexed.get('Default')
+        Deno.writeTextFile('./log.txt',`${JSON.stringify(vTree, undefined, 2)}`, { append: false} )
     },
     sanitizeResources: false,
     sanitizeOps: false
 })
 */ 
+Deno.test({
+    name: '05 - Leadsheet is reading the sheets sheet Structure', 
+    fn: () => {  
+        const LS = new LeadSheet( `${__dirname}\\..\\sheets`, "../templates", '.txt')
+        LS.debug = false
+        LS.loadAllSheets()
+        LS.parseAllSheets()
+        const sheet = LS.getRestSheet('BlueRainCoat')
+        assertExists(sheet )
+        assert(sheet.sections.length > 0 )
+        assert(sheet.chords.length > 0 )
+        assert(sheet.sectionsCP.length > 0 )
+        // Deno.writeTextFile('./log.txt',`${JSON.stringify(sheet, undefined, 2)}`, { append: false} )
+    },
+    sanitizeResources: false,
+    sanitizeOps: false
+})
+
 /*
 Deno.test({
     name: '01 - Parser can read a header Title and Auther', 

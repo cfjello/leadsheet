@@ -7,7 +7,7 @@
         {
             "request": "launch",
             "name": "Deno RUN",
-            "type": "pwa-node",
+            "type": "node",
             "cwd": "${workspaceFolder}",
             "runtimeExecutable": "C:\\Users\\claus\\.deno\\bin\\deno.exe",
             "runtimeArgs": [
@@ -22,7 +22,7 @@
         {
             "request": "launch",
             "name": "RUN main.ts",
-            "type": "pwa-node",
+            "type": "node",
             "cwd": "${workspaceFolder}",
             "runtimeExecutable": "C:\\Users\\claus\\.deno\\bin\\deno.exe",
             "runtimeArgs": [
@@ -36,7 +36,7 @@
         },
         {
             "name": "Deno TEST <file>",
-            "type": "pwa-node",
+            "type": "node",
             "request": "launch",
             "runtimeExecutable": "deno",
             "runtimeArgs": [

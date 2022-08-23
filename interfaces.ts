@@ -29,6 +29,13 @@ Sheet:
                 Array of Lyrics 
 */ 
 
+
+
+export type ChordType = {
+  chord: string,
+  duration: number
+}
+
 //
 // Vextab Rendering
 //
@@ -52,28 +59,35 @@ export type VextabHeaderType = {
 export type VextabSectionType = Map<string, string[]>
 export type VextabSectionArrType  = { name: string, value: string[] }
 
+export type VextabSectionChordType     = Map<string, ChordType[]>
+export type VextabSectionChordArrType  = { name: string, value: ChordType[] }
+
+
+
 // export type VextabSectionRestType = VextabSectionArrType[]
 
-export type VextabSheetType = {
-  header:   VextabHeaderType, 
-  sections: VextabSectionType,
-  chords:   VextabSectionType,
+export type   VextabSheetType = {
+  header:     VextabHeaderType, 
+  sections:   VextabSectionType,
+  chords:     VextabSectionChordType,
   sectionsCP: VextabSectionType
 }
 
-export type VextabRestSheetType = {
-  header:   VextabHeaderType, 
-  sections: VextabSectionArrType[]
+
+export type   VextabRestSheetType = {
+  header:     VextabHeaderType, 
+  sections:   VextabSectionArrType[]
+  chords:     VextabSectionChordArrType[]
   sectionsCP: VextabSectionArrType[]
 }
 
+/*
 export type ChordOrNoteType = {
   type: 'chord' | 'note'
-  // deno-lint-ignore no-explicit-any
   entry: any,
   duration:    number,
 }
-
+*/
 
 
 /* Type fiddling
@@ -103,7 +117,7 @@ export let  ChordOrNoteFac = () => {
   entry: any
   duration:    number
 }
-*/ 
+
 
 export type InlineType = {
   type: 'tempo' | 'meter' | 'key'
@@ -140,16 +154,17 @@ export type SectionType = {
   entry: any
   staff: StaffSystemLines
 }
-
+interface VextabRendering {
+    header: string[], notes: string[], text: string[]
+}
+*/ 
 export interface ArgsObject {
   [key: string]: string
 }
 
 export type ArgsObjectArray = ArgsObject[]
 
-interface VextabRendering {
-    header: string[], notes: string[], text: string[]
-}
+
 
 
 /*

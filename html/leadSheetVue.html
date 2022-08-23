@@ -58,16 +58,15 @@
 </head>
 <body>
 <noscript>You need to enable JavaScript to run this app.</noscript>
-<h1 style="text-align: center; font-family: courier; font-size: 60px;background-color:lightseagreen;">
-    LeadSheet - Proff of Concept
-</h1>
+<div style="text-align: center; font-family: courier; font-size: 60px;background-color:lightseagreen;">
+    <span style="font-size: 60px;">LeadSheet </span><span  style="font-size: 30px;">(v0.0.1)</span>
+</div>
 <div>
     <style>
         #sidebar-nav {
             width: 160px;
         }
-    </style>
-    
+    </style> 
     <div class="container-fluid" id="vueRoot">
         <!-- Modal -->
         <div class="modal fade" id="CPModal" tabindex="-1" role="dialog" aria-labelledby="CPModalLabel" aria-hidden="true">
@@ -143,13 +142,14 @@
                     <i class="bi bi-list bi-lg py-3 p-1"></i> <b class="text-decoration-none">Menu </b>
                 </a>
                 <div id="vueHeader" class="page-header pt-3">
-                    <h4>Title:  <span>{{sheet.header.title}}</span></h4>
-                    <h4>Author: <span v-html="sheet.header.author"/></h4>
-                    <h4>Key    : <span>{{sheet.header.key}}</span></h4>
-                    <h4>Meter  : <span v-html="sheet.header.meter.counter"/> and <span v-html="sheet.header.meter.denominator"/></h4>
-                    <h4>Tempo  :  <span v-html="sheet.header.tempo"/> </h4>  
-                    <h4>Form: <span v-html="sheet.header.form.join(',')"/> </h4>  
+                    <h5>Title:  <span>{{sheet.header.title}}</span></h5>
+                    <h5>Author: <span v-html="sheet.header.author"/></h5>
+                    <h5>Key    : <span>{{sheet.header.key}}</span></h5>
+                    <h5>Meter  : <span v-html="sheet.header.meter.counter"/> and <span v-html="sheet.header.meter.denominator"/></h5>
+                    <h5>Tempo  :  <span v-html="sheet.header.tempo"/> </h5>  
+                    <h5>Form: <span v-html="sheet.header.form.join(',')"/> </h5>  
                 </div>
+                </hr>
                 <div v-for="section in sheet.sections" v-bind:key="section.name">
                     <div class="col-12"><h4><span>{{section.name}}:</span></h4></div>
                     <div v-bind:id="section.name"></div>

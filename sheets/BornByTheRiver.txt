@@ -11,7 +11,7 @@ Key    : G
 Meter  : 4/4
 Tempo  : 86           
  
-Intro:  
+Intro: 
 || Gadd9  Am79 | Cmaj79  Bm7 | Gadd9  Am79 | Cmaj79/D#,8 Cmaj79/D#,4 D7sus4,8 D7sus4,t2 ||
 
 Verse 1:
@@ -32,11 +32,11 @@ _Nothing seems to    _slow _me _down _
 | C/D,2             C7sus4/D,8  C7sus4/D,4 G,8    | G,t2        D79sus4,2 |
 _Nothing seems to _hold _me      _back _ 
 
-Verse 2:
+Verse 2: 
 
 Solo: 
 | Gadd9 [S:G Major]  Am79 | Cmaj79      Bm7  | 
-| Em   Baug/D# [S:E Harm. Minor]   | Fsus2/D  [S:G Mixo, S: F Major] G7  |
+| Em   Baug/D# [S:E Harm. Minor]   | Fsus2/D  [S:G Mixo, S: C Major] G7  |
 | Cmaj79      Cm6 [S:C Mel. Minor] | G/B [S:G Major]  E7-5/Bb  [S:F Mel. Minor] | 
 | Am79  [S:A Aeolian]      E7/G# [S:A Harm. Minor]  | Gm6 [S:G Mixo]      C79   |
 

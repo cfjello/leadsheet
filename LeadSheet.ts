@@ -1,5 +1,5 @@
 import { ArgsObject } from "https://deno.land/x/parlexa@v1.0.3/interfaces.ts";
-import { ArgsObjectArray, VextabDefaults, VextabHeaderType, VextabRestSheetType, VextabSectionArrType, VextabSheetType } from "./interfaces.ts";
+import { ArgsObjectArray, VextabDefaults, VextabHeaderType, VextabRestSheetType, VextabSheetType } from "./interfaces.ts";
 import { WalkEntryExt } from "./fileWalk.ts";
 import { fileWalk } from "./fileWalk.ts";
 import { _ } from './lodash.ts';
@@ -79,12 +79,15 @@ export class LeadSheet {
         return this.vexed.get(sheetName)!
     }
 
-    getSheetRest(sheetName: string): VextabRestSheetType {
+
+    getRestSheet(sheetName: string): VextabRestSheetType {
         if ( ! this.vexed.has(sheetName) ) this.renderVextab( sheetName )
-        const header     = this.vexed.get(sheetName)!.header
-        const sections   = Array.from(this.vexed.get(sheetName)!.sections, ([name, value]) => ({ name, value })) 
-        const sectionsCP = Array.from(this.vexed.get(sheetName)!.sectionsCP, ([name, value]) => ({ name, value })) 
-        return { header: header, sections: sections, sectionsCP: sectionsCP }
+        return  { 
+            header:     _.clone(this.vexed.get(sheetName)!.header), 
+            sections:   Array.from(this.vexed.get(sheetName)!.sections, ([name, value]) => ({ name, value })), 
+            sectionsCP: Array.from(this.vexed.get(sheetName)!.sectionsCP, ([name, value]) => ({ name, value })), 
+            chords:     Array.from(this.vexed.get(sheetName)!.chords, ([name, value]) => ({ name, value }))  
+        }
     }
 
     loadSheet = ( entry: WalkEntryExt, force = false ): string => {
@@ -116,7 +119,7 @@ export class LeadSheet {
         let ret = false
         try {
             this.parser = new Parser( LR, PR, 'reset')  
-            this.parser.debug = true
+            this.parser.debug = this.debug
             this.parser.reset(this.sheets.get(sheetName)!)
             const tree = this.parser.getParseTree()
             align(tree) 
@@ -144,9 +147,9 @@ export class LeadSheet {
             if ( ! this.parsed.has(sheetName) ) {
                 this.parseSheet(sheetName)
             }
-            const vextab = new Vextab( this.parsed.get(sheetName) )
+            const vextab = new Vextab( this.parsed.get(sheetName), true )
             vextab.render()
-            this.vexed.set( sheetName, vextab.getSheet() ) 
+            this.vexed.set( sheetName, _.cloneDeep(vextab.getSheet()) ) 
         }
     }
 }
