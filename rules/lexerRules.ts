@@ -33,7 +33,7 @@ const LR: LexerRules = {
     METER:  XRegExp( '(?<token>Meter|M|m)[ \\t]*:[ \\t]*(?<counter>[0-9]{1,2})\/(?<denominator>[0-9]{1,2})[ \\t]*(?=,|\\]|$|\\n)', 'xig' ),
     TEMPO:  XRegExp( '(?<token>Tempo|T|t)[ \\t]*:[ \\t]*(?<value>[0-9]{1,3})[ \\t]*(?=,|\\]|$|\\n)', 'nxig' ),
     USE:    {
-        match: XRegExp('(?<token>use|Use|U|u)[ \\t]*(?<colon>:)[ \\t]*(?<value>[^\\],\\n]+),{0,1}[ \\t]*(?<only>textOnly|notesOnly){0,1}[ \\t]*(?=,|\\])', 'xuig'),
+        match: XRegExp('(?<token>use|Use|U|u)[ \\t]*(?<colon>:)[ \\t]*(?<value>[^\\],\\n]+),{0,1}[ \\t]*(?<only>textOnly|notesOnly|textAndNotes){0,1}[ \\t]*(?=,|\\])', 'xuig'),
          // deno-lint-ignore no-explicit-any
          cb: (e: any) => {
             try {

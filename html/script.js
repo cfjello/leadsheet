@@ -110,16 +110,10 @@ new Vue({
                     }
                     else if ( render === 'textOnly' ) {
                         if ( this.sheet.textOnly[section.name].length > 0 ) 
-                            document.getElementById(key).innerHTML = `<pre>${this.sheet.textOnly[section.name].join('\n')}</pre>`
+                            document.getElementById(section.name).innerHTML = `<pre style="font-size: 20px">${this.sheet.textOnly[section.name].join('\n')}</pre>`
                         else 
                             throw Error(`Section ${section.name} is "textOnly", but has no this.sheet.textOnly entry`)
-                    } 
-                    /*
-                    else if ( section.name in this.sheet.sectionsCP && this.sheet.sectionsCP[section.name].length > 0 ) { // ChordPro Rendering
-                        
-                        document.getElementById(key).innerHTML = `<pre>${this.sheet.chordPro[section.name].join('\n')}</pre>`
                     }
-                    */ 
                     else {
                         throw Error(`renderSheet. undefide value for render: ${render} - should be "textOnly | notesOnly | textAndNotes"`)
                     }

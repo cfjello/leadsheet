@@ -41,7 +41,7 @@ _heart
 | Gm7       D7sus4/A   |   Bb6          D7sus4/A   |  
 _ _ _ _ In places
 
-Verse 3 [use: Verse 1]:
+Verse 3 [use: Verse 1, textOnly]:
 _I used to _go, I ain't been _there I been _blowed out by the 
 _wind _ _ _In places
 _I used to _ go, I ain't been _there I been _blowed out by the 
@@ -49,7 +49,7 @@ _wind _ _ _ I did
 _think one more time that I _just about come _to my 
 _end _ _ _ I can 
 
-Verse 4 [use: Verse 2 Mod.]:
+Verse 4 [use: Verse 2 Mod., textOnly]:
 _howl like a wolf and I can _bark just like a little _dog _I can
 _prowl and do _good, cause I _sleeps in a _hollow 
 _log

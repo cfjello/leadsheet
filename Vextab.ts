@@ -1,5 +1,6 @@
 import { assert } from "https://deno.land/std/testing/asserts.ts";
 import { CHAR_NO_BREAK_SPACE } from "https://deno.land/std@0.131.0/path/_constants.ts";
+import { replace } from "https://deno.land/x/xregexp/types/index.d.ts";
 import { VextabHeaderType, VextabDefaults, VextabSectionType, VextabSheetType, ChordType, VextabSectionChordType, ChordsAndDurationsType,  RenderSectionType } from "./interfaces.ts"
 // import { reserved, Templating } from "./Templating.ts";
 import { _ } from './lodash.ts';
@@ -228,6 +229,10 @@ export class Vextab {
             this.sheet.textOnly.get(this.currSection)!.push(textOnly)
         }
     }
+
+    pushTextAndNotes( sectionTarget: string, sectionSource: string) {
+        this.sheet.sections.set(sectionTarget, _.clone(this.sheet.sections.get(sectionSource) ) )
+    }
     
     pushText = ( textNotes: string[] = [], textParts: string[] = [] ) => {
         let ret = false
@@ -286,6 +291,43 @@ export class Vextab {
         return ret
     }
 
+    finalizeSection = ( sectionName: string, sectionHasContent: boolean) => {
+        assert ( this.sheet.sections.has(sectionName), `finalizeSection() cannot find section: ${sectionName}`)
+        /* TODO: Fix this
+        if ( ! sectionHasContent ) {
+            if (  this.currUseSection !== '' ) {
+                this.sheet.sections.set(sectionName,   _.clone(this.sheet.sections.get(this.currUseSection)!) )
+                this.sheet.sectionsCP.set(sectionName, _.clone(this.sheet.sectionsCP.get(this.currUseSection)!) )
+                this.sheet.textOnly.set(sectionName,   _.clone(this.sheet.textOnly.get(this.currUseSection)! ) )
+            }
+            else {
+                throw Error(`finalizeSection() Error: no content in section: ${sectionName} and no USE of other section`)
+            }
+            this.currUseSection = ''
+        }
+        */ 
+        if ( this.sheet.sectionsCP.get( sectionName )!.length === 0 ) {
+            let  noteLines: string[] = []
+            noteLines = this.sheet.sections.get(sectionName)!.filter( ln => ln.startsWith('notes ') )
+            const chordPro: string[] = []
+            noteLines.forEach( nl => {
+                const entries = nl.split(' ').filter( elem => ( elem.trim().startsWith('$.big.') ||  elem.startsWith('|') ) )
+                const chords: string[] = []
+                entries.forEach( ent => {
+                    if ( ent.startsWith('$.big.') ) {
+                        const e = ent.substring( 6, ent.length-1 )
+                        chords.push (`[${e}]`)
+                    }
+                    else if ( ent.startsWith('|') )
+                    chords.push ( `[${ent.trim()}]` )
+                })
+                chordPro.push( chords.join(' ') )
+            })
+            if ( this.debug ) console.debug(`ChordPro finalized chords: ${chordPro}`)
+            this.sheet.sectionsCP.set( sectionName, chordPro )
+        }
+    }
+
     /*
     pushChordPro = ( sectionName: string): void => {
         // Special handling for sectionCP when there is no text in the section 
@@ -314,6 +356,7 @@ export class Vextab {
         let prevChord = 'unset'
         let barsInLastLine = false
         let sectionActive = false
+        let sectionHasContent = false
         // this.html = []
         try {
             this.cmds.forEach( (e, i)  => {
@@ -323,6 +366,7 @@ export class Vextab {
                         case 'NL':      
                             if ( barNotes.length > 0 ) {
                                 assert( sectionActive, `Cannot insert notes outside a section`)
+                                sectionHasContent = true
                                 this.currChordsAndDurations = this.pushNotes(barNotes, proChords)
                                 barNotes  = []
                                 proChords = []
@@ -355,6 +399,9 @@ export class Vextab {
 
                         case 'SECTION_HEAD': 
                         case 'SECTION':
+                            if ( this.currSection !== '' ) {
+                                this.finalizeSection(this.currSection,sectionHasContent)
+                            }
                             if ( this.debug ) {
                                 console.debug( '------------------------------')
                                 console.debug(`NEW SECTION: ${e.value}`)
@@ -362,6 +409,7 @@ export class Vextab {
                             this.initSection(e.value)
                             barsInLastLine = false
                             sectionActive  = true
+                            sectionHasContent = false
                             handled.set(e.id, true)
                             break
                         case 'BAR':     {
@@ -423,8 +471,6 @@ export class Vextab {
                         case 'USE': 
                             // Check if we should use another section
                             if ( typeof e.value === 'string' ) {
-                                // const keys =  Object.keys(this.sheet.sections)
-                                
                                 assert ( this.sheet.sections.has( e.value) , `USE ${e.value} does not refer to a known Section`)
                                 assert (  e.value !== this.currSection , `USE ${e.value} must not be equal to current Section`)
                                 assert (  this.sheet.chords.get(e.value) !== undefined , `USE Section ${e.value} must have some actual chords`)
@@ -445,7 +491,9 @@ export class Vextab {
                                         this.sheet.render.set(this.currSection, 'textOnly')
                                     }
                                     else {
+                                        this.pushTextAndNotes(this.currSection, this.currUseSection)
                                         this.sheet.render.set(this.currSection, 'textAndNotes')
+
                                     }
                                 }
                             }
@@ -454,40 +502,38 @@ export class Vextab {
                             const textParts = []
                             assert( sectionActive, `Cannot insert text aligned with chords outside a section`)
                             if ( this.debug ) console.log(`TEXT: ${e.textParts.join(' ')}`)
+
                             // Handle setup for the USE of another section
                             if ( this.currUseSection !== '' ) {    
                                 this.currChordsAndDurations = this.pushUseSectionLine(this.currSection, this.currUseSection, ++this.currLineCounter)     
                                 // Construct the durations from the USE section
                                 e.textDurations = _.clone(this.currChordsAndDurations!.durations)
                             }
-                            if ( this.currUseTextOnly ) {
-                                this.pushTextOnly(e.textParts.join(' '))
-                            } 
-                            else {
-                                try {
-                                    for ( let i = 0 ; i < e.textParts.length ; i++ ) {
-                                        const duration = `:${e.textDurations[i][0] === 1 ? 'w' : e.textDurations[i][0]}`
-                                        const text     = e.textParts[i].trim().replace(/,/g, '')
-                                        if ( i == 0 ) {
-                                            textParts.push(duration + ',.10,' + text) 
-                                            // prevDuration = duration
-                                        }
-                                        else {
-                                            if ( text.length > 0 )
-                                                textParts.push(',' + duration + ',' + text) 
-                                            else 
-                                                textParts.push(',' + duration) 
-                                        }
-                                        // Add any additional tied durations
-                                        for( let j = 1 ; j < e.textDurations[i].length; j++) {
-                                            textParts.push(e.textDurations[i][j] )
-                                        }
+                          
+                            try {
+                                sectionHasContent = ( sectionHasContent || e.textParts.length > 0 )
+                                this.pushTextOnly(e.textParts.join(' ').replaceAll('  ', ' '))
+                                for ( let i = 0 ; i < e.textParts.length ; i++ ) {
+                                    const duration = `:${e.textDurations[i][0] === 1 ? 'w' : e.textDurations[i][0]}`
+                                    const text     = e.textParts[i].trim().replace(/,/g, '')
+                                    if ( i == 0 ) {
+                                        textParts.push(duration + ',.10,' + text) 
+                                        // prevDuration = duration
                                     }
-                                } catch( err) {`Render().durations Error: at ${objStringify(e.textDurations)} \n ${err}` }                                   
-                                this.pushText( textParts, e.textParts )
-                                // }
-                                handled.set(e.id, true)                                                            
-                            }
+                                    else {
+                                        if ( text.length > 0 )
+                                            textParts.push(',' + duration + ',' + text) 
+                                        else 
+                                            textParts.push(',' + duration) 
+                                    }
+                                    // Add any additional tied durations
+                                    for( let j = 1 ; j < e.textDurations[i].length; j++) {
+                                        textParts.push(e.textDurations[i][j] )
+                                    }
+                                }
+                            } catch( err) {`Render().durations Error: at ${objStringify(e.textDurations)} \n ${err}` }                                   
+                            this.pushText( textParts, e.textParts )
+                            handled.set(e.id, true)                                                            
                         }
                         break
                     }
@@ -500,6 +546,9 @@ export class Vextab {
         if ( barNotes.length > 0 ) {
             this.pushNotes(barNotes, proChords) 
             // this.pushChordPro(this.currSection)
+        }
+        if ( this.currSection !== '' ) {
+            this.finalizeSection(this.currSection,sectionHasContent)
         }
     }
 }
