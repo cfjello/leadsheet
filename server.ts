@@ -7,7 +7,6 @@ import { LeadSheet } from "./LeadSheet.ts";
 import { _ } from './lodash.ts';
 
 const __dirname = path.dirname(import.meta.url);
-console.log(`DIRNAME: ${__dirname}`)
 
 // Initialize main page
 const LS = new LeadSheet()
@@ -46,7 +45,6 @@ songRouter.get("/sheet/:name", (req, res) => {
       console.log(`Server to send ${req.params.name} sheet data`)
       const data = LS.getRestSheet(req.params.name)
       Deno.writeTextFile('./log.txt',`${JSON.stringify(data, undefined, 2)}`, { append: true} )
-      // console.log(`${JSON.stringify(data, undefined, 2)} sheet data`)
       res.setStatus(200).json({
         success: "true",
         data: data,
@@ -73,8 +71,7 @@ songRouter.get("/menu", (req, res) => {
 });
 
 songRouter.get("/test", (req, res) => {
-  console.log(`Server GOT request for testItems`)
-  console.log(`Server to send Menu List data`)
+  console.log(`Server GOT request for menuItems`)
     res.setStatus(200).json({
       success: "true",
       data: testData,

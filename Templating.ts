@@ -67,7 +67,6 @@ export const tmplFac = ( _tmpl: string ): (a: ArgsObject ) => string => {
         let tmplRes = tmpl 
         let currName = ''
         try {
-            // console.log(`renderTmpl has arguments ${JSON.stringify(a)}`)
             for ( const [name, value] of Object.entries(a) ) {
                 // console.log(`tmplFac checks "${name}"`)
                 if ( vars.includes(name) ) {
@@ -152,8 +151,6 @@ export class Templating {
             // call it with the arguments object
             //
             const func =  this.tpls.get(name) as (a: ArgsObject | ArgsObjectArray, resolveAll: boolean) => string
-            // console.log (`name: ${name}, func -> ${typeof func}`)
-            // console.log (` func ARGS -> ${JSON.stringify(argsObj)}`)
             res  = func(argsObj!, resolveAll) as string
         }
         catch(err) {
@@ -162,8 +159,3 @@ export class Templating {
         return res as string
     }
 }
-
-/*
-const tp = new Templating()
-console.log( `SIZE: ${tp.tpls.size}`)
-*/

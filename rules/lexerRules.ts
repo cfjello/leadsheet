@@ -26,16 +26,24 @@ const LR: LexerRules = {
             }
         }
     },
+    // TEXT_ONLY: XRegExp( '(?<value>[^:_\\|\\[\\]]+)[ \\t]*(?=$\\n)', 'xug' ),
     NL:     XRegExp('(?<value>[\\n\\r]+?)', 'g'), 
     WS:     XRegExp('(?<value>[ \\t]+)', 'g'),
     KEY:    XRegExp( '(?<token>Key|K|k)[ \\t]*:[ \\t]*(?!$|\\n)', 'xig' ),
     METER:  XRegExp( '(?<token>Meter|M|m)[ \\t]*:[ \\t]*(?<counter>[0-9]{1,2})\/(?<denominator>[0-9]{1,2})[ \\t]*(?=,|\\]|$|\\n)', 'xig' ),
     TEMPO:  XRegExp( '(?<token>Tempo|T|t)[ \\t]*:[ \\t]*(?<value>[0-9]{1,3})[ \\t]*(?=,|\\]|$|\\n)', 'nxig' ),
     USE:    {
-        match: XRegExp('(?<token>use|Use|U|u)[ \\t]*(?<colon>:)[ \\t]*(?<value>[^\\]\\n]+)(?=,|\\])', 'xuig'),
+        match: XRegExp('(?<token>use|Use|U|u)[ \\t]*(?<colon>:)[ \\t]*(?<value>[^\\],\\n]+),{0,1}[ \\t]*(?<only>textOnly|notesOnly){0,1}[ \\t]*(?=,|\\])', 'xuig'),
          // deno-lint-ignore no-explicit-any
          cb: (e: any) => {
-            e.type  = 'USE'
+            try {
+                e.type  = 'USE'
+                e.only = e[e.length-1]
+                if ( !e.only ) e.only = ''
+                else e.only = e.only.replace(',','').trim()     
+                e.value = e[e.length-2].trim() 
+            }
+            catch(err)  { console.log(`USE cb() Error: ${e} ==> ${err}`) }
             return e
         }
     },
@@ -62,7 +70,6 @@ const LR: LexerRules = {
         match: XRegExp('(?<token>,)(?<tie>t{0,1})(?<value>[0-9]{1,2})(?<dot>[\\.]{0,2})', 'xg'),
         // deno-lint-ignore no-explicit-any
         cb: (e: any) => {
-            // console.log(`Duration callback with tie === ${e.tie}`)
             e.type  = 'DURATION'
             e.tie   = e.tie === undefined ? '' : 't'
             return e

@@ -19,15 +19,17 @@ new Vue({
                     form: ['Intro'] 
                 },
                 sections: [],
-                sectionsCP: []
+                sectionsCP: [],
+                textOnly: {},
+                render: {}
             } ,
+            showVextab: true
         }
     },     
     mounted() {
         this.init() 
     },
     updated() {
-        console.log(`Into Updated`)
         if ( this.sheet.header.title !== 'unknown' ) this.renderSheet()
     },
     methods: {
@@ -38,8 +40,6 @@ new Vue({
             fetch('http:localhost:3000/api/v1/menu')
             .then ( response => response.json() )
             .then ( resData => {
-                console.log( `INIT Menu is: ${JSON.stringify(this.menu)}`)
-                console.log( `resData is now: ${JSON.stringify(resData)}`)
                 resData.data.forEach( (value, idx) => Vue.set( this.menu, idx, { menuItem: value.menuItem, menuRef: value.menuRef } ) )
                 console.log( `INIT Menu is now: ${JSON.stringify(this.menu)}`)
             }).catch(err => {
@@ -63,15 +63,14 @@ new Vue({
                 }
                 catch (err) { console.log(err) }
         },
-        renderSection( key, value ) {
+        renderVextabSection( key, value ) {
             try {
                 console.log(`RENDER Section: "${key}" for: ${value}`)
                 const Renderer = Vex.Flow.Renderer;
                 // Create VexFlow Renderer from canvas element with id #boo
                 const target = document.getElementById(key)
                 let child = target.lastElementChild; 
-                let i = 0
-                while (child) {
+                while ( child ) {
                     target.removeChild(child);
                     child = target.lastElementChild;
                 }
@@ -94,26 +93,36 @@ new Vue({
             const self = this
             try {
                 console.log(`RENDER SHEET`)
-                this.sheet.sections.forEach( function (elem) {
-                    const vex = []
-                    elem.value.forEach(line => {
-                        if ( line.startsWith('notes') ) {
-                            vex.push('options font-size=14 space=15, width=1040') 
-                            vex.push(`tabstave notation=true tablature=false time=4/4 clef=percussion`)
-                        }
-                        vex.push(line)
-                    })
-                    self.renderSection(elem.name, vex.join(`\n`))
-                })
-                // this.rendered = true
-            }
-            catch (err) { console.log(err) }
-        },
-        renderCPSheet() {
-            try {
-                console.log(`RENDER CP SHEET`)
-                this.sheet.sectionsCP.forEach( function (elem) {
-                    document.getElementById(key).innerHTML = `<pre>${elem.value.join(`\n`)}</pre>`
+                this.sheet.sections.forEach( ( section )  => {
+                    if ( section.value.length < 1 )  console.error(`renderSheet() has no notes entry for ${section}` )
+                    console.log(`RENDER SECTION: ${JSON.stringify(section, undefined, 2)}`)
+                    const render = this.sheet.render[section.name]
+                    if ( render === 'textAndNotes' || render === 'notesOnly' ) {
+                        const vex = []
+                        section.value.forEach(line => {
+                           if ( line.startsWith('notes') ) {
+                                vex.push('options font-size=14 space=15, width=1040') 
+                                vex.push(`tabstave notation=true tablature=false time=4/4 clef=percussion`)
+                            }
+                            vex.push(line)
+                        })
+                        self.renderVextabSection(section.name, vex.join('\n'))
+                    }
+                    else if ( render === 'textOnly' ) {
+                        if ( this.sheet.textOnly[section.name].length > 0 ) 
+                            document.getElementById(key).innerHTML = `<pre>${this.sheet.textOnly[section.name].join('\n')}</pre>`
+                        else 
+                            throw Error(`Section ${section.name} is "textOnly", but has no this.sheet.textOnly entry`)
+                    } 
+                    /*
+                    else if ( section.name in this.sheet.sectionsCP && this.sheet.sectionsCP[section.name].length > 0 ) { // ChordPro Rendering
+                        
+                        document.getElementById(key).innerHTML = `<pre>${this.sheet.chordPro[section.name].join('\n')}</pre>`
+                    }
+                    */ 
+                    else {
+                        throw Error(`renderSheet. undefide value for render: ${render} - should be "textOnly | notesOnly | textAndNotes"`)
+                    }
                 })
             }
             catch (err) { console.log(err) }

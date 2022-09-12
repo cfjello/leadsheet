@@ -85,8 +85,10 @@ export class LeadSheet {
         return  { 
             header:     _.clone(this.vexed.get(sheetName)!.header), 
             sections:   Array.from(this.vexed.get(sheetName)!.sections, ([name, value]) => ({ name, value })), 
+            chords:     Array.from(this.vexed.get(sheetName)!.chords, ([name, value]) => ({ name, value })),
             sectionsCP: Array.from(this.vexed.get(sheetName)!.sectionsCP, ([name, value]) => ({ name, value })), 
-            chords:     Array.from(this.vexed.get(sheetName)!.chords, ([name, value]) => ({ name, value }))  
+            textOnly:   Object.fromEntries(this.vexed.get(sheetName)!.textOnly),
+            render:     Object.fromEntries(this.vexed.get(sheetName)!.render)
         }
     }
 
@@ -123,7 +125,7 @@ export class LeadSheet {
             this.parser.reset(this.sheets.get(sheetName)!)
             const tree = this.parser.getParseTree()
             align(tree) 
-            this.parsed.set(sheetName, _.cloneDeep(tree))
+            this.parsed.set(sheetName, _.cloneDeep(tree)) 
             ret = true
         }
         catch(err) { console.error(err) }

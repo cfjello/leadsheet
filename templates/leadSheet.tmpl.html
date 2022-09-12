@@ -23,7 +23,6 @@
             name: string,
             sheet: string,
             async fetchSheet(name) {
-                console.log(`Petite to request Sheet: ${name} from server`)
                 this.sheet = await await fetch(`https://api/v1/sheet?${name}`)
             }
         })

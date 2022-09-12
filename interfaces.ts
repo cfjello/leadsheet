@@ -62,7 +62,8 @@ export type VextabSectionArrType  = { name: string, value: string[] }
 export type VextabSectionChordType     = Map<string, ChordType[]>
 export type VextabSectionChordArrType  = { name: string, value: ChordType[] }
 
-
+export type RenderType = 'textOnly' | 'notesOnly' | 'textAndNotes'
+export type RenderSectionType = Map<string, RenderType>
 
 // export type VextabSectionRestType = VextabSectionArrType[]
 
@@ -70,7 +71,9 @@ export type   VextabSheetType = {
   header:     VextabHeaderType, 
   sections:   VextabSectionType,
   chords:     VextabSectionChordType,
-  sectionsCP: VextabSectionType
+  sectionsCP: VextabSectionType,
+  textOnly:   VextabSectionType,
+  render:     RenderSectionType
 }
 
 
@@ -79,6 +82,13 @@ export type   VextabRestSheetType = {
   sections:   VextabSectionArrType[]
   chords:     VextabSectionChordArrType[]
   sectionsCP: VextabSectionArrType[]
+  textOnly:   { [key: string]: string[] }
+  render:     { [key: string]: RenderType }
+}
+
+export type ChordsAndDurationsType = {
+  durations: string[][],
+  chords: string[]
 }
 
 /*

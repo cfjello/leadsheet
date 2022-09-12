@@ -53,6 +53,8 @@
             margin: 0; /* Remove margins */
         }
         [v-cloak] { display: none; }
+        h4 { color: rgb(20, 146, 150)}
+        h5 { color: rgb(26, 171, 26);}
     </style>
     <title>LeadSheet</title>
 </head>
@@ -149,17 +151,10 @@
                     <h5>Tempo  :  <span v-html="sheet.header.tempo"/> </h5>  
                     <h5>Form: <span v-html="sheet.header.form.join(',')"/> </h5>  
                 </div>
-                </hr>
                 <div v-for="section in sheet.sections" v-bind:key="section.name">
                     <div class="col-12"><h4><span>{{section.name}}:</span></h4></div>
                     <div v-bind:id="section.name"></div>
                 </div>
-                <!-- div v-for="sectionCP in sheet.sectionsCP" v-bind:key="sectionCP.name + '_CP'">
-                    <div v-show="!showVextab">
-                        <div class="col-12"><h4><span>{{sectionCP.name}}:</span></h4></div>
-                        <div v-bind:id="sectionCP.name + '_CP'">{{sheet.sectionCP.join('\n')}}</div>
-                    </div>
-                </div -->
             </main>
         </div>
     </div>

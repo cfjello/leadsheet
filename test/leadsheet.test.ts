@@ -25,7 +25,7 @@ for(let i = 0; i < angie.length ; i++) {
 // const decoder = new TextDecoder('utf-8');  <Keys<ParserTokens, LexerRules>>
 // const angie = decoder.decode(Deno.readFileSync('./Angie.txt'))
 */
-/*
+
 Deno.test({
     name: '01 - Parser is working on .ts Angie file', 
     fn: () => {  
@@ -104,17 +104,18 @@ Deno.test({
     sanitizeResources: false,
     sanitizeOps: false
 })
-*/ 
+
 Deno.test({
-    name: '05 - Leadsheet is reading the sheets sheet Structure', 
+    name: '06 - Leadsheet is reading the sheets sheet Structure', 
     fn: () => {  
         const LS = new LeadSheet( `${__dirname}\\..\\sheets`, "../templates", '.txt')
         LS.debug = false
         LS.loadAllSheets()
         LS.parseAllSheets()
-        const sheet = LS.getRestSheet('BlueRainCoat')
+        const sheet = LS.getRestSheet('Angie')
+        Deno.writeTextFile('./log.txt',`${JSON.stringify(sheet, undefined, 2)}`, { append: true} )
         assertExists(sheet )
-        assert(sheet.sections.length > 0 )
+        assert(sheet.sections.length > 3 )
         assert(sheet.chords.length > 0 )
         assert(sheet.sectionsCP.length > 0 )
         // Deno.writeTextFile('./log.txt',`${JSON.stringify(sheet, undefined, 2)}`, { append: false} )

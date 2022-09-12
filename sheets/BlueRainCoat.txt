@@ -5,7 +5,7 @@ Form:
   - Verse 1
   - Chorus
   - Verse 2
-  - Chorus
+  - Chorus 2
   - Synth Solo over Verse
   - Guitar Solo over Chorus
   - Verse 3 
@@ -44,7 +44,27 @@ _said that you gave it to _her. That
 | Abmaj7                                     | Am7 
 _night that you planned to go _clear
 | Eb69              | Dm79 | Dm79
-_Did you ever go _clear?
+_Did you ever go _clear? _  The
+
+Verse 2 [Use: Verse 1]:
+_last time I saw you, you _looked to much older. Your
+_famous blue raincoat was _torn at the sholder
+_You'd been to the station _ to meet ev'ry train. But you
+_came home alone without _Lili Marlene. So you                 
+_threaded _ my _woman to a flake           
+_flake _of your  _life
+_And when she came _home she was   
+_no_bodies     _wife  _ and I
+
+Chorus 2:
+| Bbmaj7  | Ebmaj7   Dm7           | F
+_See you _there with a _rose in your _teeth. 
+| F#dim7                     | Gm7
+_Just one more thin gypsy _ thief when I see Jane's awa-
+| Abmaj7                                     | Am7 
+_ ke.   She 
+| Eb69              | Dm79 | Dm79
+_sends her re- _ gards _ The
 
 Chorus 3:
 | Bbmaj7   | Ebmaj7   Dm7              | F

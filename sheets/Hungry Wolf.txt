@@ -18,7 +18,7 @@ Intro:
 |: Gm7      D7sus4/A   | Bb6  D7sus4/A :|      
 
 Verse 1:
-|| Gm7             D7sus4/A   | Bb6                  D7sus4/A        
+| Gm7             D7sus4/A   | Bb6                  D7sus4/A        
 _I'm that hungry _wolf in the _ground is where I _dug my 
 | Gm7          D7sus4/A   |   Bb6          G7/B
 _cave
@@ -46,5 +46,15 @@ _I used to _go, I ain't been _there I been _blowed out by the
 _wind _ _ _In places
 _I used to _ go, I ain't been _there I been _blowed out by the 
 _wind _ _ _ I did 
-_think one more _time that I _just about come _to my 
-_end
+_think one more time that I _just about come _to my 
+_end _ _ _ I can 
+
+Verse 4 [use: Verse 2 Mod.]:
+_howl like a wolf and I can _bark just like a little _dog _I can
+_prowl and do _good, cause I _sleeps in a _hollow 
+_log
+_ _ _ _
+
+Solo 1 [use: Verse 1, notesOnly]:
+
+Solo 2 [use: Verse 2 Mod., notesOnly]:

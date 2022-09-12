@@ -64,7 +64,8 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             'section',
             LR.BAR,
             'inline',
-            LR.TEXT
+            LR.TEXT,
+            // LR.TEXT_ONLY,
         ] 
     },
     FORM: {

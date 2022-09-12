@@ -1,3 +1,4 @@
+import string_decoder from 'https://deno.land/std@0.133.0/node/internal_binding/string_decoder.ts'
 import { lodash as _ } from 'https://deno.land/x/deno_ts_lodash/mod.ts'
 
 // deno-lint-ignore no-explicit-any
@@ -14,6 +15,9 @@ export const align = (cmds: any[]) => {
  
     // Remember chord durations in barline scope
     let barLineIdx  = 0 
+    // deno-lint-ignore no-explicit-any
+    // const barGridSections  = Map<string, any[][]>
+    // deno-lint-ignore no-explicit-any
     const barGrid: any[][] = []
     barGrid[barLineIdx] = []
     const barLines: number[][] = []
@@ -141,12 +145,11 @@ export const align = (cmds: any[]) => {
                     currTempo = e.value
                     tickPerMin      = currTempo * quaterNoteTicks
                     milliSecPerTick = Math.round( 60000 / tickPerMin)
-                break
                 }
-            case 'FORM': {
+                break
+            case 'FORM': 
                 e.formEntries = getFormEntries(i)
                 break
-                } 
             case 'REST':
             case 'CHORD_NOTE': {
                 // Build chord duration
@@ -166,18 +169,32 @@ export const align = (cmds: any[]) => {
                 // Get the full chord 
                 e.fullChord = _.clone(getFullChord(e, i))
                 e.comment = getComment(i)
-                break
                 }
+                break
             case 'TEXT': {
-                const textParts = e.value.replace(/_[ \t]+/g, '_').replace(/[ \t]+/g, ' ').split('_') // .slice(1)
-                const idx = barLineIdx - 1
-                if ( ! barGrid[idx] || barGrid[idx].length < textParts.length ) {
-                    throw Error( `Text alignment Error. Missing chords to match text line underscores, '_': ${e.value}`)
+                // Single textPart
+                // if ( e.value.replace(/[^_]/g,'').length === 1 ) { // A textOnly part
+                //    e.textParts = [ e.value.trim().replace( /^_[ \t]*/, 'textOnly ' ) ]
+                //    e.textDurations = []
+                // }
+                // else {
+                    // Multiple textparts
+                    const textParts = e.value.replace(/_[ \t]*/g, '_').replace(/[ \t]+/g, ' ').split('_') // .slice(1)
+                    const idx = barLineIdx - 1
+                    // if ( ! barGrid[idx] || barGrid[idx].length < textParts.length ) {
+                    //     throw Error( `Text alignment Error. Missing chords to match text line underscores, '_': ${e.value}`)
+                    // }
+                    e.textParts     = _.clone(textParts)
+                    e.textDurations = barGrid[idx] ? _.clone(barGrid[idx]): []
+                //}     
                 }
-                e.textParts     = _.clone(textParts)
-                e.textDurations = _.clone(barGrid[idx])
                 break
-            }
+            case 'TEXT_ONLY': {
+                    // Single textPart
+                    e.textParts = [ e.value.replace( /^[ \t]*/, 'textOnly ' ) ]
+                    e.textDurations = []
+                }
+                break
         }
     })
 }
