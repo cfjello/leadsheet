@@ -13,7 +13,7 @@
             "runtimeArgs": [
                 "run",
                 "--unstable",
-                "--inspect-brk",
+                "--inspect-brk=127.0.0.1:9229",
                 "--allow-all",
                 "${file}"
             ],
@@ -21,16 +21,16 @@
         },
         {
             "request": "launch",
-            "name": "RUN main.ts",
+            "name": "server.ts",
             "type": "node",
             "cwd": "${workspaceFolder}",
             "runtimeExecutable": "C:\\Users\\claus\\.deno\\bin\\deno.exe",
             "runtimeArgs": [
                 "run",
                 "--unstable",
-                "--inspect-brk",
+                "--inspect-brk=127.0.0.1:9229",
                 "--allow-all",
-                "./main.ts"
+                "./server.ts"
             ],
             "attachSimplePort": 9229
         },
@@ -41,12 +41,12 @@
             "runtimeExecutable": "deno",
             "runtimeArgs": [
                 "test", 
-                "--inspect-brk",  
+                "--inspect-brk=127.0.0.1:9201",  
                 "-A", 
                 "--unstable", 
-                "${workspaceFolder}/test/leadsheet.test.ts"
+                "${file}"
             ],
-            "attachSimplePort": 9229
+            "attachSimplePort": 9201
         },
     ],
 }

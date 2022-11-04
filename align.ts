@@ -16,8 +16,6 @@ export const align = (cmds: any[]) => {
     // Remember chord durations in barline scope
     let barLineIdx  = 0 
     // deno-lint-ignore no-explicit-any
-    // const barGridSections  = Map<string, any[][]>
-    // deno-lint-ignore no-explicit-any
     const barGrid: any[][] = []
     barGrid[barLineIdx] = []
     const barLines: number[][] = []
@@ -25,11 +23,22 @@ export const align = (cmds: any[]) => {
     let currChordsLeft = 1
 
 // deno-lint-ignore no-explicit-any
-    const getSubTree = ( startIdx: number ): any[] => {
+    const getSubTree = ( startIdx: number, fromParent = false, backStops = [] as string[]): any[] => {
         // deno-lint-ignore no-explicit-any
         const res: any[] = []
-        const ident = cmds[startIdx].ident
-        for ( let i = startIdx + 1; cmds[i] && cmds[i].ident.substring(0,ident.length) === ident; i++ ) res.push(cmds[i])
+        const cmd   = cmds[startIdx]
+        const ident = fromParent ? cmd.ident.substring( 0, cmd.ident.lastIndexOf('.') ) : cmd.ident
+
+        // console.debug(`SubTree ident: ${cmd.ident} ==> ${ident}`)
+        for ( let i = startIdx + 1; 
+            cmds[i] && cmds[i].ident.substring(0,ident.length) === ident; 
+            i++ ) {
+                // console.debug(`check: ${cmds[i]}`)
+                if ( backStops.includes(cmds[i].type) ) 
+                    break
+                else
+                    res.push(cmds[i])
+            }
         return res
     }
 
@@ -41,7 +50,12 @@ export const align = (cmds: any[]) => {
 
     const getDuration = (idx: number): { duration: number[], tie: string } => {
         const duration: number[] = []
-        const vArr = getSubTree(idx).filter( v => { return v.type === 'DURATION' || v.type === 'DURATION2' || v.type === 'DURATION_ADD'})
+        const fromParent = true
+        const backStops = ['chord', 'CHORD_NOTE']
+        const vArr = getSubTree(idx, fromParent, backStops )
+                     .filter( v => { 
+                        return v.type === 'DURATION' || v.type === 'DURATION2' || v.type === 'DURATION_ADD'
+                    })
         for ( let i = 0 ; i < vArr.length ; i++ ) {
             switch (vArr[i].value ) {
                 case 'w' :  duration.push(1); break
@@ -57,6 +71,7 @@ export const align = (cmds: any[]) => {
         }
         const tie = vArr && vArr.length > 0 ? vArr[0].tie : ''
         if ( duration.length === 0 ) duration.push(getDefaultDuration())
+        console.debug(`getDuration() -> duration: ${duration}, tie: ${tie}`)
         return { duration: duration, tie: tie }
     }
 
@@ -67,6 +82,7 @@ export const align = (cmds: any[]) => {
         return res
     }
 
+    // deno-lint-ignore no-explicit-any
     const getFullChord = (chord: any, idx: number): string[] => {
         const fullChord: string[] = []
         fullChord.push(chord.value)
@@ -114,39 +130,34 @@ export const align = (cmds: any[]) => {
 
     cmds.forEach( (e, i)  => {
         switch ( e.type ) { /* falls through */
-            case 'BAR' :
+            case 'BAR' : {
                 barCount++
                 currBarUnits = currMeter.counter * currMeter.denominator
                 barUnitsLeft = currBarUnits
                 currChordsLeft = getChordsCountInBar(i)
                 break
-            case 'NL' : 
+                }
+            case 'NL' : {
                 currBarUnits = currMeter.counter * currMeter.denominator
                 barUnitsLeft = currBarUnits
                 if ( barLines.length > barLineIdx && barLines[barLineIdx].length > 0  ) { 
                     barLineIdx++ 
                     barLines[barLineIdx] = []
                 }
-                /*
-                if ( barGrid.length > barLineIdx && barGrid[barLineIdx].length > 0  ) { 
-                    barLineIdx++ 
-                    barGrid[barLineIdx] = []
-                }
-                */
                 break
-            case 'METER':
+                }
+            case 'METER': {
                 currMeter = { counter: e.counter, denominator: e.denominator }
                 currBarUnits = currMeter.counter * currMeter.denominator
                 break
-            case 'TEMPO' : {
-                if ( e.value < 20 || e.value > 460 )
-                    throw Error(`Tempo: ${e.value } is out of range [20-460]`) 
-                else 
-                    currTempo = e.value
-                    tickPerMin      = currTempo * quaterNoteTicks
-                    milliSecPerTick = Math.round( 60000 / tickPerMin)
                 }
+            case 'TEMPO' : {
+                if ( e.value < 20 || e.value > 460 ) throw Error(`Tempo: ${e.value } is out of range [20-460]`) 
+                currTempo = e.value
+                tickPerMin      = currTempo * quaterNoteTicks
+                milliSecPerTick = Math.round( 60000 / tickPerMin )
                 break
+                }   
             case 'FORM': 
                 e.formEntries = getFormEntries(i)
                 break
@@ -154,7 +165,7 @@ export const align = (cmds: any[]) => {
             case 'CHORD_NOTE': {
                 // Build chord duration
                 const durObj = getDuration(i) 
-                e.duration = _.clone(durObj.duration)
+                e.duration = _.cloneDeep(durObj.duration)
                 e.tie = durObj.tie
                 barLines[barLineIdx].push(e.duration[0])
                 if ( barGrid[barLineIdx] === undefined ) barGrid[barLineIdx] = []
@@ -169,32 +180,22 @@ export const align = (cmds: any[]) => {
                 // Get the full chord 
                 e.fullChord = _.clone(getFullChord(e, i))
                 e.comment = getComment(i)
-                }
                 break
+                }
             case 'TEXT': {
-                // Single textPart
-                // if ( e.value.replace(/[^_]/g,'').length === 1 ) { // A textOnly part
-                //    e.textParts = [ e.value.trim().replace( /^_[ \t]*/, 'textOnly ' ) ]
-                //    e.textDurations = []
-                // }
-                // else {
-                    // Multiple textparts
-                    const textParts = e.value.replace(/_[ \t]*/g, '_').replace(/[ \t]+/g, ' ').split('_') // .slice(1)
-                    const idx = barLineIdx - 1
-                    // if ( ! barGrid[idx] || barGrid[idx].length < textParts.length ) {
-                    //     throw Error( `Text alignment Error. Missing chords to match text line underscores, '_': ${e.value}`)
-                    // }
-                    e.textParts     = _.clone(textParts)
-                    e.textDurations = barGrid[idx] ? _.clone(barGrid[idx]): []
-                //}     
+                // Multiple textparts
+                const textParts = e.value.replace(/_[ \t]*/g, '_').replace(/[ \t]+/g, ' ').split('_') // .slice(1)
+                const idx = barLineIdx - 1
+                e.textParts     = _.clone(textParts)
+                e.textDurations = barGrid[idx] ? _.clone(barGrid[idx]): []  
+                break   
                 }
-                break
-            case 'TEXT_ONLY': {
-                    // Single textPart
-                    e.textParts = [ e.value.replace( /^[ \t]*/, 'textOnly ' ) ]
-                    e.textDurations = []
-                }
-                break
+            case 'SCALE': {
+                e.children.forEach( (c: { value: string }) => {
+                    console.debug(c.value)
+                })
+                break 
+            }
         }
     })
 }

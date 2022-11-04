@@ -10,15 +10,16 @@ const LR: LexerRules = {
         match:  XRegExp( '(?<token>\-)[ \\t]*(?<value>[\\p{L}0-9\\-\\. \\t]+?)[ \\t]*(?=$|\\n)', 'xuig'),
         multi: '1:m'
     },
-    BAR:        XRegExp('(?<value>\\|{1,2})','xug'),
+    BAR:          XRegExp('(?<value>\\|{1,2})','xug'),
     SECTION_HEAD: XRegExp( '(?<value>[^_\\|][\\p{L}0-9\\-\\. \\t]+)[ \\t]*(?=\\[)', 'xug' ),
-    SECTION:    XRegExp( '(?<value>[\\p{L}0-9\\-\\. \\t]+?)[ \\t]*(?<colon>:)', 'xug' ),
+    SECTION:      XRegExp( '(?<value>[\\p{L}0-9\\-\\. \\t]+?)[ \\t]*(?<colon>:)', 'xug' ),
     TEXT:    { 
         match: XRegExp( '(?<value0>_)[ \\t]*(?<value>[\\p{L}0-9\\-\'’ \\t\\p{P}]+)[ \\t]*(?=$|\\n)', 'xug' ),
         // deno-lint-ignore no-explicit-any
         cb: ( e: any ) => { 
             try {
-                e.value = e.groups.value0.trim() + e.groups.value.trim()
+                // e.value = e.value0.trim() + e.value.trim()
+                e.value = e.value.trim()
                 return e
             }
             catch(err) {
@@ -29,7 +30,7 @@ const LR: LexerRules = {
     // TEXT_ONLY: XRegExp( '(?<value>[^:_\\|\\[\\]]+)[ \\t]*(?=$\\n)', 'xug' ),
     NL:     XRegExp('(?<value>[\\n\\r]+?)', 'g'), 
     WS:     XRegExp('(?<value>[ \\t]+)', 'g'),
-    KEY:    XRegExp( '(?<token>Key|K|k)[ \\t]*:[ \\t]*(?!$|\\n)', 'xig' ),
+    KEY:    XRegExp( '(?<token>Key|K|k)[ \\t]*:', 'xig' ),
     METER:  XRegExp( '(?<token>Meter|M|m)[ \\t]*:[ \\t]*(?<counter>[0-9]{1,2})\/(?<denominator>[0-9]{1,2})[ \\t]*(?=,|\\]|$|\\n)', 'xig' ),
     TEMPO:  XRegExp( '(?<token>Tempo|T|t)[ \\t]*:[ \\t]*(?<value>[0-9]{1,3})[ \\t]*(?=,|\\]|$|\\n)', 'nxig' ),
     USE:    {
@@ -38,19 +39,16 @@ const LR: LexerRules = {
          cb: (e: any) => {
             try {
                 e.type  = 'USE'
-                e.only = e[e.length-1]
-                if ( !e.only ) e.only = ''
-                else e.only = e.only.replace(',','').trim()     
-                e.value = e[e.length-2].trim() 
+                e.value = e.value.trim() 
             }
             catch(err)  { console.log(`USE cb() Error: ${e} ==> ${err}`) }
             return e
         }
     },
-    TEXT_NOTE:  XRegExp('(?<token>Note|N|n)[ \t]*\:[ \t]*(?<value>[\\p{L}0-9\- \\t]+?)[ \\t]*(?=,|\\]|$|\\n)', 'xuig'),
-    TEXT_NOTE2: XRegExp('(?<token>@)(?<who>[\\p{L}0-9\- \\t]+?)[ \t]*(?<colon>[\:])[ \t]*(?<value>[\\p{L}0-9\- \\t]+?)[ \\t]*(?=,|\\]|$|\\n)', 'xuig'),
+    TEXT_NOTE:  XRegExp('(?<token>Note|N|n)[ \t]*\:[ \t]*(?<value>[^\\],\\n]+)[ \\t]*(?=,|\\]|$|\\n)', 'xuig'),
+    TEXT_NOTE2: XRegExp('(?<token>@)(?<who>[\\p{L}0-9\- \\t]+?)[ \t]*(?<colon>[\:])[ \t]*(?<value>[^\\],\\n]+)[ \\t]*(?=,|\\]|$|\\n)', 'xuig'),
     SCALE: { 
-        match: XRegExp( '(?<token>Scale|S|s)[ \\t]*:[ \\t]*(?!$|\\n)', 'xig' ),
+        match:  XRegExp( '(?<token>Scale|S|s)[ \\t]*:', 'xig' ),
         // deno-lint-ignore no-explicit-any
         cb: (e: any) => {
             e.type  = 'SCALE'
@@ -71,7 +69,8 @@ const LR: LexerRules = {
         // deno-lint-ignore no-explicit-any
         cb: (e: any) => {
             e.type  = 'DURATION'
-            e.tie   = e.tie === undefined ? '' : 't'
+            // e.tie   = e.tie === undefined ? '' : 't'
+            console.debug ( `TIE -> e.tie is: '${e.tie}'`)
             return e
         }
     },
@@ -82,7 +81,8 @@ const LR: LexerRules = {
             const tokens = ['w','h','t','q']
             e.value = tokens.indexOf(e.token) + 1
             e.type  = 'DURATION'
-            e.tie   = e.tie === undefined ? '' : 't'
+            console.debug ( `TIE2 -> e.tie is: '${e.tie}`)
+            // e.tie   = e.tie === undefined ? '' : 't'
             return e
         }
     },
@@ -91,6 +91,7 @@ const LR: LexerRules = {
         // deno-lint-ignore no-explicit-any
         cb: (e: any) => {
             e.type  = 'DURATION_ADD'
+            console.debug ( `TIE3 -> e.tie is: '${e.tie}`)
             return e
         }
     },
@@ -109,7 +110,7 @@ const LR: LexerRules = {
     },
     CHORD_TYPE: XRegExp('(?<value>[S|s]us2|[S|s]us4|[D|d]im|[A|a]ug|[M|m]ajor|[M|m]aj|[M|m]inor|[Q|q]uatal|[M|m]in|M|m|Q|q|5)', 'xg'),
     CHORD_EXT:  XRegExp('(?<value>b5|#5|6|7|9|b9|#9|11|#11|b13|13)', 'g'),
-    CHORD_EXT2: XRegExp('(?<value>add2|add9|add11|add#11|add13)', 'g'),
+    CHORD_EXT2: XRegExp('(?<value>add2|add9|sus4|add11|add#11|add13)', 'g'),
     CHORD_BASS: XRegExp('(?<token>\/)(?<value>[A|B|C|D|E|F|G|a|b|c|d|e|f|g][#|b]{0,1})', 'xg'),
     CHORD_INVERSION: XRegExp('(?<token>[\\^|v])(?<value>[0-5])', 'xg'),
     CHORD_MINUS_NOTE:XRegExp('(?<value>\\-1|\\-3|\\-5)', 'xg'),
@@ -120,12 +121,11 @@ const LR: LexerRules = {
     NOTE_UPPER:  XRegExp('(?<value>A|B|C|D|E|F|G)(?<sharpFlat>[#|b]{0,1})', 'xg') ,
     NOTE_BOTH:   XRegExp('(?<value>A|B|C|D|E|F|G)(?<sharpFlat>[#|b]{0,1})', 'xig') ,
     // MAJOR: 
-    MINOR_MOD: XRegExp('(?<value>Harmonic|Harm|Harm|Melodic|Mel|Mel)\\.{0,1}[ \\t]*(?!:)','xig') ,
+    MINOR_MOD: XRegExp('(?<value>Harmonic|Harm|Har|Melodic|Mel)\\.{0,1}[ \\t]*(?!:)','xig') ,
     MINOR:     XRegExp('(?<value>Minor|minor|Min|min|m)[ \\t]*(?![a-z:])', 'xg'),
     MAJOR:     XRegExp('(?<value>Major|Maj|M)[ \\t]*(?![a-z:])', 'xg'),
-    MODE:   XRegExp('(?<value>Ionian|Ion|Dorian|Dor|Phygian|Phy|Lydian|Lyd|Mixolydian|mixo|mix|Aeolian|Aeo|Locrian|Loc)\\.{0,1}','xig'),
+    MODE:   XRegExp('(?<value>Ionian|Ion|Dorian|Dor|Phygian|Phy|Lydian|Lyd|Mixolydian|mixo|mix|Aeolian|Aeo|Natural|Nat|Locrian|Loc)\\.{0,1}','xig'),
     REPEAT_LAST: XRegExp('(?<token>\/)', 'xg'),
-    // 
 }
 
 export default LR

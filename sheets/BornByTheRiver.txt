@@ -7,19 +7,18 @@ Form:
   - Solo
   - Verse 3
   - Coda
-Key    : G
 Meter  : 4/4
 Tempo  : 86           
  
 Intro: 
-|| Gadd9  Am79 | Cmaj79  Bm7 | Gadd9  Am79 | Cmaj79/D#,8 Cmaj79/D#,4 D7sus4,8 D7sus4,t2 ||
+| Gadd9  Am79 | Cmaj79  Bm7 | Gadd9  Am79 | Cmaj79/D#,8 Cmaj79/D#,4 D7sus4,8 D7sus4,t2 |
 
 Verse 1:
 | Gadd9          Am79 | Cmaj79             Bm7                | 
 _I was born by the _river. _Just like this _river I been
 | Em               Baug/D#    | Fsus2/D            G7         |
 _Moving ever _since.          _Ain’t got no-_one
-| Cmaj79          Cm6                     | G/B                    E7-5/Bb  | 
+| Cmaj79,2          Cm6,2                     | G/B,2                    E7/Bb,2  | 
      _to call my _own,                _you know I been _moving since the         
 | Am79        E7/G#   | Gm6       C79   |
    _day I was _born.     _ Ye-e-s      _I'm    a    
@@ -40,11 +39,7 @@ _And come back and _tell me _what you have _learned. I'm a
 
 Chorus 2 [use: Chorus, textAndNotes]:
 
-Solo: 
-| Gadd9 [S:G Major]  Am79 | Cmaj79      Bm7  | 
-| Em   Baug/D# [S:E Harm. Minor]   | Fsus2/D  [S:G Mixo, S: C Major] G7  |
-| Cmaj79      Cm6 [S:C Mel. Minor] | G/B [S:G Major]  E7-5/Bb  [S:F Mel. Minor] | 
-| Am79  [S:A Aeolian]      E7/G# [S:A Harm. Minor]  | Gm6 [S:G Mixo]      C79   |
+Solo  [use: Verse 1, notesOnly]: 
 
 Verse 3  [use: Verse 1, textOnly]: 
 _Went back and _told him I'd _found me a _wife,

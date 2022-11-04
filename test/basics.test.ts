@@ -14,10 +14,10 @@ Deno.test({
         assert( parser.result.size >= 5 )
         const tree = parser.getParseTree().filter( v => v.type !== 'Token')
         tree.forEach( e => {
-            assert( e.type === 'NOTE_UPPER' || e.type === 'NOTE_LOWER')
+            assert( e.type === 'NOTE_UPPER' || e.type === 'NOTE_BOTH')
             assert( ['F', 'G', 'C', 'A'].includes(e.value as string))
         })
-        // console.log(JSON.stringify(tree, undefined, 2))
+       
         assert( tree.length === 4 )
     },
     sanitizeResources: false,
@@ -27,14 +27,13 @@ Deno.test({
 Deno.test({
     name: '02 - Parser can read Minor Scales', 
     fn: () => {  
-        const titleStr = "   F Melodic Minor    G Harm. m  Cm"
-        const parser = new Parser( LR, PR, 'scale')
+        const titleStr = "   F Melodic Minor            "
+        const parser = new Parser( LR, PR, 'scaleMode')
         parser.debug = false
         parser.reset(titleStr)
-        assert( parser.result.size >= 5 )
         const tree = parser.getParseTree().filter( v => v.type !== 'Token')
-        // console.log(JSON.stringify(tree, undefined, 2))
-        assert( tree.length === 8 )
+        assert( parser.result.size >= 5 )
+        assert( tree.length === 3 )
     },
     sanitizeResources: false,
     sanitizeOps: false
@@ -44,12 +43,11 @@ Deno.test({
     name: '03 - Parser can read All Scales', 
     fn: () => {  
         const titleStr = "   F   G Major  C mixo"
-        const parser = new Parser( LR, PR, 'scale')
+        const parser = new Parser( LR, PR, 'scaleMode')
         parser.debug = false
         parser.reset(titleStr)
         assert( parser.result.size >= 5 )
         const tree = parser.getParseTree().filter( v => v.type !== 'Token')
-        // console.log(JSON.stringify(tree, undefined, 2))
         assert( tree.length === 5 )
     },
     sanitizeResources: false,
@@ -142,4 +140,3 @@ Deno.test({
     sanitizeResources: false,
     sanitizeOps: false
 })
-

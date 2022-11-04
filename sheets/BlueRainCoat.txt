@@ -10,7 +10,6 @@ Form:
   - Guitar Solo over Chorus
   - Verse 3 
   - Chorus 3
-Key: Gm
 Meter: 6/8
 Tempo: 78
 
@@ -46,7 +45,7 @@ _night that you planned to go _clear
 | Eb69              | Dm79 | Dm79
 _Did you ever go _clear? _  The
 
-Verse 2 [Use: Verse 1]:
+Verse 2 [Use: Verse 1, textOnly]:
 _last time I saw you, you _looked to much older. Your
 _famous blue raincoat was _torn at the sholder
 _You'd been to the station _ to meet ev'ry train. But you
@@ -54,7 +53,7 @@ _came home alone without _Lili Marlene. So you
 _threaded _ my _woman to a flake           
 _flake _of your  _life
 _And when she came _home she was   
-_no_bodies     _wife  _ and I
+_no-_bodies     _wife  _ and I
 
 Chorus 2:
 | Bbmaj7  | Ebmaj7   Dm7           | F

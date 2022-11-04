@@ -1,4 +1,4 @@
-import { ArgsObject } from "https://deno.land/x/parlexa@v1.0.3/interfaces.ts";
+import { ArgsObject } from "https://deno.land/x/parlexa/interfaces.ts";
 import { ArgsObjectArray, VextabDefaults, VextabHeaderType, VextabRestSheetType, VextabSheetType } from "./interfaces.ts";
 import { WalkEntryExt } from "./fileWalk.ts";
 import { fileWalk } from "./fileWalk.ts";
@@ -25,6 +25,7 @@ export class LeadSheet {
     // Data Structures
     songs  = new Map<string, WalkEntryExt>()
     sheets = new Map<string, string>()
+    // deno-lint-ignore no-explicit-any
     parsed = new Map<string, any>()
     vexed  = new Map<string, VextabSheetType>()
     fileEntries = new Map<string, WalkEntryExt>()
@@ -33,7 +34,10 @@ export class LeadSheet {
     // Parser
     parser = new Parser( LR, PR, 'reset')   
 
-    constructor( public sheetsDir = `${__dirname}/sheets`, public templateDir = `${__dirname}/templates`, public matchPattern = '.txt' , public conf = { 
+    constructor( public sheetsDir = `${__dirname}/sheets`, 
+        // public templateDir = `${__dirname}/templates`,
+        public matchPattern = '.txt' , 
+        public conf = { 
         quaterNoteTicks:  420, 
         currTicks:        0,
         currBarSize:      4 * 420 ,
@@ -45,7 +49,8 @@ export class LeadSheet {
     // Menu Items
     getMenuItems = ( force = false ): ArgsObject[] => {
         if ( this.menuList.length === 0 || force ) {
-            for ( let [ key, entry] of this.fileEntries ) 
+            // deno-lint-ignore no-unused-vars
+            for ( const [ key, entry] of this.fileEntries ) 
                 this.menuList.push({ menuItem: entry.name, menuRef: entry.baseName} as ArgsObject)
         }
         return this.menuList
@@ -106,7 +111,8 @@ export class LeadSheet {
         if ( this.fileEntries.size === 0 || force ) this.loadSheetList()  
         let currEntry: WalkEntryExt | undefined = undefined 
         try {
-            for ( let [key, entry] of this.fileEntries) {
+            // deno-lint-ignore no-unused-vars
+            for ( const [key, entry] of this.fileEntries) {
                 currEntry = entry
                 if ( entry.isFile && ! entry.isDirectory ) {
                     const sheet = Deno.readTextFileSync(entry.path).replace(/\r/mg, '')  
@@ -117,11 +123,22 @@ export class LeadSheet {
         catch( err ) { console.error(`Cannot read file: ${currEntry} - ${err}`) }
     }
 
-    parseSheet( sheetName: string ): boolean {
+    loadNamedSheet = (sheetName: string , fileExt = '.txt') => {
+        const base = path.basename(this.sheetsDir)
+        const filePath = path.normalize(`${__dirname}/${base}/${sheetName}${fileExt}`)
+        try {
+                const sheet = Deno.readTextFileSync(filePath).replace(/\r/mg, '')  
+                this.sheets.set(sheetName, _.cloneDeep(sheet))
+        }
+        catch( err ) { console.error(`Cannot read file: ${filePath} - ${err}`) }
+    }
+
+    parseSheet( sheetName: string, forceRead = false ): boolean {
         let ret = false
         try {
             this.parser = new Parser( LR, PR, 'reset')  
             this.parser.debug = this.debug
+            if ( forceRead ) this.loadNamedSheet(sheetName)
             this.parser.reset(this.sheets.get(sheetName)!)
             const tree = this.parser.getParseTree()
             align(tree) 
@@ -147,7 +164,7 @@ export class LeadSheet {
     renderVextab(sheetName: string, force = false) {
         if ( ! this.vexed.has(sheetName) || force ) {
             if ( ! this.parsed.has(sheetName) ) {
-                this.parseSheet(sheetName)
+                this.parseSheet(sheetName, force)
             }
             const vextab = new Vextab( this.parsed.get(sheetName), true )
             vextab.render()

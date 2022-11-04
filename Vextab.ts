@@ -1,4 +1,5 @@
 import { assert } from "https://deno.land/std/testing/asserts.ts";
+import { consoleSize } from "https://deno.land/std@0.127.0/_deno_unstable.ts";
 import { CHAR_NO_BREAK_SPACE } from "https://deno.land/std@0.131.0/path/_constants.ts";
 import { replace } from "https://deno.land/x/xregexp/types/index.d.ts";
 import { VextabHeaderType, VextabDefaults, VextabSectionType, VextabSheetType, ChordType, VextabSectionChordType, ChordsAndDurationsType,  RenderSectionType } from "./interfaces.ts"
@@ -7,7 +8,7 @@ import { _ } from './lodash.ts';
 import objStringify from "./objStringify.js";
 
 export class Vextab {
-    private _debug = true;
+    private _debug = false;
     currChordsAndDurations: ChordsAndDurationsType | undefined
     public get debug() {
         return this._debug;
@@ -58,10 +59,10 @@ export class Vextab {
     }
 
     getSheet(): Required<VextabSheetType>  {
-        if ( this.debug ) {
+        // if ( this.debug ) {
             // Object.entries(this.sheet.sections).forEach( (key, value) => console.debug(`FOUND: ${key}: ${value}`))
-            console.debug(`this.sheet: ${objStringify(this.sheet, undefined, 2)}`)
-        }
+            // console.debug(`this.sheet: ${objStringify(this.sheet, undefined, 2)}`)
+        // }
         return this.sheet as Required<VextabSheetType>
     }
 
@@ -106,7 +107,7 @@ export class Vextab {
             }
         }
         catch(err) {
-            console.log(`lookAhead: ${err}`)
+            console.error(`lookAhead: ${err}`)
         }
         return res
         }
@@ -159,7 +160,7 @@ export class Vextab {
     pushNotes = ( barNotes: string[] = [], proChords: ChordType[] = [] ): ChordsAndDurationsType | undefined => {
         let ret: ChordsAndDurationsType | undefined
         if ( barNotes.length > 0 ) {
-            if ( this.debug ) console.debug(`${this.currSection}: notes ${barNotes.join(' ')} `)
+            if ( this.debug ) console.debug(`notes ${barNotes.join(' ')} `)
             this.sheet.sections.get(this.currSection)!.push('notes ' + barNotes.join(' '))
             const currChords =  this.sheet.chords.get(this.currSection)!
             this.currChordPtr = (this.sheet.chords.get( this.currSection) ?? []).length
@@ -205,8 +206,8 @@ export class Vextab {
         try {
             const notesLines = this.sheet.sections.get(sectionSource)?.filter( ln => ln.startsWith('notes ') )!
             const notesLine = notesLines[lineIdx]
-            console.log(`PUSH ${sectionSource}[${lineIdx}] ==> ${sectionTarget}: ${notesLine}`);
-            console.log('---------------------------------')
+            if ( this.debug ) console.debug(`PUSH ${sectionSource}[${lineIdx}] ==> ${sectionTarget}: ${notesLine}`);
+            if ( this.debug ) console.debug('---------------------------------')
             // TODO: Remove this check later 
             if ( ! this.sheet.sections.has(sectionTarget) ) this.sheet.sections.set(sectionTarget, [])
             this.sheet.sections.get(sectionTarget)!.push(notesLine)
@@ -242,7 +243,7 @@ export class Vextab {
                 if ( ! this.sheet.sections.has(this.currSection) ) this.sheet.sections.set(this.currSection, [])
                 if ( ! this.sheet.sectionsCP.has(this.currSection) ) this.sheet.sectionsCP.set(this.currSection, [])
                 
-                if ( this.debug ) console.debug(`${this.currSection}: text ${textNotes.join(' ')} `)
+                if ( this.debug ) console.debug(`text ${textNotes.join(' ')} `)
                 
                 this.sheet.sections.get(this.currSection)!.push('text ' + textNotes.join(' '))
                 //
@@ -273,7 +274,7 @@ export class Vextab {
                     }
                 }
                 else {
-                    console.log(`ChordPro CHORD: ${objStringify(chords, undefined,2)}`);
+                    if ( this.debug ) console.debug(`ChordPro CHORD: ${objStringify(chords, undefined,2)}`);
                     if ( chords.length > textParts.length + offset ) {
                         for( let i = textParts.length + offset; i < chords.length; i++) {
                             chordPro += ` [${chords[i].chord}]`
@@ -286,14 +287,15 @@ export class Vextab {
             }
         }
         catch(err) {
-            console.log(err)
+            console.error(err)
         }
         return ret
     }
 
     finalizeSection = ( sectionName: string, sectionHasContent: boolean) => {
         assert ( this.sheet.sections.has(sectionName), `finalizeSection() cannot find section: ${sectionName}`)
-        /* TODO: Fix this
+        
+        /* TODO: fix this 
         if ( ! sectionHasContent ) {
             if (  this.currUseSection !== '' ) {
                 this.sheet.sections.set(sectionName,   _.clone(this.sheet.sections.get(this.currUseSection)!) )
@@ -303,9 +305,9 @@ export class Vextab {
             else {
                 throw Error(`finalizeSection() Error: no content in section: ${sectionName} and no USE of other section`)
             }
-            this.currUseSection = ''
         }
         */ 
+
         if ( this.sheet.sectionsCP.get( sectionName )!.length === 0 ) {
             let  noteLines: string[] = []
             noteLines = this.sheet.sections.get(sectionName)!.filter( ln => ln.startsWith('notes ') )
@@ -328,23 +330,6 @@ export class Vextab {
         }
     }
 
-    /*
-    pushChordPro = ( sectionName: string): void => {
-        // Special handling for sectionCP when there is no text in the section 
-        if ( sectionName !== '' ) {
-            if ( ! this.sheet.sectionsCP.has(sectionName) )  this.sheet.sectionsCP.set(sectionName, [])
-            if ( this.sheet.sectionsCP.get(sectionName)!.length === 0 ) {
-                let chordPro = '';
-                const chords = (this.sheet.chords.get(sectionName) ?? []).splice(0,this.currChordPtr);
-                chords.forEach( val => { chordPro += ` [${val.chord}]` })
-                if ( chordPro !== '' ) {
-                    this.sheet.sectionsCP.get(sectionName)!.push(chordPro)
-                }
-            }
-        }
-    }
-    */
-    
     render = () => {
         const handled = new Map<string, boolean>()
          // deno-lint-ignore no-explicit-any
@@ -362,8 +347,9 @@ export class Vextab {
             this.cmds.forEach( (e, i)  => {
                 if ( ! handled.has(e.id) ) {
                     currElem = e
-                    switch ( e.type ) {
-                        case 'NL':      
+                    // if ( this.debug) console.debug(`Vextab Type: ${JSON.stringify(e)}`)
+                    // switch ( e.type ) {
+                    if ( e.type ===  'NL' ) {     
                             if ( barNotes.length > 0 ) {
                                 assert( sectionActive, `Cannot insert notes outside a section`)
                                 sectionHasContent = true
@@ -374,31 +360,30 @@ export class Vextab {
                                 firstChord = true
                                 handled.set(e.id, true)
                             }
-                            break
-                        case 'TITLE':   
+                        }
+                    else if ( e.type === 'TITLE') {  
                             barsInLastLine = false
                             sectionActive = false
                             this.currChordsAndDurations = undefined
                             this.sheet.header.title = e.value
                             handled.set(e.id, true)
-                            break
-                        case 'AUTHOR':  
+                        }
+                    else if ( e.type === 'AUTHOR' )  {
                             barsInLastLine = false
                             sectionActive = false
                             this.currChordsAndDurations = undefined
                             this.sheet.header.author = e.value
                             handled.set(e.id, true)
-                            break
-                        case 'FORM':    
+                        }
+                    else if ( e.type === 'FORM') {
                             barsInLastLine = false
                             sectionActive = false
                             this.currChordsAndDurations = undefined
                             this.sheet.header.form =  e.formEntries
                             handled.set(e.id, true)
-                            break
-
-                        case 'SECTION_HEAD': 
-                        case 'SECTION':
+                        }
+                    else if ( e.type === 'SECTION_HEAD' ||  
+                              e.type === 'SECTION') {
                             if ( this.currSection !== '' ) {
                                 this.finalizeSection(this.currSection,sectionHasContent)
                             }
@@ -411,43 +396,50 @@ export class Vextab {
                             sectionActive  = true
                             sectionHasContent = false
                             handled.set(e.id, true)
-                            break
-                        case 'BAR':     {
+                        }
+                    else if ( e.type === 'BAR' ) {
                                 const bar = e.REPEAT_COUNT !== undefined ? '=|:' : '|'
                                 const proBar = e.REPEAT_COUNT !== undefined ? '|:' : '|'
                                 barNotes.push(bar)
                                 proChords.push({ chord: proBar, duration: 0 })
                                 handled.set(e.id, true)  
-                            }                              
-                            break
-                                    
-                        case 'CHORD_NOTE': {
+                        }                                    
+                    else if ( e.type === 'CHORD_NOTE' ) {
                                 const chord = e.fullChord.join('')
+                                assert ( e.tie !== undefined, `Missing 'tie' in ${JSON.stringify(e)}`)
+                                // const barNotesLen = barNotes.length
+                                // console.debug(`---------------------------`)
                                 const comment = ( e.comment !== '' ? ' (' + e.comment + ')' : e.comment).replace(',', ';')
                                 // set the chord position
                                 const encoding = '$' 
                                 let duration = e.duration[0]
                                 if ( firstChord ) {
+                                    // console.debug(`FIRSTCHORD -> :${e.duration[0]}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`)
                                     barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
                                     firstChord = false
                                 }
                                 else if ( chord !== prevChord ) {
+                                    // console.debug(`NOT EQUALS PREV CHORD -> :${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
                                     barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
                                 } 
                                 else {
+                                    // console.debug(`EQUALS PREV CHORD -> :${e.duration[0]}S ${e.tie}B/4`)
                                     barNotes.push(`:${e.duration[0]}S ${e.tie}B/4`)
                                 }
+
+                                // const _barNotes = barNotes.slice(barNotesLen)
+                                // console.debug(`Durations build -> ${_barNotes}`)
                                 // add any tied note lengths
                                 for( let i = 1 ; i < e.duration.length; i++ ) {
                                     duration += e.duration[i]
+                                    console.debug(`ADD Duration ->  :${e.duration[i]}S tB/4`)
                                     barNotes.push(` :${e.duration[i]}S tB/4 `)
                                 }
                                 proChords.push({ chord:chord, duration: duration })
                                 prevChord = chord
                                 handled.set(e.id, true)        
-                            }                                                    
-                            break
-                        case 'REST':    {
+                        }                                                    
+                    else if ( e.type === 'REST' ) {
                                 let duration = e.duration[0]
                                 barNotes.push(`:${e.duration} ${e.tie}##`)
                                 // add any tied note lengths
@@ -456,19 +448,15 @@ export class Vextab {
                                     barNotes.push(` :${e.duration[i]}S t## `)
                                 }
                                 proChords.push({chord: 'R', duration: duration })
-                                handled.set(e.id, true)
+                                handled.set(e.id, true) 
+                            }                      
+                    else if ( e.type === 'SCALE' ) {
+                            const mode = e.mode && e.mode.length > 0 ? ` ${e.mode}` : ''
+                            const modifier = e.modifier && e.modifier.length > 0 ? ` ${e.modifier}` : ''
+                            barNotes.push(`$<${e.note}${e.sh_fl ?? ''}${modifier}${mode}>$`) 
+                            handled.set(e.id, true)
                             }
-                            break                
-                            /*
-                        case 'SCALE':   {
-                                        const mode = e.mode && e.mode.length > 0 ? ` ${e.mode}` : ''
-                                        const modifier = e.modifier && e.modifier.length > 0 ? ` ${e.modifier}` : ''
-                                        barNotes.push(`$<${e.note}${e.sh_fl ?? ''}${modifier}${mode}>$`) 
-                                        handled.set(e.id, true)
-                                        break
-                                        }
-                                    */
-                        case 'USE': 
+                    else if ( e.type === 'USE' ) {
                             // Check if we should use another section
                             if ( typeof e.value === 'string' ) {
                                 assert ( this.sheet.sections.has( e.value) , `USE ${e.value} does not refer to a known Section`)
@@ -497,11 +485,10 @@ export class Vextab {
                                     }
                                 }
                             }
-                            break
-                        case 'TEXT': {
+                        }
+                    else if ( e.type === 'TEXT') {
                             const textParts = []
                             assert( sectionActive, `Cannot insert text aligned with chords outside a section`)
-                            if ( this.debug ) console.log(`TEXT: ${e.textParts.join(' ')}`)
 
                             // Handle setup for the USE of another section
                             if ( this.currUseSection !== '' ) {    
@@ -517,7 +504,7 @@ export class Vextab {
                                     const duration = `:${e.textDurations[i][0] === 1 ? 'w' : e.textDurations[i][0]}`
                                     const text     = e.textParts[i].trim().replace(/,/g, '')
                                     if ( i == 0 ) {
-                                        textParts.push(duration + ',.10,' + text) 
+                                        textParts.push(duration + ',.10,' + text)  
                                         // prevDuration = duration
                                     }
                                     else {
@@ -533,15 +520,13 @@ export class Vextab {
                                 }
                             } catch( err) {`Render().durations Error: at ${objStringify(e.textDurations)} \n ${err}` }                                   
                             this.pushText( textParts, e.textParts )
-                            handled.set(e.id, true)                                                            
+                            handled.set(e.id, true)                                                           
                         }
-                        break
                     }
-                }
             })
         }
         catch(err) {
-            console.log(`Render() Error: at ${JSON.stringify(currElem)} - ${err}`)
+            console.error(`Render() Error: at ${JSON.stringify(currElem)} - ${err}`)
         }
         if ( barNotes.length > 0 ) {
             this.pushNotes(barNotes, proChords) 

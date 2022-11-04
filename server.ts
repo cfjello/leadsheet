@@ -10,9 +10,9 @@ const __dirname = path.dirname(import.meta.url);
 
 // Initialize main page
 const LS = new LeadSheet()
+// LS.debug = true
 LS.loadAllSheets()
-LS.parseAllSheets()
-// LS.renderVextab('Angie')
+// LS.parseAllSheets()
 
 
 const app = opine();
@@ -44,7 +44,7 @@ songRouter.get("/sheet/:name", (req, res) => {
   else { // We have a song
       console.log(`Server to send ${req.params.name} sheet data`)
       const data = LS.getRestSheet(req.params.name)
-      Deno.writeTextFile('./log.txt',`${JSON.stringify(data, undefined, 2)}`, { append: true} )
+      // Deno.writeTextFile('./log.txt',`${JSON.stringify(data, undefined, 2)}`, { append: false} )
       res.setStatus(200).json({
         success: "true",
         data: data,

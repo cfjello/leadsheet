@@ -1,12 +1,10 @@
-import { assert, assertEquals, assertExists } from "https://deno.land/std/testing/asserts.ts";
+import { assert, assertExists } from "https://deno.land/std/testing/asserts.ts";
+import { LeadSheet } from "../LeadSheet.ts"
+import { align } from "../align.ts"
 import { angie } from "./angieData.ts"
 import { Parser } from "https://deno.land/x/parlexa/mod.ts"
 import  LR  from "../rules/lexerRules.ts"
 import { PR } from "../rules/parserRules.ts"
-import LeadSheet from "../LeadSheet.ts";
-import { Templating } from "../Templating.ts";
-import Vextab from "../Vextab.ts";
-import align from "../align.ts";
 import * as path from "https://deno.land/std/path/mod.ts";
 
 const __dirname = path.dirname( path.fromFileUrl(new URL('./leadsheet', import.meta.url)) )
@@ -14,17 +12,6 @@ const __dirname = path.dirname( path.fromFileUrl(new URL('./leadsheet', import.m
 // deno-lint-ignore no-explicit-any
 export interface PIndexable { [key: string]: any }
 const debug_hook = __dirname
-// const sheet = Deno.readTextFileSync('./sheets/Angie.txt').replace(/\r/mg, '') 
-/*
-let errors = 0
-for(let i = 0; i < angie.length ; i++) {
-    if ( angie.charAt(i) !== sheet.charAt(i) ) {
-        if ( errors++ < 10) console.log(`CHAR[${i}] mismatch: "${angie.charAt(i)}" !== "${sheet.charAt(i)}"`)
-    }
-}
-// const decoder = new TextDecoder('utf-8');  <Keys<ParserTokens, LexerRules>>
-// const angie = decoder.decode(Deno.readFileSync('./Angie.txt'))
-*/
 
 Deno.test({
     name: '01 - Parser is working on .ts Angie file', 
@@ -34,11 +21,12 @@ Deno.test({
         parser.reset(angie)
         assert(parser.result.size > 0 )
         const tree = parser.getParseTree()
-        assert(tree.length >  1000 )
+        assert(tree.length >  800 )
     },
     sanitizeResources: false,
     sanitizeOps: false
 })
+
 
 Deno.test({
     name: '02 - Parser is working on .txt Angie file', 
@@ -49,7 +37,7 @@ Deno.test({
         parser.reset(sheet.toString())
         assert(parser.result.size > 0 )
         const tree = parser.getParseTree()
-        assert(tree.length > 1000 )
+        assert(tree.length > 800 )
     },
     sanitizeResources: false,
     sanitizeOps: false
@@ -88,11 +76,10 @@ Deno.test({
     sanitizeOps: false
 })
 
-
 Deno.test({
     name: '05 - Leadsheet can read the parseTree', 
     fn: () => {  
-        const LS = new LeadSheet( "../sheets", "../templates", '.txt')
+        const LS = new LeadSheet( "../sheets", '.txt')
         LS.debug = false
         LS.loadAllSheets()
         LS.parseAllSheets()
@@ -108,7 +95,7 @@ Deno.test({
 Deno.test({
     name: '06 - Leadsheet is reading the sheets sheet Structure', 
     fn: () => {  
-        const LS = new LeadSheet( `${__dirname}\\..\\sheets`, "../templates", '.txt')
+        const LS = new LeadSheet( `${__dirname}\\..\\sheets`, '.txt')
         LS.debug = false
         LS.loadAllSheets()
         LS.parseAllSheets()

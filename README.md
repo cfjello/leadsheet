@@ -1,4 +1,4 @@
-# Leadsheet - initial version, DO NOT USE
+# Leadsheet - Prototype/Proff of Concept
 
 This package reads a text leadsheets and produces a Vextab representation on a webpage. The text representation that has the format:
 ```

@@ -7,7 +7,6 @@ Form:
   - Intro
   - Verse 3
   - Coda
-Key    : A Minor
 Meter  : 4/4
 Tempo  : 120                
 
@@ -53,5 +52,5 @@ _Angie, I still love you _baby _Ev'ry where I look I see your _eyes
 _There ain't a woman that comes _close to you. So
    |C        F               |G
 _come on _baby dry your _eyes. But         
-|Am     |E7      |  Gsus4 G Fsus4 F | Csus4 C
+|Am     |E7      |  Gsus4 G Fsus4 F        | Csus4 C
 _ Angie, _ Angie, _Ain't _it _good to _be a-_li-_ve

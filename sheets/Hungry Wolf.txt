@@ -10,7 +10,6 @@ Form:
     - Verse 5 Mod.
     - Verse 6
     - Verse 7 Mod.
-Key: G 
 Tempo: 113 
 Meter: 4/4
 
@@ -20,12 +19,12 @@ Intro:
 Verse 1:
 | Gm7             D7sus4/A   | Bb6                  D7sus4/A        
 _I'm that hungry _wolf in the _ground is where I _dug my 
-| Gm7          D7sus4/A   |   Bb6          G7/B
+| Gm7          D7sus4/A   |   Bb6          D7sus4/A
 _cave
 | Cm7   Bb6/D   | Eb79                          D7sus4
 _I'm that hungry _wolf and the _ground is where I _dug my
 | Gm7       D7sus4/A   |   Bb6          D7sus4/A   
-_cave. _ _ _ I leave 
+_cave. _ _ _I leave 
 | Ebmaj7                                  | Am7b5             D7#5b9           
 _prowling just at dark and get home in the _morning just a    _while ‘fore 
 | Gm              D7sus4/A     | Bb6                  D7sus4/A        
