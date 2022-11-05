@@ -39,7 +39,11 @@ _And come back and _tell me _what you have _learned. I'm a
 
 Chorus 2 [use: Chorus, textAndNotes]:
 
-Solo  [use: Verse 1, notesOnly]: 
+Solo: 
+| Gadd9 [S:G Major]  Am79 | Cmaj79      Bm7  | 
+| Em   Baug/D# [S:E Harm. Minor]   | Fsus2/D  [S:G Mixo, S: C Major] G7  |
+| Cmaj79      Cm6 [S:C Mel. Minor] | G/B [S:G Major]  E7-5/Bb  [S:F Mel. Minor] | 
+| Am79  [S:A Aeolian]      E7/G# [S:A Harm. Minor]  | Gm6 [S:G Mixo]      C79   |
 
 Verse 3  [use: Verse 1, textOnly]: 
 _Went back and _told him I'd _found me a _wife,

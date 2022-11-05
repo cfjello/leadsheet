@@ -59,10 +59,6 @@ export class Vextab {
     }
 
     getSheet(): Required<VextabSheetType>  {
-        // if ( this.debug ) {
-            // Object.entries(this.sheet.sections).forEach( (key, value) => console.debug(`FOUND: ${key}: ${value}`))
-            // console.debug(`this.sheet: ${objStringify(this.sheet, undefined, 2)}`)
-        // }
         return this.sheet as Required<VextabSheetType>
     }
 
@@ -265,7 +261,6 @@ export class Vextab {
                 })
 
                 if ( this.currChordsAndDurations !== undefined ) {
-                    // console.log(`ChordPro currChordsAndDurations: ${objStringify(this.currChordsAndDurations, undefined,2)}`);
                     const len = this.currChordsAndDurations.chords.length
                     if ( chords.length > textParts.length + offset ) {
                         for( let i = textParts.length + offset; i < len; i++) {
@@ -295,7 +290,7 @@ export class Vextab {
     finalizeSection = ( sectionName: string, sectionHasContent: boolean) => {
         assert ( this.sheet.sections.has(sectionName), `finalizeSection() cannot find section: ${sectionName}`)
         
-        /* TODO: fix this 
+        /* TODO: Maybe add this 
         if ( ! sectionHasContent ) {
             if (  this.currUseSection !== '' ) {
                 this.sheet.sections.set(sectionName,   _.clone(this.sheet.sections.get(this.currUseSection)!) )
@@ -347,8 +342,6 @@ export class Vextab {
             this.cmds.forEach( (e, i)  => {
                 if ( ! handled.has(e.id) ) {
                     currElem = e
-                    // if ( this.debug) console.debug(`Vextab Type: ${JSON.stringify(e)}`)
-                    // switch ( e.type ) {
                     if ( e.type ===  'NL' ) {     
                             if ( barNotes.length > 0 ) {
                                 assert( sectionActive, `Cannot insert notes outside a section`)
@@ -407,32 +400,23 @@ export class Vextab {
                     else if ( e.type === 'CHORD_NOTE' ) {
                                 const chord = e.fullChord.join('')
                                 assert ( e.tie !== undefined, `Missing 'tie' in ${JSON.stringify(e)}`)
-                                // const barNotesLen = barNotes.length
-                                // console.debug(`---------------------------`)
                                 const comment = ( e.comment !== '' ? ' (' + e.comment + ')' : e.comment).replace(',', ';')
                                 // set the chord position
                                 const encoding = '$' 
                                 let duration = e.duration[0]
                                 if ( firstChord ) {
-                                    // console.debug(`FIRSTCHORD -> :${e.duration[0]}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`)
                                     barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
                                     firstChord = false
                                 }
                                 else if ( chord !== prevChord ) {
-                                    // console.debug(`NOT EQUALS PREV CHORD -> :${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
                                     barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
                                 } 
                                 else {
-                                    // console.debug(`EQUALS PREV CHORD -> :${e.duration[0]}S ${e.tie}B/4`)
                                     barNotes.push(`:${e.duration[0]}S ${e.tie}B/4`)
                                 }
-
-                                // const _barNotes = barNotes.slice(barNotesLen)
-                                // console.debug(`Durations build -> ${_barNotes}`)
                                 // add any tied note lengths
                                 for( let i = 1 ; i < e.duration.length; i++ ) {
                                     duration += e.duration[i]
-                                    console.debug(`ADD Duration ->  :${e.duration[i]}S tB/4`)
                                     barNotes.push(` :${e.duration[i]}S tB/4 `)
                                 }
                                 proChords.push({ chord:chord, duration: duration })
@@ -450,10 +434,21 @@ export class Vextab {
                                 proChords.push({chord: 'R', duration: duration })
                                 handled.set(e.id, true) 
                             }                      
-                    else if ( e.type === 'SCALE' ) {
-                            const mode = e.mode && e.mode.length > 0 ? ` ${e.mode}` : ''
-                            const modifier = e.modifier && e.modifier.length > 0 ? ` ${e.modifier}` : ''
-                            barNotes.push(`$<${e.note}${e.sh_fl ?? ''}${modifier}${mode}>$`) 
+                    else if ( e.value === 'scale' ) {
+                            const len = barNotes.length
+                            if ( len === 0 ) {
+                                barNotes.push(`[${e.fullScale.join(' ')}]`) 
+                            }
+                            else {
+                                const prevEntry = barNotes[len-1]
+                                // If previous entry is a chord entry, merge
+                                if ( prevEntry.endsWith('$') ) {
+                                    barNotes[len-1] = prevEntry.substring(0, prevEntry.length -1) + ` [${e.fullScale.join(' ')}]$`
+                                }
+                                else {
+                                    barNotes.push(`[${e.fullScale.join(' ')}]`)
+                                }
+                            }
                             handled.set(e.id, true)
                             }
                     else if ( e.type === 'USE' ) {
@@ -469,7 +464,6 @@ export class Vextab {
                                     this.currLineCounter = -1
                                     this.sheet.chords.set( this.currSection, this.sheet.chords.get(this.currUseSection)! )
                                     if (this.debug ) console.debug(`Render for ${this.currSection} is set to: ${e.only}`) 
-                                    //    this.sheet.chords.get( this.currSection)?.forEach(el => console.log(`   ${objStringify(el)}`) )
                                     if ( e.only === 'notesOnly' ) {
                                         this.pushNotesOnly(this.currSection, this.currUseSection)
                                         this.sheet.render.set(this.currSection, 'notesOnly')

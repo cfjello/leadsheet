@@ -87,6 +87,8 @@ export class LeadSheet {
 
     getRestSheet(sheetName: string): VextabRestSheetType {
         if ( ! this.vexed.has(sheetName) ) this.renderVextab( sheetName )
+        const parseTree = this.parsed.get(sheetName)
+        Deno.writeTextFile('./pars.txt',`${JSON.stringify(parseTree, undefined, 2)}`, { append: false} )
         return  { 
             header:     _.clone(this.vexed.get(sheetName)!.header), 
             sections:   Array.from(this.vexed.get(sheetName)!.sections, ([name, value]) => ({ name, value })), 
@@ -166,7 +168,7 @@ export class LeadSheet {
             if ( ! this.parsed.has(sheetName) ) {
                 this.parseSheet(sheetName, force)
             }
-            const vextab = new Vextab( this.parsed.get(sheetName), true )
+            const vextab = new Vextab( this.parsed.get(sheetName) )
             vextab.render()
             this.vexed.set( sheetName, _.cloneDeep(vextab.getSheet()) ) 
         }

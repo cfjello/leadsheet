@@ -52,6 +52,7 @@ const LR: LexerRules = {
         // deno-lint-ignore no-explicit-any
         cb: (e: any) => {
             e.type  = 'SCALE'
+            e.value = 'S:'
             return e
         }
     },
@@ -69,8 +70,6 @@ const LR: LexerRules = {
         // deno-lint-ignore no-explicit-any
         cb: (e: any) => {
             e.type  = 'DURATION'
-            // e.tie   = e.tie === undefined ? '' : 't'
-            console.debug ( `TIE -> e.tie is: '${e.tie}'`)
             return e
         }
     },
@@ -81,8 +80,6 @@ const LR: LexerRules = {
             const tokens = ['w','h','t','q']
             e.value = tokens.indexOf(e.token) + 1
             e.type  = 'DURATION'
-            console.debug ( `TIE2 -> e.tie is: '${e.tie}`)
-            // e.tie   = e.tie === undefined ? '' : 't'
             return e
         }
     },
@@ -91,7 +88,6 @@ const LR: LexerRules = {
         // deno-lint-ignore no-explicit-any
         cb: (e: any) => {
             e.type  = 'DURATION_ADD'
-            console.debug ( `TIE3 -> e.tie is: '${e.tie}`)
             return e
         }
     },
@@ -113,7 +109,14 @@ const LR: LexerRules = {
     CHORD_EXT2: XRegExp('(?<value>add2|add9|sus4|add11|add#11|add13)', 'g'),
     CHORD_BASS: XRegExp('(?<token>\/)(?<value>[A|B|C|D|E|F|G|a|b|c|d|e|f|g][#|b]{0,1})', 'xg'),
     CHORD_INVERSION: XRegExp('(?<token>[\\^|v])(?<value>[0-5])', 'xg'),
-    CHORD_MINUS_NOTE:XRegExp('(?<value>\\-1|\\-3|\\-5)', 'xg'),
+    CHORD_MINUS_NOTE:{
+        match: XRegExp('(?<value>\\-1|\\-3|\\-5|no3,no5,no1)', 'xg'),
+        // deno-lint-ignore no-explicit-any
+        cb: (e: any ) => {
+            e.value = e.value.replace('-','no')
+            return e
+        }
+    },
     CHORD_COMMENT: XRegExp('(?<lp>\\[)[ \\t]*(?<value>[^\\]]*)[ \\t]*(?<rp>\\])', 'xg'),
     REPEAT_PREV: XRegExp('(?<token>%)', 'xg'),
     // DRUM_KIT:           /bd|sn|ki|hh|oh|ht|mt|lt|cy|cr|cow|tam/,

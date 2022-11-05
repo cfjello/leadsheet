@@ -29,11 +29,9 @@ export const align = (cmds: any[]) => {
         const cmd   = cmds[startIdx]
         const ident = fromParent ? cmd.ident.substring( 0, cmd.ident.lastIndexOf('.') ) : cmd.ident
 
-        // console.debug(`SubTree ident: ${cmd.ident} ==> ${ident}`)
         for ( let i = startIdx + 1; 
             cmds[i] && cmds[i].ident.substring(0,ident.length) === ident; 
             i++ ) {
-                // console.debug(`check: ${cmds[i]}`)
                 if ( backStops.includes(cmds[i].type) ) 
                     break
                 else
@@ -43,8 +41,8 @@ export const align = (cmds: any[]) => {
     }
 
     const getDefaultDuration = () => {
-        const divisor  = Math.round( barUnitsLeft / currChordsLeft)
-        const duration = Math.round( currBarUnits / divisor )  
+        const divisor  = Math.trunc( barUnitsLeft / currChordsLeft)
+        const duration = Math.trunc( currBarUnits / divisor )  
         return duration
     }
 
@@ -71,7 +69,6 @@ export const align = (cmds: any[]) => {
         }
         const tie = vArr && vArr.length > 0 ? vArr[0].tie : ''
         if ( duration.length === 0 ) duration.push(getDefaultDuration())
-        console.debug(`getDuration() -> duration: ${duration}, tie: ${tie}`)
         return { duration: duration, tie: tie }
     }
 
@@ -123,80 +120,75 @@ export const align = (cmds: any[]) => {
             if ( cmds[i].type === 'CHORD_NOTE' || cmds[i].type === 'REST' || cmds[i].type === 'CHORD_REPEAT') {
                 chordCount++
             }
-        }
-        // currDuration = chordCount === 0 ? 1 : chordCount 
+        } 
         return chordCount
     }
 
     cmds.forEach( (e, i)  => {
-        switch ( e.type ) { /* falls through */
-            case 'BAR' : {
-                barCount++
-                currBarUnits = currMeter.counter * currMeter.denominator
-                barUnitsLeft = currBarUnits
-                currChordsLeft = getChordsCountInBar(i)
-                break
-                }
-            case 'NL' : {
-                currBarUnits = currMeter.counter * currMeter.denominator
-                barUnitsLeft = currBarUnits
-                if ( barLines.length > barLineIdx && barLines[barLineIdx].length > 0  ) { 
-                    barLineIdx++ 
-                    barLines[barLineIdx] = []
-                }
-                break
-                }
-            case 'METER': {
+        if (e.type ===  'BAR') {
+            barCount++
+            currBarUnits = currMeter.counter * currMeter.denominator
+            barUnitsLeft = currBarUnits
+            currChordsLeft = getChordsCountInBar(i)
+            }
+        else if (e.type === 'NL') {
+            currBarUnits = currMeter.counter * currMeter.denominator
+            barUnitsLeft = currBarUnits
+            if ( barLines.length > barLineIdx && barLines[barLineIdx].length > 0  ) { 
+                barLineIdx++ 
+                barLines[barLineIdx] = []
+            }
+            }
+        else if (e.type === 'METER') {
                 currMeter = { counter: e.counter, denominator: e.denominator }
                 currBarUnits = currMeter.counter * currMeter.denominator
-                break
                 }
-            case 'TEMPO' : {
-                if ( e.value < 20 || e.value > 460 ) throw Error(`Tempo: ${e.value } is out of range [20-460]`) 
-                currTempo = e.value
-                tickPerMin      = currTempo * quaterNoteTicks
-                milliSecPerTick = Math.round( 60000 / tickPerMin )
-                break
-                }   
-            case 'FORM': 
-                e.formEntries = getFormEntries(i)
-                break
-            case 'REST':
-            case 'CHORD_NOTE': {
-                // Build chord duration
-                const durObj = getDuration(i) 
-                e.duration = _.cloneDeep(durObj.duration)
-                e.tie = durObj.tie
-                barLines[barLineIdx].push(e.duration[0])
-                if ( barGrid[barLineIdx] === undefined ) barGrid[barLineIdx] = []
-                barGrid[barLineIdx].push(e.duration)
-                e.ticks = 0
-                for ( const d of barGrid[barLineIdx] ) {
-                    e.ticks += Math.round( ( 4 / d ) * quaterNoteTicks )
-                }
-                e.realTime = milliSecPerTick * e.ticks
-                barUnitsLeft -=  ( currBarUnits / e.duration )
-                currChordsLeft--
-                // Get the full chord 
-                e.fullChord = _.clone(getFullChord(e, i))
-                e.comment = getComment(i)
-                break
-                }
-            case 'TEXT': {
-                // Multiple textparts
-                const textParts = e.value.replace(/_[ \t]*/g, '_').replace(/[ \t]+/g, ' ').split('_') // .slice(1)
-                const idx = barLineIdx - 1
-                e.textParts     = _.clone(textParts)
-                e.textDurations = barGrid[idx] ? _.clone(barGrid[idx]): []  
-                break   
-                }
-            case 'SCALE': {
-                e.children.forEach( (c: { value: string }) => {
-                    console.debug(c.value)
-                })
-                break 
+        else if (e.type === 'TEMPO') {
+            if ( e.value < 20 || e.value > 460 ) throw Error(`Tempo: ${e.value } is out of range [20-460]`) 
+            currTempo = e.value
+            tickPerMin      = currTempo * quaterNoteTicks
+            milliSecPerTick = Math.round( 60000 / tickPerMin )
+            }   
+        else if (e.type === 'FORM') { 
+            e.formEntries = getFormEntries(i)
             }
+        else if (e.type === 'REST' ||
+                 e.type === 'CHORD_NOTE') {
+            // Build chord duration
+            const durObj = getDuration(i) 
+            e.duration = _.cloneDeep(durObj.duration)
+            e.tie = durObj.tie
+            barLines[barLineIdx].push(e.duration[0])
+            if ( barGrid[barLineIdx] === undefined ) barGrid[barLineIdx] = []
+            barGrid[barLineIdx].push(e.duration)
+            e.ticks = 0
+            for ( const d of barGrid[barLineIdx] ) {
+                e.ticks += Math.round( ( 4 / d ) * quaterNoteTicks )
+            }
+            e.realTime = milliSecPerTick * e.ticks
+            barUnitsLeft -=  ( currBarUnits / e.duration )
+            currChordsLeft--
+            // Get the full chord 
+            e.fullChord = _.clone(getFullChord(e, i))
+            e.comment = getComment(i)
+            }
+        else if (e.type === 'TEXT') {
+            // Multiple textparts
+            const textParts = e.value.replace(/_[ \t]*/g, '_').replace(/[ \t]+/g, ' ').split('_') // .slice(1)
+            const idx = barLineIdx - 1
+            e.textParts     = _.clone(textParts)
+            e.textDurations = barGrid[idx] ? _.clone(barGrid[idx]): []  
+            }
+        else if (e.value === 'scale' ) {
+            const fullScale = [] as string[]
+            // Get the subtree terminal symbols
+            const subTree = getSubTree(i).filter( (ent) => { return (! ['Token', 'COMMENT'].includes(ent.type) ) } )
+            subTree.forEach( c => {
+                fullScale.push(c.type === 'NOTE_BOTH' ? c.value + c.sharpFlat: c.value )
+                
+            })
+            cmds[i].fullScale = _.clone(fullScale)
         }
-    })
+        })
 }
 export default align
