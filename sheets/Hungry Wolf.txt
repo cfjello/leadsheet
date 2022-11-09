@@ -1,5 +1,6 @@
 Title: Hungry Wolf
 Author: J. T. Funny Paper Smith 
+Key: Gm
 Form: 
     - Intro
     - Verse 1
@@ -50,9 +51,9 @@ _end _ _ _ I can
 
 Verse 4 [use: Verse 2 Mod., textOnly]:
 _howl like a wolf and I can _bark just like a little _dog _I can
+_howl like a wolf and I can _bark just like a little _dog _I can
 _prowl and do _good, cause I _sleeps in a _hollow 
-_log
-_ _ _ _
+_log _ _ _
 
 Solo 1 [use: Verse 1, notesOnly]:
 

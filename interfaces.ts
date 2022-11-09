@@ -51,6 +51,7 @@ export type VextabDefaults = {
 export type VextabHeaderType = { 
   title:    string,
   author:   string,
+  key:      string,
   tempo:    number,
   meter:    { counter: number, denominator: number},
   form:     string[],

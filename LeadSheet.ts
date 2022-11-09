@@ -13,7 +13,7 @@ import Vextab from "./Vextab.ts";
 const __dirname = path.dirname( path.fromFileUrl(new URL('./leadsheet', import.meta.url)) )
 
 export class LeadSheet {   
-   private _debug = false;
+   private _debug = false
     public get debug() {
         return this._debug
     }
@@ -87,8 +87,8 @@ export class LeadSheet {
 
     getRestSheet(sheetName: string): VextabRestSheetType {
         if ( ! this.vexed.has(sheetName) ) this.renderVextab( sheetName )
-        const parseTree = this.parsed.get(sheetName)
-        Deno.writeTextFile('./pars.txt',`${JSON.stringify(parseTree, undefined, 2)}`, { append: false} )
+        // const parseTree = this.parsed.get(sheetName)
+        // Deno.writeTextFile('./pars.txt',`${JSON.stringify(parseTree, undefined, 2)}`, { append: false} )
         return  { 
             header:     _.clone(this.vexed.get(sheetName)!.header), 
             sections:   Array.from(this.vexed.get(sheetName)!.sections, ([name, value]) => ({ name, value })), 

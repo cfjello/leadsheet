@@ -1,4 +1,3 @@
-import string_decoder from 'https://deno.land/std@0.133.0/node/internal_binding/string_decoder.ts'
 import { lodash as _ } from 'https://deno.land/x/deno_ts_lodash/mod.ts'
 
 // deno-lint-ignore no-explicit-any
@@ -9,7 +8,7 @@ export const align = (cmds: any[]) => {
     let currTempo       = 120
     let tickPerMin      = currTempo * quaterNoteTicks
     let milliSecPerTick = Math.round( 60000 / tickPerMin)
-    let currBarUnits    = currMeter.counter * currMeter.denominator 
+    let currBarUnits    = currMeter.counter * currMeter.denominator
     let barUnitsLeft    = currBarUnits
     let barCount        = 0 
  
@@ -42,7 +41,7 @@ export const align = (cmds: any[]) => {
 
     const getDefaultDuration = () => {
         const divisor  = Math.trunc( barUnitsLeft / currChordsLeft)
-        const duration = Math.trunc( currBarUnits / divisor )  
+        const duration = Math.trunc( currBarUnits / divisor ) 
         return duration
     }
 
@@ -121,6 +120,9 @@ export const align = (cmds: any[]) => {
                 chordCount++
             }
         } 
+        if ( chordCount % 2 !== 0 ) {
+            const dummy = ''
+        }
         return chordCount
     }
 
@@ -179,15 +181,27 @@ export const align = (cmds: any[]) => {
             e.textParts     = _.clone(textParts)
             e.textDurations = barGrid[idx] ? _.clone(barGrid[idx]): []  
             }
-        else if (e.value === 'scale' ) {
+        else if (e.type === 'SCALE' ) {
             const fullScale = [] as string[]
             // Get the subtree terminal symbols
-            const subTree = getSubTree(i).filter( (ent) => { return (! ['Token', 'COMMENT'].includes(ent.type) ) } )
-            subTree.forEach( c => {
+            const subTree = getSubTree(i, true)
+            subTree.filter( (ent) => { 
+                if ( ! ['Token', 'COMMENT', 'NL'].includes(ent.type) ) return ent 
+            }).forEach( c => {
                 fullScale.push(c.type === 'NOTE_BOTH' ? c.value + c.sharpFlat: c.value )
-                
             })
             cmds[i].fullScale = _.clone(fullScale)
+        }
+        else if (e.type === 'KEY' ) {
+            const fullKey = [] as string[]
+            // Get the subtree terminal symbols
+            const subTree = getSubTree(i, true)
+            subTree.filter( (ent) => { 
+                if ( ! ['Token', 'COMMENT', 'NL'].includes(ent.type) ) return ent 
+            }).forEach( c => {
+                fullKey.push( c.type === 'NOTE_BOTH' ? c.value + c.sharpFlat: c.value )
+            })
+            cmds[i].fullKey = _.clone(fullKey)
         }
         })
 }

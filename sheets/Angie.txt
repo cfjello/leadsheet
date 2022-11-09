@@ -1,5 +1,6 @@
 Title: Angie
 Author: Rolling Stones
+Key: Am
 Form:  
   - Intro 
   - Verse

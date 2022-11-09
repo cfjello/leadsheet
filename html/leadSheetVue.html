@@ -150,7 +150,7 @@
                     <h5>Title:  <span>{{sheet.header.title}}</span></h5>
                     <h5>Author: <span v-html="sheet.header.author"/></h5>
                     <h5>Key    : <span>{{sheet.header.key}}</span></h5>
-                    <h5>Meter  : <span v-html="sheet.header.meter.counter"/> and <span v-html="sheet.header.meter.denominator"/></h5>
+                    <h5>Meter  : <span>{{sheet.header.meter.counter}}/{{sheet.header.meter.denominator}}</h5>
                     <h5>Tempo  :  <span v-html="sheet.header.tempo"/> </h5>  
                     <h5>Form: <span v-html="sheet.header.form.join(',')"/> </h5>  
                 </div>

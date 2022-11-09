@@ -1,3 +1,4 @@
+import { CHAR_FORWARD_SLASH } from "https://deno.land/std@0.127.0/path/_constants.ts";
 import { Keys, ParserRules } from "https://deno.land/x/parlexa/mod.ts"
 import LR from "./lexerRules.ts";
 
@@ -6,7 +7,7 @@ import LR from "./lexerRules.ts";
 //
 export type ParserTokens = 'reset' | 'header' | 'space' | 'form' |
         'allways' | 'duration' | 'barEntry' | 'chord' | 'common' | 'commonList'| 
-        'inline' | 'note' | 'scale' | 'key' | 'scaleMode' | 'minor' | 'section' | 'sectionExt'
+        'inline' | 'note' | 'scale' | 'key' | 'scaleList' | 'scaleMode' | 'minor' | 'section' | 'sectionExt'
 //
 // ParserRules groups (key tokens below) are typed as the combination of the user defined  
 // ParserTokens (above) and the LexerRules instanse (LR) keys
@@ -44,13 +45,16 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
         expect: [
             [ LR.TITLE,  '0:1' ],
             [ LR.AUTHOR, '0:1' ], 
+            [ LR.METER,  '0:1' ],
+            [ LR.TEMPO,  '0:1' ],
+            [ 'key', '0:1'],
             [ LR.FORM,   '0:1' ]
         ] 
     },
     reset: { 
         multi: '1:m',
         expect: [
-           'header' ,
+           'header',
            'common', 
             'section',
             LR.BAR,
@@ -116,8 +120,8 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             [ LR.CHORD_TYPE, '0:1'],
             LR.CHORD_EXT,
             LR.CHORD_EXT2,
-            [LR.CHORD_BASS, '0:1'],
             LR.CHORD_MINUS_NOTE,
+            [LR.CHORD_BASS, '0:1'],
             [ 'duration', '0:1' ],
             // LR.CHORD_COMMENT,
             [LR.GROOVE_ADJUST, '0:1']
@@ -142,13 +146,22 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             [LR.MINOR, '1:1']
         ]
     },
+    scaleList: {
+        multi: '0:m',
+        expect: [
+            [LR.SLASH, '1:1'],
+            ['scaleMode', '1:1']
+        ]
+
+    },
     scaleMode: {
-        multi: '1:m',
+        multi: '1:1',
         expect: [
             [LR.NOTE_BOTH, '1:1'],
-            [LR.MODE, '0:1', 'xor'],
-            ['minor', '0:1' , 'xor'],
-            [LR.MAJOR]
+            [LR.MODE, '0:1', 'or'],
+            ['minor', '0:1' , 'or'],
+            [LR.MAJOR, '0:1'],
+            ['scaleList', '0:m']
         ]
     },
     scale: {
@@ -158,9 +171,11 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
         ],
     },
     key: {
+        multi: '0:1',
         expect: [
             [LR.KEY, '1:1'],
-            ['scaleMode', '1:1']
+            ['scaleMode', '1:1'],
+            [LR.NL, '1:m']
         ]
     },
 }

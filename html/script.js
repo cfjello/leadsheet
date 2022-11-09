@@ -101,7 +101,7 @@ new Vue({
                         const vex = []
                         section.value.forEach(line => {
                            if ( line.startsWith('notes') ) {
-                                vex.push('options font-size=14 space=15, width=1040') 
+                                vex.push('options font-size=14 space=15, width=1240') 
                                 vex.push(`tabstave notation=true tablature=false time=4/4 clef=percussion`)
                             }
                             vex.push(line)

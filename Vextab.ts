@@ -1,7 +1,4 @@
 import { assert } from "https://deno.land/std/testing/asserts.ts";
-import { consoleSize } from "https://deno.land/std@0.127.0/_deno_unstable.ts";
-import { CHAR_NO_BREAK_SPACE } from "https://deno.land/std@0.131.0/path/_constants.ts";
-import { replace } from "https://deno.land/x/xregexp/types/index.d.ts";
 import { VextabHeaderType, VextabDefaults, VextabSectionType, VextabSheetType, ChordType, VextabSectionChordType, ChordsAndDurationsType,  RenderSectionType } from "./interfaces.ts"
 // import { reserved, Templating } from "./Templating.ts";
 import { _ } from './lodash.ts';
@@ -41,6 +38,7 @@ export class Vextab {
             header: {
                 title:  'Unknown',
                 author: 'Unknown',
+                key:    'C',
                 tempo:  conf.currTempo ?? 120,
                 meter:  conf.currMeter ?? { counter: 4, denominator: 4},
                 form: []
@@ -368,6 +366,18 @@ export class Vextab {
                             this.sheet.header.author = e.value
                             handled.set(e.id, true)
                         }
+                    else if ( e.type === 'KEY' )  {
+                            this.sheet.header.key = e.fullKey.join(' ')
+                            handled.set(e.id, true)
+                        }
+                    else if ( e.type === 'TEMPO' )  {
+                            this.sheet.header.tempo = e.value
+                            handled.set(e.id, true)
+                        }
+                    else if ( e.type === 'METER' )  {
+                            this.sheet.header.meter = { counter: e.counter, denominator: e.denominator }
+                            handled.set(e.id, true)
+                        }
                     else if ( e.type === 'FORM') {
                             barsInLastLine = false
                             sectionActive = false
@@ -434,7 +444,7 @@ export class Vextab {
                                 proChords.push({chord: 'R', duration: duration })
                                 handled.set(e.id, true) 
                             }                      
-                    else if ( e.value === 'scale' ) {
+                    else if ( e.type === 'SCALE' ) {
                             const len = barNotes.length
                             if ( len === 0 ) {
                                 barNotes.push(`[${e.fullScale.join(' ')}]`) 
@@ -447,6 +457,28 @@ export class Vextab {
                                 }
                                 else {
                                     barNotes.push(`[${e.fullScale.join(' ')}]`)
+                                }
+                            }
+                            handled.set(e.id, true)
+                            }
+                    else if ( e.type === 'TEXT_NOTE' ||  e.type === 'TEXT_NOTE2' ) {
+                            const len = barNotes.length
+                            let note = e.value
+                            if ( e.type === 'TEXT_NOTE2' ) {
+                                note = `[${e.token}${e.who}: ${e.value}]`
+                            }
+
+                            if ( len === 0 ) {
+                                barNotes.push(`[${note}]`) 
+                            }
+                            else {
+                                const prevEntry = barNotes[len-1]
+                                // If previous entry is a chord entry, merge
+                                if ( prevEntry.endsWith('$') ) {
+                                    barNotes[len-1] = prevEntry.substring(0, prevEntry.length -1) + ` [${note}]$`
+                                }
+                                else {
+                                    barNotes.push(note)
                                 }
                             }
                             handled.set(e.id, true)

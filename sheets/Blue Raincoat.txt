@@ -63,11 +63,31 @@ _Just one more thin gypsy _ thief when I see Jane's awa-
 | Abmaj7                                     | Am7 
 _ ke.   She 
 | Eb69              | Dm79 | Dm79
-_sends her re- _ gards _ The
+_sends her re- _ gards _
+
+Solo:
+| Gm7 [S:G Aeolian]  | Ebmaj79
+| Cm79           | Dm7
+| Gm7            | Ebmaj79
+| Cm79           | Dm7
+| Gm7 Abmaj79 [S:Ab Major]    | Am7 [S:G Dorian/A Aeolian]                  
+| Gm7 [S:G Aeolian] Abmaj79 [S:Ab Major]    | Fsus4/Db            
+| Cmadd2 [S:Bb Major]        | Dm7 
+| Ebmaj79        | Dm79 |
+
+Verse 3 [Use: Verse 1, textOnly]:
+_What can I tell my  _brother my killer
+_what can I possibly _say. I
+_guess I forgive you. I _ guess that I miss you. I'm
+_glad that you stod In my _way. So                 
+_if you _ ever come _by here be it for           
+_Jane _or for  _me
+_You enemy's _sleeping now   
+_and his _woman is _ free _ Yes, and 
 
 Chorus 3:
-| Bbmaj7   | Ebmaj7   Dm7              | F
-_ Yes, and thanks for, _the _trouble you _took from her eyes, I
+| Bbmaj7   | Ebmaj7   Dm7        | F
+_ thanks for, _the _trouble you _took from her eyes, I
 | F#dim7        | Gm7     | Abmaj79          | Am7   F7
 _thought it was _there for _good, so I never _ tried. _ And
 | Bbmaj7  | Ebmaj7   Dm7           | F
