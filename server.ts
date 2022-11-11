@@ -10,7 +10,7 @@ const __dirname = path.dirname(import.meta.url);
 
 // Initialize main page
 const LS = new LeadSheet()
-// LS.debug = true
+LS.debug = true
 LS.loadAllSheets()
 // LS.parseAllSheets()
 
@@ -29,9 +29,19 @@ app.use((req, res, next) => {
 });
 const songRouter = Router();
 const indexRouter = Router();
+//
+// Serve Main Page
+//
+/*
+songRouter.get("/", (req, res) => {
+  console.log(`Server GOT request for Main Page`)
+    // res.sendFile(path.join(__dirname, '/index.html'));
+    // const html = Deno.readFileSync("./html/leadSheetVue.html")
+    res.setStatus(200).sendFile(path.join(__dirname, './html/leadSheetVue.html'))
+});
+*/
 
-// Add our /cats route to the v1 API router
-// for retrieving a list of all the cats.
+// Serve Song Pages
 songRouter.get("/sheet/:name", (req, res) => {
     console.log(`Server GOT request for Sheet`)
   if ( ! req.params.name ) {  // TODO: check later - || ! LS.menuList.includes(req.params.name)
@@ -52,6 +62,7 @@ songRouter.get("/sheet/:name", (req, res) => {
   }
 });
 
+// Serve Menu Items
 songRouter.get("/menu", (req, res) => {
     console.log(`Server GOT request for MenuItems`)
   if ( ! LS.menuList) {

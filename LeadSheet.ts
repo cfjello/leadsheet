@@ -168,7 +168,7 @@ export class LeadSheet {
             if ( ! this.parsed.has(sheetName) ) {
                 this.parseSheet(sheetName, force)
             }
-            const vextab = new Vextab( this.parsed.get(sheetName) )
+            const vextab = new Vextab( this.parsed.get(sheetName), true )
             vextab.render()
             this.vexed.set( sheetName, _.cloneDeep(vextab.getSheet()) ) 
         }

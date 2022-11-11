@@ -109,11 +109,11 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
         expect: [
             [ 'chord',  '0:1', 'xor' ],
             [ LR.REST, '0:1', 'xor'],
-            [ LR.REPEAT_LAST, '0:1', 'xor'],
+            [ LR.REPEAT_CHORD, '0:1', 'xor'],
+            [ LR.REPEAT_BAR, '0:1', 'xor'],
             [ 'inline', '0:1' ]
         ]
     },
-  
     chord: {
         expect: [
             [ LR.CHORD_NOTE, '1:1' ],

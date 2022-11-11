@@ -105,9 +105,9 @@ const LR: LexerRules = {
             return e
         }
     },
-    CHORD_TYPE: XRegExp('(?<value>[S|s]us2|[S|s]us4|[D|d]im|[A|a]ug|[M|m]ajor|[M|m]aj|[M|m]inor|[Q|q]uatal|[M|m]in|M|m|Q|q|5)', 'xg'),
+    CHORD_TYPE: XRegExp('(?<value>[S|s]us2|[S|s]us4|[D|d]im|[A|a]ug|[M|m]ajor|[M|m]aj|[M|m]inor|[Q|q]uatal|[M|m]in|M|m|Q|q|5)', 'ixg'),
     CHORD_EXT:  XRegExp('(?<value>b5|#5|6|7|9|b9|#9|11|#11|b13|13)', 'g'),
-    CHORD_EXT2: XRegExp('(?<value>add2|add#5|add9|sus4|add11|add#11|add13)', 'g'),
+    CHORD_EXT2: XRegExp('(?<value>add2|add#5|add9|sus2|sus4|add11|add#11|add13)', 'g'),
     CHORD_BASS: XRegExp('(?<token>\/)(?<value>[A|B|C|D|E|F|G|a|b|c|d|e|f|g][#|b]{0,1})', 'xg'),
     CHORD_INVERSION: XRegExp('(?<token>[\\^|v])(?<value>[0-5])', 'xg'),
     CHORD_MINUS_NOTE:{
@@ -128,8 +128,9 @@ const LR: LexerRules = {
     MINOR_MOD: XRegExp('(?<value>Harmonic|Harm|Har|Melodic|Mel)\\.{0,1}[ \\t]*(?!:)','xig') ,
     MINOR:     XRegExp('(?<value>Minor|minor|Min|min|m)[ \\t]*(?![a-z:])', 'xg'),
     MAJOR:     XRegExp('(?<value>Major|Maj|M)[ \\t]*(?![a-z:])', 'xg'),
-    MODE:   XRegExp('(?<value>Ionian|Ion|Dorian|Dor|Phygian|Phy|Lydian|Lyd|Mixolydian|mixo|mix|Aeolian|Aeo|Natural|Nat|Locrian|Loc)\\.{0,1}','xig'),
-    REPEAT_LAST: XRegExp('(?<token>\/)', 'xg'),
+    MODE:      XRegExp('(?<value>Ionian|Ion|Dorian|Dor|Phygian|Phy|Lydian|Lyd|Mixolydian|mixo|mix|Aeolian|Aeo|Natural|Nat|Locrian|Loc)\\.{0,1}','xig'),
+    REPEAT_CHORD: XRegExp('(?<value>\/)', 'xg'),
+    REPEAT_BAR:   XRegExp('(?<value>%)', 'xg'),
 }
 
 export default LR

@@ -120,9 +120,6 @@ export const align = (cmds: any[]) => {
                 chordCount++
             }
         } 
-        if ( chordCount % 2 !== 0 ) {
-            const dummy = ''
-        }
         return chordCount
     }
 

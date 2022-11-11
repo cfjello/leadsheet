@@ -250,7 +250,7 @@ export class Vextab {
                 let indexMem = 0
                 textParts.forEach( ( value, index ) => {
                     indexMem = index
-                    assert( index + offset < chords.length, `chords[${index + offset}] is out of range: 0-${chords.length}` )
+                    assert( index + offset < chords.length, `chords[${index + offset}] is out of range: 0-${chords.length} for '${value}'` )
                     if ( chords[index + offset].chord.startsWith('|') || chords[index + offset].chord.endsWith('|') ) {
                         chordPro += `[${chords[index + offset].chord}]`
                         offset++
@@ -332,6 +332,7 @@ export class Vextab {
         let proChords: ChordType[] = []
         let firstChord = true
         let prevChord = 'unset'
+        let prevDuration = [] as number[]
         let barsInLastLine = false
         let sectionActive = false
         let sectionHasContent = false
@@ -414,14 +415,23 @@ export class Vextab {
                                 // set the chord position
                                 const encoding = '$' 
                                 let duration = e.duration[0]
+
+                                const chordNoBass = chord.replace(/\/[A-G][b#]{0,1}/,'')
+                                const prevNoBass = prevChord.replace(/\/[A-G][b#]{0,1}/,'')
+                                
                                 if ( firstChord ) {
                                     barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
                                     firstChord = false
                                 }
                                 else if ( chord !== prevChord ) {
-                                    barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
+                                    if ( chordNoBass === prevNoBass ) {
+                                        const bass = chord.replace(/^[^\/]+/,'')
+                                        barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.-${bass}${comment}${encoding}`)
+                                    }
+                                    else
+                                        barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
                                 } 
-                                else {
+                                else {            
                                     barNotes.push(`:${e.duration[0]}S ${e.tie}B/4`)
                                 }
                                 // add any tied note lengths
@@ -431,8 +441,21 @@ export class Vextab {
                                 }
                                 proChords.push({ chord:chord, duration: duration })
                                 prevChord = chord
+                                prevDuration = e.duration
                                 handled.set(e.id, true)        
-                        }                                                    
+                        }
+                    else if ( e.type === 'REPEAT_CHORD' ) {
+                            assert( prevChord !== 'unset', `A previous chord must exist to use '/' for Repeat Chord`)
+                            let duration = prevDuration[0]
+                            barNotes.push(`:${duration}S B/4`)
+                            // add any tied note lengths
+                            for( let i = 1 ; i < prevDuration.length; i++ ) {
+                                duration += prevDuration[i]
+                                barNotes.push(` :${prevDuration[i]}S tB/4 `)
+                            }
+                            proChords.push({ chord: prevChord, duration: duration })
+                            handled.set(e.id, true)     
+                        }                                                           
                     else if ( e.type === 'REST' ) {
                                 let duration = e.duration[0]
                                 barNotes.push(`:${e.duration} ${e.tie}##`)
