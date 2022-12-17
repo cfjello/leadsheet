@@ -25,12 +25,6 @@
             el: "#vueRoot",
             data() {
                 return  {
-                    baseURL:  "http://localhost:3000/api/v1",  
-                    /* vexHeader: [ 
-                        'options font-size=14 space=15, width=840', 
-                        `tabstave notation=true tablature=false time=4/4 clef=percussion`
-                    ],
-                    */
                     menu: [{ menuItem: 'Dummy', menuRef: 'Dummy' }],
                     sheet:  { 
                         header: { 
@@ -67,11 +61,11 @@
                     console.log(`I am this.dummyFunc()`)
                 },
                 fetchMenu() {
-                    fetch('http://localhost:3000/api/v1/menu')
+                    fetch('/api/v1/menu')
                     .then ( response => response.json() )
                     .then ( resData => {
                         resData.data.forEach( (value, idx) => Vue.set( this.menu, idx, { menuItem: value.menuItem, menuRef: value.menuRef } ) )
-                        console.log( `INIT Menu is now: ${JSON.stringify(this.menu)}`)
+                        // console.log( `INIT Menu is now: ${JSON.stringify(this.menu)}`)
                     }).catch(err => {
                         console.log(err)
                     })
@@ -80,11 +74,11 @@
                     name = name === undefined ? 'Default' : name
                     console.log(`Vue to request Sheet: ${name} from server`)
                         try {
-                            fetch( `http://localhost:3000/api/v1/sheet/${name}`)
+                            fetch( `/api/v1/sheet/${name}`)
                             .then ( response => response.json() )
                             .then ( resData => { 
                                 this.sheet = resData.data
-                                console.log(`NEW SHEET: ${JSON.stringify(this.sheet)}`)
+                                // console.log(`NEW SHEET: ${JSON.stringify(this.sheet)}`)
                                 // this.rendered = false
                             })
                             .catch(err => {
