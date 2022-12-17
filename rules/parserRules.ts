@@ -1,7 +1,7 @@
-// import { Matcher } from "https://deno.land/x/parlexa/interfaces.ts";
-// import { Keys, ParserRules } from "https://deno.land/x/parlexa/mod.ts"
-import { Keys, ParserRules } from "../../parlexa/mod.ts"
-import { Matcher } from "../../parlexa/interfaces.ts"
+import { Matcher } from "https://deno.land/x/parlexa/interfaces.ts";
+import { Keys, ParserRules } from "https://deno.land/x/parlexa/mod.ts"
+// import { Keys, ParserRules } from "../../parlexa/mod.ts"
+// import { Matcher } from "../../parlexa/interfaces.ts"
 import LR from "./lexerRules.ts";
 
 //

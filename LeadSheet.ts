@@ -4,8 +4,8 @@ import { ArgsObjectArray, VextabDefaults, VextabHeaderType, VextabRestSheetType,
 import { WalkEntryExt } from "./fileWalk.ts";
 import { fileWalk } from "./fileWalk.ts";
 import { _ } from './lodash.ts';
-// import { Parser } from "https://deno.land/x/parlexa/mod.ts";
-import { Parser } from "../parlexa/mod.ts";
+import { Parser } from "https://deno.land/x/parlexa/mod.ts";
+// import { Parser } from "../parlexa/mod.ts";
 import LR from "./rules/lexerRules.ts";
 import PR from "./rules/parserRules.ts";
 import align from "./align.ts";

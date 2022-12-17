@@ -1,7 +1,7 @@
 // @deno-types='https://deno.land/x/xregexp/types/index.d.ts'
 import XRegExp from  'https://deno.land/x/xregexp/src/index.js'
-// import { LexerRules } from "https://deno.land/x/parlexa/mod.ts";
-import { LexerRules } from "../../parlexa/mod.ts";
+import { LexerRules } from "https://deno.land/x/parlexa/mod.ts";
+// import { LexerRules } from "../../parlexa/mod.ts";
 
 const LR: LexerRules = {
     TITLE:      XRegExp( '(?<token>Title)[ \\t]*(?<colon>:)[ \\t]*(?<value>[\\p{L}0-9\\-\\.\'’ \\t]+?)[ \\t]*(?=$|\\n)', 'xuig' ),
