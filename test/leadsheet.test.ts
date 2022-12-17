@@ -2,8 +2,8 @@ import { assert, assertExists } from "https://deno.land/std/testing/asserts.ts";
 import { LeadSheet } from "../LeadSheet.ts"
 import { align } from "../align.ts"
 import { angie } from "./angieData.ts"
-// import { Parser } from "https://deno.land/x/parlexa/mod.ts"
-import { Parser } from "../../parlexa/mod.ts"
+import { Parser } from "https://deno.land/x/parlexa/mod.ts"
+// import { Parser } from "../../parlexa/mod.ts"
 import  LR  from "../rules/lexerRules.ts"
 import { PR } from "../rules/parserRules.ts"
 import * as path from "https://deno.land/std/path/mod.ts";

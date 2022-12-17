@@ -1,6 +1,6 @@
 import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
-// import { Parser } from "https://deno.land/x/parlexa/mod.ts";
-import { Parser } from "../../parlexa/mod.ts"
+import { Parser } from "https://deno.land/x/parlexa/mod.ts";
+// import { Parser } from "../../parlexa/mod.ts"
 import  LR  from "../rules/lexerRules.ts"
 import { PR } from "../rules/parserRules.ts"
 export interface PIndexable { [key: string]: any }

@@ -1,5 +1,5 @@
 // import { ArgsObject } from "https://deno.land/x/parlexa/interfaces.ts";
-import { ArgsObject } from "../parlexa/interfaces.ts";
+import { ArgsObject } from "https://deno.land/x/parlexa/interfaces.ts";
 import { ArgsObjectArray, VextabDefaults, VextabHeaderType, VextabRestSheetType, VextabSheetType } from "./interfaces.ts";
 import { WalkEntryExt } from "./fileWalk.ts";
 import { fileWalk } from "./fileWalk.ts";
