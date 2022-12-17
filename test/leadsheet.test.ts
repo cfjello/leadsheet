@@ -2,7 +2,8 @@ import { assert, assertExists } from "https://deno.land/std/testing/asserts.ts";
 import { LeadSheet } from "../LeadSheet.ts"
 import { align } from "../align.ts"
 import { angie } from "./angieData.ts"
-import { Parser } from "https://deno.land/x/parlexa/mod.ts"
+// import { Parser } from "https://deno.land/x/parlexa/mod.ts"
+import { Parser } from "../../parlexa/mod.ts"
 import  LR  from "../rules/lexerRules.ts"
 import { PR } from "../rules/parserRules.ts"
 import * as path from "https://deno.land/std/path/mod.ts";
@@ -43,10 +44,11 @@ Deno.test({
     sanitizeOps: false
 })
 
+
 Deno.test({
     name: '03 - Parser is working on .txt BornByTheRiver file', 
     fn: () => {  
-        const sheet = Deno.readTextFileSync('../sheets/BornByTheRiver.txt').replace(/\r/mg, '') 
+        const sheet = Deno.readTextFileSync(`../sheets/I'm a Mover.txt`).replace(/\r/mg, '') 
         const parser = new Parser( LR, PR, 'reset')
         parser.debug = false
         parser.reset(sheet.toString())
@@ -58,6 +60,7 @@ Deno.test({
     sanitizeOps: false
 })
 
+/*
 Deno.test({
     name: '04 - Vextab is working on .txt Angie file', 
     fn: () => {  
@@ -85,8 +88,8 @@ Deno.test({
         LS.parseAllSheets()
         const pTree = LS.parsed.get('Default')
         assert(pTree.length > 100 )
-        const vTree = LS.vexed.get('Default')
-        Deno.writeTextFile('./log.txt',`${JSON.stringify(vTree, undefined, 2)}`, { append: false} )
+        // const vTree = LS.vexed.get('Default')
+        // Deno.writeTextFile('./log.txt',`${JSON.stringify(vTree, undefined, 2)}`, { append: false} )
     },
     sanitizeResources: false,
     sanitizeOps: false
@@ -110,3 +113,4 @@ Deno.test({
     sanitizeResources: false,
     sanitizeOps: false
 })
+*/

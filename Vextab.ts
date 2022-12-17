@@ -237,24 +237,34 @@ export class Vextab {
                 if ( ! this.sheet.sections.has(this.currSection) ) this.sheet.sections.set(this.currSection, [])
                 if ( ! this.sheet.sectionsCP.has(this.currSection) ) this.sheet.sectionsCP.set(this.currSection, [])
                 
-                if ( this.debug ) console.debug(`text ${textNotes.join(' ')} `)
+                // console.debug(`text ${JSON.stringify(textNotes)} `)
                 
                 this.sheet.sections.get(this.currSection)!.push('text ' + textNotes.join(' '))
                 //
                 // Generate the ChordPro text and chords
                 //
                 const chords: ChordType[] = this.sheet.chords.get(this.currSection)!
+                
+                if ( this.debug ) {
+                    console.debug(`Section: ${this.currSection}, num. of chords and Bars: ${chords.length} `)
+                    const chordsArr = chords.filter(e => e.chord !== '|')
+                    console.debug(`Section: ${this.currSection}, num. of chords: ${chordsArr.length} `)
+                    console.debug(`Section: ${this.currSection}, num. of text parts: ${textParts.length} `)
+                }
+
                 assert( chords !== undefined , `chords for ${this.currSection} must be defined` )
                 let chordPro = ""
-                let offset = this.currChordPtr > 0 ? ++this.currChordPtr : 0
+                let offset = 0  // this.currChordPtr > 0 ? ++this.currChordPtr : 0
                 let indexMem = 0
                 textParts.forEach( ( value, index ) => {
+                    // console.debug(`textPart: ${JSON.stringify(value)} `)
                     indexMem = index
                     assert( index + offset < chords.length, `chords[${index + offset}] is out of range: 0-${chords.length} for '${value}'` )
                     if ( chords[index + offset].chord.startsWith('|') || chords[index + offset].chord.endsWith('|') ) {
                         chordPro += `[${chords[index + offset].chord}]`
                         offset++
                     }
+                    if ( this.debug ) console.debug(`CHORD: ${chords[index + offset].chord} for: '${value}'`)
                     chordPro += `[${chords[index + offset].chord}]${value}`
                 })
 
@@ -551,20 +561,18 @@ export class Vextab {
                                 this.pushTextOnly(e.textParts.join(' ').replaceAll('  ', ' '))
                                 for ( let i = 0 ; i < e.textParts.length ; i++ ) {
                                     const duration = `:${e.textDurations[i][0] === 1 ? 'w' : e.textDurations[i][0]}`
-                                    const text     = e.textParts[i].trim().replace(/,/g, '')
+                                    let text  = e.textParts[i].trim().replace(/,/g, ';')
+                                    if ( text === '' ) text = '_'
                                     if ( i == 0 ) {
                                         textParts.push(duration + ',.10,' + text)  
                                         // prevDuration = duration
                                     }
                                     else {
-                                        if ( text.length > 0 )
-                                            textParts.push(',' + duration + ',' + text) 
-                                        else 
-                                            textParts.push(',' + duration) 
+                                        textParts.push(',' + duration + ',' + text) 
                                     }
                                     // Add any additional tied durations
                                     for( let j = 1 ; j < e.textDurations[i].length; j++) {
-                                        textParts.push(e.textDurations[i][j] )
+                                        textParts.push(',:' +  e.textDurations[i][j] + '_' )
                                     }
                                 }
                             } catch( err) {`Render().durations Error: at ${objStringify(e.textDurations)} \n ${err}` }                                   

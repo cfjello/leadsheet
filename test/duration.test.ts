@@ -13,7 +13,7 @@ Deno.test({
     name: '05 - Leadsheet can read the parseTree', 
     fn: () => {  
         const LS = new LeadSheet( "../sheets", '.txt')
-        LS.debug = true
+        LS.debug = false
         LS.loadAllSheets()
         LS.renderVextab('Default', true)
         // const parseTree = LS.parsed.get('Default')

@@ -1,13 +1,17 @@
-import { CHAR_FORWARD_SLASH } from "https://deno.land/std@0.127.0/path/_constants.ts";
-import { Keys, ParserRules } from "https://deno.land/x/parlexa/mod.ts"
+// import { Matcher } from "https://deno.land/x/parlexa/interfaces.ts";
+// import { Keys, ParserRules } from "https://deno.land/x/parlexa/mod.ts"
+import { Keys, ParserRules } from "../../parlexa/mod.ts"
+import { Matcher } from "../../parlexa/interfaces.ts"
 import LR from "./lexerRules.ts";
 
 //
 // User defined group-tokens for this set of parser rules
 //
-export type ParserTokens = 'reset' | 'header' | 'space' | 'form' |
-        'allways' | 'duration' | 'barEntry' | 'chord' | 'common' | 'commonList'| 
-        'inline' | 'note' | 'scale' | 'key' | 'scaleList' | 'scaleMode' | 'minor' | 'section' | 'sectionExt'
+export type ParserTokens = 'reset' | 'header' | 'space' | 'form' | 'barLine' | 'barInLine' |
+        'allways' | 'duration' | 'barEntry' | 'chord' | 'common' | 'commonList'| 'noteList' |
+        'inline' | 'note' | 'scale' | 'key' | 'scaleList' | 'scaleMode' | 'scaleCmd' |
+        'minor' | 'section' | 'sections' | 'sectionExt' | 'sectionLines' | 'keyCmd' | 'keyWords' | 
+        'noteGroup'
 //
 // ParserRules groups (key tokens below) are typed as the combination of the user defined  
 // ParserTokens (above) and the LexerRules instanse (LR) keys
@@ -16,7 +20,11 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
     always : {  
         expect: [
             [ LR.WS , '0:m', 'ignore'],
-            [ LR.NL,  '0:m' ]
+            {
+                match: LR.NL,
+                multi: '0:1', 
+                cb: (m, s) => { s.comment = 'This is parser global user defined data' ;return m }
+            } as Matcher
         ]
     },
     duration: {     
@@ -38,29 +46,41 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
         expect: [
             [ 'sectionExt' , '1:1', 'xor'],
             [ LR.SECTION, '1:1'],
-            LR.BAR
+            ['sectionLines',  '1:m']
         ]
     },
     header: {
         expect: [
-            [ LR.TITLE,  '0:1' ],
-            [ LR.AUTHOR, '0:1' ], 
-            [ LR.METER,  '0:1' ],
-            [ LR.TEMPO,  '0:1' ],
-            [ 'key', '0:1'],
-            [ LR.FORM,   '0:1' ]
-        ] 
+            LR.TITLE,
+            LR.AUTHOR, 
+            LR.METER,
+            LR.TEMPO,
+            'keyCmd',
+            'scaleCmd'
+        ]
+    },
+    keyWords: {
+        expect: [
+            'header',
+            LR.FORM
+        ]
+    },
+    sectionLines: {
+        expect: [
+            'barLine',
+            LR.TEXT
+        ]
+    },
+    sections: {
+        expect: [
+            ['keyWords', '1:1', 'xor'],
+            [ 'section' , '1:1'],
+        ]
     },
     reset: { 
         multi: '1:m',
         expect: [
-           'header',
-           'common', 
-            'section',
-            LR.BAR,
-            'inline',
-            LR.TEXT,
-            // LR.TEXT_ONLY,
+            'sections'
         ] 
     },
     FORM: {
@@ -97,24 +117,34 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             [ LR.SQ_BRACKET_END, '1:1']
         ]
     },
-    BAR: {
-        multi: '1:m',
+    barInLine: {
+        multi: '0:m',
         expect: [
-            [ LR.REPEAT_COUNT, '0:m'],
-            'barEntry',
-            [ LR.REPEAT_END,  '0:2' ]
+            [ LR.BAR, '1:1'],
+            [ LR.REPEAT_COUNT, '0:1' ],
+            [ 'barEntry' , '0:m'],
+            [ LR.REPEAT_END,  '0:1' ]
+        ]
+    },
+    barLine: {
+        multi: '0:m',
+        line: true,
+        expect: [
+           'barInLine'
         ]
     },
     barEntry: {
+        multi: '1:m',
         expect: [
-            [ 'chord',  '0:1', 'xor' ],
-            [ LR.REST, '0:1', 'xor'],
-            [ LR.REPEAT_CHORD, '0:1', 'xor'],
-            [ LR.REPEAT_BAR, '0:1', 'xor'],
-            [ 'inline', '0:1' ]
+            [ 'chord',  '1:1', 'xor' ],
+            [ LR.REST, '1:1', 'xor'],
+            [ LR.REPEAT_CHORD, '1:1', 'xor'],
+            [ LR.REPEAT_BAR, '1:1', 'xor'],
+            [ 'inline', '1:1' ]
         ]
     },
     chord: {
+        multi: '0:m',     
         expect: [
             [ LR.CHORD_NOTE, '1:1' ],
             [ LR.CHORD_TYPE, '0:1'],
@@ -123,20 +153,39 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             LR.CHORD_MINUS_NOTE,
             [LR.CHORD_BASS, '0:1'],
             [ 'duration', '0:1' ],
-            // LR.CHORD_COMMENT,
             [LR.GROOVE_ADJUST, '0:1']
-        ]
+        ],
     },
     REST: {
         expect: [
             [ 'duration', '0:1']
         ]
     },
+    noteList: {
+        multi: '0:m',
+        expect: [
+            [LR.COMMA, '1:1'],
+            ['note', '1:1']
+        ]
+    },
     note: {
         expect: [
-            [LR.NOTE_UPPER, 'xor'],
-            [LR.NOTE_LOWER, 'xor'],
-            [LR.NOTE_BOTH]
+            [LR.NOTE_LOWER, '1:1'],
+            [LR.OCTAVE, '0:1'],
+            ['noteList', '0:m']
+        ]
+    },
+    noteGroup: {
+        expect: [
+            [LR.BRACKET, '1:1'],
+            ['note', '1:m'],
+            [LR.BRACKET_END, '1:1'],
+        ]
+    },
+    notes:  {
+        expect: [
+            ['note', '1:1', 'xor'],
+            ['noteGroup', '1:1']
         ]
     },
     minor: {
@@ -149,13 +198,14 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
     scaleList: {
         multi: '0:m',
         expect: [
+            [LR.COMMA, '1:1', 'xor'],
             [LR.SLASH, '1:1'],
             ['scaleMode', '1:1']
         ]
 
     },
     scaleMode: {
-        multi: '1:1',
+        multi: '1:m',
         expect: [
             [LR.NOTE_BOTH, '1:1'],
             [LR.MODE, '0:1', 'or'],
@@ -170,12 +220,25 @@ export const PR: ParserRules<Keys<ParserTokens, typeof LR>> = {
             ['scaleMode', '1:1']
         ],
     },
+    scaleCmd: {
+        line: true,
+        expect: [
+            [LR.SCALE,    '1:1' ],
+            ['scaleMode', '1:1']
+        ],
+    },
     key: {
         multi: '0:1',
         expect: [
             [LR.KEY, '1:1'],
-            ['scaleMode', '1:1'],
-            [LR.NL, '1:m']
+            ['scaleMode', '0:1'],
+        ]
+    },
+    keyCmd: {
+        line: true,
+        expect: [
+            [LR.KEY, '1:1'],
+            ['scaleMode', '0:1'],
         ]
     },
 }

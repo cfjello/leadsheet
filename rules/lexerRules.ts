@@ -1,6 +1,7 @@
 // @deno-types='https://deno.land/x/xregexp/types/index.d.ts'
 import XRegExp from  'https://deno.land/x/xregexp/src/index.js'
-import { LexerRules } from "https://deno.land/x/parlexa/mod.ts";
+// import { LexerRules } from "https://deno.land/x/parlexa/mod.ts";
+import { LexerRules } from "../../parlexa/mod.ts";
 
 const LR: LexerRules = {
     TITLE:      XRegExp( '(?<token>Title)[ \\t]*(?<colon>:)[ \\t]*(?<value>[\\p{L}0-9\\-\\.\'’ \\t]+?)[ \\t]*(?=$|\\n)', 'xuig' ),
@@ -64,6 +65,8 @@ const LR: LexerRules = {
     REPEAT_END:     XRegExp('[ \\t]*(?<colon>:)[ \\t]*(?=\\|)', 'xg'),
     SQ_BRACKET:     XRegExp( '(?<token>[\\[])', 'g' ),
     SQ_BRACKET_END: XRegExp( '(?<token>[\\]])', 'g'),
+    BRACKET:        XRegExp( '(?<token>[\\()])', 'g' ),
+    BRACKET_END:    XRegExp( '(?<token>[\\)])', 'g'),
     COMMA:          XRegExp('(?<value>,)', 'g'),
     COLON:          XRegExp('(?<value>:)', 'g'),
     DURATION:   { 
@@ -109,6 +112,7 @@ const LR: LexerRules = {
     CHORD_EXT:  XRegExp('(?<value>b5|#5|6|7|9|b9|#9|11|#11|b13|13)', 'g'),
     CHORD_EXT2: XRegExp('(?<value>add2|add#5|add9|sus2|sus4|add11|add#11|add13)', 'g'),
     CHORD_BASS: XRegExp('(?<token>\/)(?<value>[A|B|C|D|E|F|G|a|b|c|d|e|f|g][#|b]{0,1})', 'xg'),
+    OCTAVE: XRegExp('(?<token>\/)(?<value>\\-2|\\-1|0|1|2|3|4|5|6)', 'xg'),
     CHORD_INVERSION: XRegExp('(?<token>[\\^|v])(?<value>[0-5])', 'xg'),
     CHORD_MINUS_NOTE:{
         match: XRegExp('(?<value>\\-1|\\-3|\\-5|no3|no5|no1)', 'xg'),
@@ -120,8 +124,9 @@ const LR: LexerRules = {
     },
     CHORD_COMMENT: XRegExp('(?<lp>\\[)[ \\t]*(?<value>[^\\]]*)[ \\t]*(?<rp>\\])', 'xg'),
     REPEAT_PREV: XRegExp('(?<token>%)', 'xg'),
-    // DRUM_KIT:           /bd|sn|ki|hh|oh|ht|mt|lt|cy|cr|cow|tam/,
+    DRUM_KIT:    XRegExp('(?<value>bd|sn|ki|hh|oh|ht|mt|lt|cy|cr|co|cow|ta|tam)', 'xg'),
     NOTE_LOWER:  XRegExp('(?<value>a|b|c|d|e|f|g)(?<sharpFlat>[#|b]{0,1})', 'xg'),
+    NOTE_LINK:   XRegExp('(?<value>[\\-1]{0,1})', 'xg'),
     NOTE_UPPER:  XRegExp('(?<value>A|B|C|D|E|F|G)(?<sharpFlat>[#|b]{0,1})', 'xg') ,
     NOTE_BOTH:   XRegExp('(?<value>A|B|C|D|E|F|G)(?<sharpFlat>[#|b]{0,1})', 'xig') ,
     // MAJOR: 

@@ -67,7 +67,12 @@ export const align = (cmds: any[]) => {
             }
         }
         const tie = vArr && vArr.length > 0 ? vArr[0].tie : ''
-        if ( duration.length === 0 ) duration.push(getDefaultDuration())
+        if ( duration.length === 0 ) {
+            const defDur = getDefaultDuration()
+            duration.push(defDur)
+            // console.debug(`Default Duration: ${defDur}`)
+        }
+        // console.debug(`{duration: ${duration}, tie: ${tie} }`)
         return { duration: duration, tie: tie }
     }
 

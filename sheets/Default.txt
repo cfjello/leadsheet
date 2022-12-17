@@ -6,5 +6,4 @@ Key: G
 Form:  
   - Intro 
          
-Intro:  
-|| Gadd9,2  Am79,2 | Cmaj79,2  Bm7,2 | Gadd9  Am79 | Cmaj79,8 Cmaj79,4 D7sus4,8 D7sus4,t2 ||
+Intro: || Gadd9,2  Am79,2 | Cmaj79,2  Bm7,2 | Gadd9  Am79 | Cmaj79,8 Cmaj79,4 D7sus4,8 D7sus4,t2 ||

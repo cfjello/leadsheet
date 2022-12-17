@@ -1,5 +1,6 @@
 import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
-import { Parser } from "https://deno.land/x/parlexa/mod.ts";
+// import { Parser } from "https://deno.land/x/parlexa/mod.ts";
+import { Parser } from "../../parlexa/mod.ts"
 import  LR  from "../rules/lexerRules.ts"
 import { PR } from "../rules/parserRules.ts"
 export interface PIndexable { [key: string]: any }
@@ -7,15 +8,15 @@ export interface PIndexable { [key: string]: any }
 Deno.test({
     name: '01 - Parser can read Notes', 
     fn: () => {  
-        const titleStr = "F G C A"
+        const str = "f g c a"
         const parser = new Parser( LR, PR, 'note')
         parser.debug = false
-        parser.reset(titleStr)
+        parser.reset(str)
         assert( parser.result.size >= 5 )
         const tree = parser.getParseTree().filter( v => v.type !== 'Token')
         tree.forEach( e => {
-            assert( e.type === 'NOTE_UPPER' || e.type === 'NOTE_BOTH')
-            assert( ['F', 'G', 'C', 'A'].includes(e.value as string))
+            assert( e.type === 'NOTE_LOWER')
+            assert( ['f', 'g', 'c', 'a'].includes(e.value as string))
         })
        
         assert( tree.length === 4 )
@@ -42,13 +43,13 @@ Deno.test({
 Deno.test({
     name: '03 - Parser can read All Scales', 
     fn: () => {  
-        const titleStr = "   F   G Major  C mixo"
+        const titleStr = "   F  , G Major , C mixo"
         const parser = new Parser( LR, PR, 'scaleMode')
         parser.debug = false
         parser.reset(titleStr)
         assert( parser.result.size >= 5 )
         const tree = parser.getParseTree().filter( v => v.type !== 'Token')
-        assert( tree.length === 5 )
+        assertEquals( tree.length, 7 )
     },
     sanitizeResources: false,
     sanitizeOps: false

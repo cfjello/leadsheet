@@ -1,9 +1,11 @@
-import { ArgsObject } from "https://deno.land/x/parlexa/interfaces.ts";
+// import { ArgsObject } from "https://deno.land/x/parlexa/interfaces.ts";
+import { ArgsObject } from "../parlexa/interfaces.ts";
 import { ArgsObjectArray, VextabDefaults, VextabHeaderType, VextabRestSheetType, VextabSheetType } from "./interfaces.ts";
 import { WalkEntryExt } from "./fileWalk.ts";
 import { fileWalk } from "./fileWalk.ts";
 import { _ } from './lodash.ts';
-import { Parser } from "https://deno.land/x/parlexa/mod.ts";
+// import { Parser } from "https://deno.land/x/parlexa/mod.ts";
+import { Parser } from "../parlexa/mod.ts";
 import LR from "./rules/lexerRules.ts";
 import PR from "./rules/parserRules.ts";
 import align from "./align.ts";
@@ -168,7 +170,7 @@ export class LeadSheet {
             if ( ! this.parsed.has(sheetName) ) {
                 this.parseSheet(sheetName, force)
             }
-            const vextab = new Vextab( this.parsed.get(sheetName), true )
+            const vextab = new Vextab( this.parsed.get(sheetName), false )
             vextab.render()
             this.vexed.set( sheetName, _.cloneDeep(vextab.getSheet()) ) 
         }

@@ -1,6 +1,7 @@
 import { assert } from "https://deno.land/std/testing/asserts.ts";
 import { angie } from "./angieData.ts"
-import { Parser } from "https://deno.land/x/parlexa/mod.ts";
+// import { Parser } from "https://deno.land/x/parlexa/mod.ts";
+import { Parser } from "../../parlexa/mod.ts";
 import  LR  from "../rules/lexerRules.ts"
 import { PR } from "../rules/parserRules.ts"
 export interface PIndexable { [key: string]: any }
@@ -36,7 +37,7 @@ Deno.test({
 })
 
 Deno.test({
-    name: '03 - ParseTree has only the matched child references', 
+    name: '03 - ParseTree has only the matched child references (this test will fail if parser.debug === true)', 
     fn: () => {  
         const idMap = new Map<string,any>()
         const parser = new Parser( LR, PR, 'reset')

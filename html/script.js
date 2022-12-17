@@ -2,7 +2,7 @@ new Vue({
     el: "#vueRoot",
     data() {
         return  {
-            baseUrl:  "http:localhost:3000/api/v1",  
+            baseURL:  "http:localhost:3000/api/v1",  
             /* vexHeader: [ 
                 'options font-size=14 space=15, width=840', 
                 `tabstave notation=true tablature=false time=4/4 clef=percussion`
@@ -23,10 +23,13 @@ new Vue({
                 textOnly: {},
                 render: {}
             } ,
-            showVextab: true
+            showVextab: true,
         }
     },     
-    mounted() {
+    // mounted() {
+    //     this.init() 
+    // },
+    beforeMount() {
         this.init() 
     },
     updated() {
@@ -37,7 +40,7 @@ new Vue({
             console.log(`I am this.dummyFunc()`)
         },
         fetchMenu() {
-            fetch('http:localhost:3000/api/v1/menu')
+            fetch('${this.baseUrl}/menu')
             .then ( response => response.json() )
             .then ( resData => {
                 resData.data.forEach( (value, idx) => Vue.set( this.menu, idx, { menuItem: value.menuItem, menuRef: value.menuRef } ) )
@@ -50,7 +53,7 @@ new Vue({
             name = name === undefined ? 'Default' : name
             console.log(`Vue to request Sheet: ${name} from server`)
                 try {
-                    fetch( `http:localhost:3000/api/v1/sheet/${name}`)
+                    fetch( `${this.baseUrl}/sheet/${name}`)
                     .then ( response => response.json() )
                     .then ( resData => { 
                         this.sheet = resData.data
@@ -101,7 +104,7 @@ new Vue({
                         const vex = []
                         section.value.forEach(line => {
                            if ( line.startsWith('notes') ) {
-                                vex.push('options font-size=14 space=15, width=1240') 
+                                vex.push('options font-size=14 space=15, width=1040') 
                                 vex.push(`tabstave notation=true tablature=false time=4/4 clef=percussion`)
                             }
                             vex.push(line)
@@ -130,4 +133,4 @@ new Vue({
             catch (err) { console.log(err) }
         }
     }
-});  
+}); 
