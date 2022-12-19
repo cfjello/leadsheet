@@ -36,8 +36,8 @@ export class LeadSheet {
     // Parser
     parser = new Parser( LR, PR, 'reset')   
 
-    constructor( public sheetsDir = `${__dirname}/sheets`, 
-        // public templateDir = `${__dirname}/templates`,
+    constructor( 
+        public sheetsDir = `${__dirname}/sheets`, 
         public matchPattern = '.txt' , 
         public conf = { 
         quaterNoteTicks:  420, 
@@ -62,17 +62,17 @@ export class LeadSheet {
         return Object.keys(this.menuList)
     }
 
-    loadSheetList = (): Map<string,WalkEntryExt> => {
+    loadSheetList = async (): Promise<Map<string,WalkEntryExt>> => {
         let entry: WalkEntryExt = {} as WalkEntryExt
         try {
-            for (entry of fileWalk(this.sheetsDir, this.matchPattern)) {
+            for (entry of await fileWalk(this.sheetsDir, this.matchPattern)) {
                 if ( entry.isFile && ! entry.isDirectory ) {
                     this.fileEntries.set(entry.baseName, entry)
                 }
             }
         }
         catch( err ) { console.error(`Cannot read file: ${entry} - ${err}`) }
-        return this.fileEntries
+        return Promise.resolve(this.fileEntries) 
     }
 
     // Sheet header
@@ -87,62 +87,66 @@ export class LeadSheet {
     }
 
 
-    getRestSheet(sheetName: string): VextabRestSheetType {
-        if ( ! this.vexed.has(sheetName) ) this.renderVextab( sheetName )
+    getRestSheet = async(sheetName: string): Promise<VextabRestSheetType> => {
+        if ( ! this.vexed.has(sheetName) ) await this.renderVextab( sheetName )
         // const parseTree = this.parsed.get(sheetName)
         // Deno.writeTextFile('./pars.txt',`${JSON.stringify(parseTree, undefined, 2)}`, { append: false} )
-        return  { 
+        return Promise.resolve( { 
             header:     _.clone(this.vexed.get(sheetName)!.header), 
             sections:   Array.from(this.vexed.get(sheetName)!.sections, ([name, value]) => ({ name, value })), 
             chords:     Array.from(this.vexed.get(sheetName)!.chords, ([name, value]) => ({ name, value })),
             sectionsCP: Array.from(this.vexed.get(sheetName)!.sectionsCP, ([name, value]) => ({ name, value })), 
             textOnly:   Object.fromEntries(this.vexed.get(sheetName)!.textOnly),
             render:     Object.fromEntries(this.vexed.get(sheetName)!.render)
-        }
+        })
     }
 
-    loadSheet = ( entry: WalkEntryExt, force = false ): string => {
+    loadSheet = async ( entry: WalkEntryExt, force = false ): Promise<string> => {
         let sheet = ''
         if ( entry.isFile  && ( ! this.sheets.has(entry.baseName) || force ) ) {
-            sheet = Deno.readTextFileSync(entry.path).replace(/\r/mg, '')  
+            sheet = (await Deno.readTextFile(entry.path)).replace(/\r/mg, '')  
             this.sheets.set( entry.baseName, _.cloneDeep(sheet) )
             sheet = this.sheets.get(entry.baseName)!
         }
-        return sheet
+        return Promise.resolve(sheet)
     }
 
-    loadAllSheets = (force = false) => {
-        if ( this.fileEntries.size === 0 || force ) this.loadSheetList()  
+    loadAllSheets = async (force = false): Promise<void> => {
+        if ( this.fileEntries.size === 0 || force ) await this.loadSheetList()  
         let currEntry: WalkEntryExt | undefined = undefined 
         try {
             // deno-lint-ignore no-unused-vars
             for ( const [key, entry] of this.fileEntries) {
                 currEntry = entry
                 if ( entry.isFile && ! entry.isDirectory ) {
-                    const sheet = Deno.readTextFileSync(entry.path).replace(/\r/mg, '')  
-                    this.sheets.set(entry.baseName, _.cloneDeep(sheet))
+                    await Deno.readTextFile(entry.path)
+                    .then( file => file.replace(/\r/mg, ''))
+                    .then ( sheet =>   this.sheets.set(entry.baseName, _.cloneDeep(sheet)) )
                 }
             }
+            Promise.resolve()
         }
         catch( err ) { console.error(`Cannot read file: ${currEntry} - ${err}`) }
     }
 
-    loadNamedSheet = (sheetName: string , fileExt = '.txt') => {
+    loadNamedSheet = async (sheetName: string , fileExt = '.txt'):  Promise<void> => {
         const base = path.basename(this.sheetsDir)
         const filePath = path.normalize(`${__dirname}/${base}/${sheetName}${fileExt}`)
         try {
-                const sheet = Deno.readTextFileSync(filePath).replace(/\r/mg, '')  
-                this.sheets.set(sheetName, _.cloneDeep(sheet))
+                await Deno.readTextFile(filePath)
+                .then( file => file.replace(/\r/mg, ''))
+                .then ( sheet =>   this.sheets.set(sheetName, _.cloneDeep(sheet)) )
+                Promise.resolve()
         }
         catch( err ) { console.error(`Cannot read file: ${filePath} - ${err}`) }
     }
 
-    parseSheet( sheetName: string, forceRead = false ): boolean {
+    parseSheet = async ( sheetName: string, forceRead = false ): Promise<boolean> => {
         let ret = false
         try {
             this.parser = new Parser( LR, PR, 'reset')  
             this.parser.debug = this.debug
-            if ( forceRead ) this.loadNamedSheet(sheetName)
+            if ( forceRead ) await this.loadNamedSheet(sheetName)
             this.parser.reset(this.sheets.get(sheetName)!)
             const tree = this.parser.getParseTree()
             align(tree) 
@@ -150,30 +154,31 @@ export class LeadSheet {
             ret = true
         }
         catch(err) { console.error(err) }
-        return ret
+        return Promise.resolve(ret)
     }
 
-    parseAllSheets(): boolean {
+    parseAllSheets = async (): Promise<boolean> => {
         let ret = false
         try {
            for ( const key of this.sheets.keys() ) {
                 ret = true
-                this.parseSheet(key)
+                await this.parseSheet(key)
            }
         }
         catch(err) { console.error(err) }
-        return ret
+        return Promise.resolve(ret)
     }
 
-    renderVextab(sheetName: string, force = false) {
+    renderVextab = async (sheetName: string, force = false): Promise<void>  => {
         if ( ! this.vexed.has(sheetName) || force ) {
-            if ( ! this.parsed.has(sheetName) ) {
-                this.parseSheet(sheetName, force)
+            if ( ! this.parsed.has(sheetName) || force ) {
+                await this.parseSheet(sheetName, force)
             }
             const vextab = new Vextab( this.parsed.get(sheetName), false )
             vextab.render()
             this.vexed.set( sheetName, _.cloneDeep(vextab.getSheet()) ) 
         }
+        return Promise.resolve()
     }
 }
 export default LeadSheet

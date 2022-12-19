@@ -10,7 +10,7 @@ const __dirname = path.dirname(import.meta.url);
 // Initialize main page
 const LS = new LeadSheet()
 LS.debug = false
-LS.loadAllSheets()
+await LS.loadAllSheets()
 // LS.parseAllSheets()
 
 
@@ -48,19 +48,8 @@ htmlRouter.get("/html/favicon.png", (req, res, next) => {
   res.sendFile(fileName)
 });
 
-
-/*
-// GET js file
-jsRouter.get("/html/script.js", (req, res, next) => {
-  const fileName = path.join(__dirname,"./html/script.js").normalize()
-  console.log(`Server sends file: ${fileName}`)
-  res.set( { 'content-type':  'application/json'} )
-  res.sendFile( path.join(__dirname, fileName ) )
-});
-*/
-
 // Serve Song Pages
-songRouter.get("/sheet/:name", (req, res) => {
+songRouter.get("/sheet/:name", async (req, res) => {
     console.log(`Server GOT request for Sheet`)
   if ( ! req.params.name ) {  // TODO: check later - || ! LS.menuList.includes(req.params.name)
       console.log(`Server Unknown Song Error for: ${req.params.name}`) 
@@ -71,7 +60,7 @@ songRouter.get("/sheet/:name", (req, res) => {
   }
   else { // We have a song
       console.log(`Server to send ${req.params.name} sheet data`)
-      const data = LS.getRestSheet(req.params.name)
+      const data = await LS.getRestSheet(req.params.name)
       // Deno.writeTextFile('./log.txt',`${JSON.stringify(data, undefined, 2)}`, { append: false} )
       // res.set( { 'content-type': 'application/json'} )
       res.setStatus(200).json({
@@ -82,7 +71,7 @@ songRouter.get("/sheet/:name", (req, res) => {
 });
 
 // Serve Menu Items
-songRouter.get("/menu", (req, res) => {
+songRouter.get("/menu", async (req, res) => {
     console.log(`Server GOT request for MenuItems`)
   if ( ! LS.menuList) {
       console.log(`Server cannot find the Menu List`) 
@@ -96,7 +85,7 @@ songRouter.get("/menu", (req, res) => {
       // res.set( { 'content-type': 'application/json'} )
       res.setStatus(200).json({
         success: "true",
-        data: LS.getMenuItems(),
+        data: await LS.getMenuItems(),
       });
   }
 });
