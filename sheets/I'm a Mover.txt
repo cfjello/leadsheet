@@ -7,11 +7,12 @@ Form:
   - Solo
   - Verse 3
   - Coda
+Key: G
 Meter  : 4/4
 Tempo  : 86           
  
 Intro: 
-| Gadd9  Am79 | Cmaj79  Bm7 | Gadd9  Am79 | Cmaj79/D#,8 Cmaj79/D#,4 D7sus4,8 D7sus4,t2 |
+| Gadd9  Am79 | Cmaj79  Bm7 | Gadd9  Am79 | Cmaj79,8 Cmaj79,4 D7sus4,8 D7sus4,t2 |
 
 Verse 1:
 | Gadd9          Am79 | Cmaj79             Bm7                | 

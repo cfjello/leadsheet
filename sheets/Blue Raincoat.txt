@@ -10,6 +10,7 @@ Form:
   - Guitar Solo over Chorus
   - Verse 3 
   - Chorus 3
+  Key: G Minor
 Meter: 6/8
 Tempo: 78
 
@@ -61,7 +62,7 @@ _See you _there with a _rose in your _teeth.
 | F#dim7                     | Gm7
 _Just one more thin gypsy _ thief when I see Jane's awa-
 | Abmaj7                                     | Am7 
-_ ke.   She 
+_ ke.  _ She 
 | Eb69              | Dm79 | Dm79
 _sends her re- _ gards _
 

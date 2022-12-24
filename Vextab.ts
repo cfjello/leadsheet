@@ -24,8 +24,9 @@ export class Vextab {
     currUseDurations: string[][] = []
     currChordPtr    = 0
 
+
     // deno-lint-ignore no-explicit-any
-    constructor( public cmds: any[], debug = false, public conf = { 
+    constructor( public cmds: any[], debug = false, _transpose = 0, _sharpFlat = '',  public conf = { 
         quaterNoteTicks:  420, 
         currTicks:        0,
         currBarSize:      4 * 420 ,
@@ -47,9 +48,43 @@ export class Vextab {
             chords:   new Map() as VextabSectionChordType,
             sectionsCP:   new Map() as VextabSectionType,
             textOnly: new  Map() as VextabSectionType,
-            render: new Map() as RenderSectionType
+            render: new Map() as RenderSectionType,
+            transpose: _transpose,
+            sharpFlat: _sharpFlat
+
         }
         this.debug = debug
+        console.debug(`Vextab.constructor() - Transpose: ${this.sheet.transpose}, sharpFlat = ${this.sheet.sharpFlat}`)
+    }
+
+    // Transposition: 
+    notesSharp = [ "A", "A#", "B" , "C" , "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" , "C" , "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A" ]
+    notesFlat  = [ "A", "Bb", "B" , "C" , "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" , "C" , "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A" ]
+
+    transpose = (note: string, trans = this.sheet.transpose, sfTarget = this.sheet.sharpFlat ): string  => { 
+        assert ( trans > -12 && trans < 12, `vextab.transpose() - transposition: ${trans}  must be in the range: -11 to 11`)
+        let ret = note
+        let noteIdx = 0
+        const sfNote = note.length > 1 ? note.charAt(1) : ''
+        if ( sfNote === 'b' ) {
+            noteIdx = this.notesFlat.indexOf(note)
+        }
+        else {
+            noteIdx = this.notesSharp.indexOf(note)
+        }
+        const transIdx = ( (noteIdx + 12 ) + trans ) % 12
+        if ( sfTarget === '' ) {
+            sfTarget = sfNote === '#' ? sfNote : 'b'
+        }
+        if ( sfTarget === 'b' ) {
+            ret = this.notesFlat[transIdx]
+        }
+        else if (  sfTarget === '#' ) {
+            ret = this.notesSharp[transIdx]
+        }
+        // console.debug(`transpose: ${trans}, note: ${note}, ret: ${ret}`)
+        return ret
+     
     }
 
     getHeader = (): Required<VextabHeaderType> => {
@@ -333,7 +368,7 @@ export class Vextab {
         }
     }
 
-    render = () => {
+    render = (transpose = 0, sharpFlat = '' ) => {
         const handled = new Map<string, boolean>()
          // deno-lint-ignore no-explicit-any
         let currElem: any 
@@ -347,6 +382,7 @@ export class Vextab {
         let sectionActive = false
         let sectionHasContent = false
         // this.html = []
+        assert( transpose > -12 && transpose < 12, `Illegal transpose value: ${transpose} - must be between -11 and 11.` )
         try {
             this.cmds.forEach( (e, i)  => {
                 if ( ! handled.has(e.id) ) {
@@ -378,7 +414,15 @@ export class Vextab {
                             handled.set(e.id, true)
                         }
                     else if ( e.type === 'KEY' )  {
-                            this.sheet.header.key = e.fullKey.join(' ')
+                            const transNote = e.fullKey[0]
+                            let keyNote =  e.fullKey[0]
+                            const sharpFlat = transNote[1] ?? '' 
+                            if ( this.sheet.transpose !== 0 || ( sharpFlat !== '' && sharpFlat !== this.sheet.sharpFlat ) ) {
+                                keyNote = this.transpose(transNote, this.sheet.transpose)
+                            }
+                            const key = keyNote + ' ' + e.fullKey.slice(1).join(' ')
+                            e.transKey = key
+                            this.sheet.header.key = key
                             handled.set(e.id, true)
                         }
                     else if ( e.type === 'TEMPO' )  {
@@ -412,47 +456,66 @@ export class Vextab {
                             handled.set(e.id, true)
                         }
                     else if ( e.type === 'BAR' ) {
-                                const bar = e.REPEAT_COUNT !== undefined ? '=|:' : '|'
-                                const proBar = e.REPEAT_COUNT !== undefined ? '|:' : '|'
-                                barNotes.push(bar)
-                                proChords.push({ chord: proBar, duration: 0 })
-                                handled.set(e.id, true)  
+                            const bar = e.REPEAT_COUNT !== undefined ? '=|:' : '|'
+                            const proBar = e.REPEAT_COUNT !== undefined ? '|:' : '|'
+                            barNotes.push(bar)
+                            proChords.push({ chord: proBar, duration: 0 })
+                            handled.set(e.id, true)  
                         }                                    
                     else if ( e.type === 'CHORD_NOTE' ) {
-                                const chord = e.fullChord.join('')
-                                assert ( e.tie !== undefined, `Missing 'tie' in ${JSON.stringify(e)}`)
-                                const comment = ( e.comment !== '' ? ' (' + e.comment + ')' : e.comment).replace(',', ';')
-                                // set the chord position
-                                const encoding = '$' 
-                                let duration = e.duration[0]
+                            // Handling transposion
+                            const sharpFlat = e.sharpFlat ?? ''
+                            const transNote = e.value + sharpFlat
+                            let chordNote = e.value + sharpFlat
+                            let bassIdx = e.fullChord.indexOf('/')
+                            let bassNote = bassIdx > 0 ? '/' +  e.fullChord[bassIdx+1] : ''
+                            const t = this.sheet.transpose as number
+                            if ( t !== 0 || ( sharpFlat !== '' && sharpFlat !== this.sheet.sharpFlat ) ) {
+                                chordNote = this.transpose(transNote, t)
+                                if ( bassIdx < 0 ) {
+                                    bassIdx = e.fullChord.length + 1
+                                }
+                                else {
+                                    bassNote = '/' + this.transpose(e.fullChord[bassIdx+1])
+                                }
+                            }
+                            const chord = chordNote + e.fullChord.slice(transNote.length).join('').replace(/\/.*$/,'') + bassNote;
+                            e.transChord = chord
+                            // console.debug( `Orig: ${e.fullChord.join('')}, NewChord: ${chord}, newNote: ${chordNote}, t: ${this.sheet.transpose}`)
+                            assert ( e.tie !== undefined, `Missing 'tie' in ${JSON.stringify(e)}`)
+                            const comment = ( e.comment !== '' ? ' (' + e.comment + ')' : e.comment).replace(',', ';')
 
-                                const chordNoBass = chord.replace(/\/[A-G][b#]{0,1}/,'')
-                                const prevNoBass = prevChord.replace(/\/[A-G][b#]{0,1}/,'')
-                                
-                                if ( firstChord ) {
-                                    barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
-                                    firstChord = false
+                            // set the chord position and duration
+                            const encoding = '$' 
+                            let duration = e.duration[0]
+
+                            const chordNoBass = chord.replace(/\/[A-G][b#]{0,1}/,'')
+                            const prevNoBass = prevChord.replace(/\/[A-G][b#]{0,1}/,'')
+                            
+                            if ( firstChord ) {
+                                barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
+                                firstChord = false
+                            }
+                            else if ( chord !== prevChord ) {
+                                if ( chordNoBass === prevNoBass ) {
+                                    const bass = chord.replace(/^[^\/]+/,'')
+                                    barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.-${bass}${comment}${encoding}`)
                                 }
-                                else if ( chord !== prevChord ) {
-                                    if ( chordNoBass === prevNoBass ) {
-                                        const bass = chord.replace(/^[^\/]+/,'')
-                                        barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.-${bass}${comment}${encoding}`)
-                                    }
-                                    else
-                                        barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
-                                } 
-                                else {            
-                                    barNotes.push(`:${e.duration[0]}S ${e.tie}B/4`)
-                                }
-                                // add any tied note lengths
-                                for( let i = 1 ; i < e.duration.length; i++ ) {
-                                    duration += e.duration[i]
-                                    barNotes.push(` :${e.duration[i]}S tB/4 `)
-                                }
-                                proChords.push({ chord:chord, duration: duration })
-                                prevChord = chord
-                                prevDuration = e.duration
-                                handled.set(e.id, true)        
+                                else
+                                    barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
+                            } 
+                            else {            
+                                barNotes.push(`:${e.duration[0]}S ${e.tie}B/4`)
+                            }
+                            // add any tied note lengths
+                            for( let i = 1 ; i < e.duration.length; i++ ) {
+                                duration += e.duration[i]
+                                barNotes.push(` :${e.duration[i]}S tB/4 `)
+                            }
+                            proChords.push({ chord:chord, duration: duration })
+                            prevChord = chord
+                            prevDuration = e.duration
+                            handled.set(e.id, true)        
                         }
                     else if ( e.type === 'REPEAT_CHORD' ) {
                             assert( prevChord !== 'unset', `A previous chord must exist to use '/' for Repeat Chord`)
@@ -467,29 +530,45 @@ export class Vextab {
                             handled.set(e.id, true)     
                         }                                                           
                     else if ( e.type === 'REST' ) {
-                                let duration = e.duration[0]
-                                barNotes.push(`:${e.duration} ${e.tie}##`)
-                                // add any tied note lengths
-                                for( let i = 1 ; i < e.duration.length; i++ ) {
-                                    duration += e.duration[i]
-                                    barNotes.push(` :${e.duration[i]}S t## `)
-                                }
-                                proChords.push({chord: 'R', duration: duration })
-                                handled.set(e.id, true) 
-                            }                      
+                            let duration = e.duration[0]
+                            barNotes.push(`:${e.duration} ${e.tie}##`)
+                            // add any tied note lengths
+                            for( let i = 1 ; i < e.duration.length; i++ ) {
+                                duration += e.duration[i]
+                                barNotes.push(` :${e.duration[i]}S t## `)
+                            }
+                            proChords.push({chord: 'R', duration: duration })
+                            handled.set(e.id, true) 
+                        }                      
                     else if ( e.type === 'SCALE' ) {
+                            const scaleArr = _.clone(e.fullScale)
+
+                            for ( let i = 0; i < e.fullScale ; i++ ) {
+                                let transNote = 'none'
+                                if ( i == 0 ) transNote = e.fullScale[i]
+                                else if ( e.fullScale[i] === '/' || e.fullScale[i] === ',' ) {
+                                    transNote = e.fullScale[++i]
+                                }
+                                if ( transNote !== 'none' ) {
+                                    const sharpFlat = transNote[1] ?? '' 
+                                    if ( this.sheet.transpose  !== 0 || ( sharpFlat !== '' && sharpFlat !== this.sheet.sharpFlat ) ) {
+                                        scaleArr[i] = this.transpose(transNote)
+                                    }
+                                }
+                            }
+                            const scale = scaleArr.join(' ')
                             const len = barNotes.length
                             if ( len === 0 ) {
-                                barNotes.push(`[${e.fullScale.join(' ')}]`) 
+                                barNotes.push(`[${scale}]`) 
                             }
                             else {
                                 const prevEntry = barNotes[len-1]
                                 // If previous entry is a chord entry, merge
                                 if ( prevEntry.endsWith('$') ) {
-                                    barNotes[len-1] = prevEntry.substring(0, prevEntry.length -1) + ` [${e.fullScale.join(' ')}]$`
+                                    barNotes[len-1] = prevEntry.substring(0, prevEntry.length -1) + ` [${scale}]$`
                                 }
                                 else {
-                                    barNotes.push(`[${e.fullScale.join(' ')}]`)
+                                    barNotes.push(`[${scale}]`)
                                 }
                             }
                             handled.set(e.id, true)
@@ -548,14 +627,12 @@ export class Vextab {
                     else if ( e.type === 'TEXT') {
                             const textParts = []
                             assert( sectionActive, `Cannot insert text aligned with chords outside a section`)
-
                             // Handle setup for the USE of another section
                             if ( this.currUseSection !== '' ) {    
                                 this.currChordsAndDurations = this.pushUseSectionLine(this.currSection, this.currUseSection, ++this.currLineCounter)     
                                 // Construct the durations from the USE section
                                 e.textDurations = _.clone(this.currChordsAndDurations!.durations)
-                            }
-                          
+                            }         
                             try {
                                 sectionHasContent = ( sectionHasContent || e.textParts.length > 0 )
                                 this.pushTextOnly(e.textParts.join(' ').replaceAll('  ', ' '))

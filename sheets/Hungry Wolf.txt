@@ -1,6 +1,6 @@
 Title: Hungry Wolf
 Author: J. T. Funny Paper Smith 
-Key: Gm
+Key: G Minor
 Form: 
     - Intro
     - Verse 1

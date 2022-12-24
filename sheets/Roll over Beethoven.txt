@@ -1,6 +1,14 @@
 Title: Roll Over Beethoven 
+Key: F Minor
 Tempo: 66
-
+Form: 
+    - Intro
+    - Verse 1
+    - Bridge 1
+    - Chorus
+    - Verse 3
+    - Verse 4
+    - Chorus 1
 Intro: 
 | Fm7 | Bb79 | Fm7 | Bb79 |
 
@@ -22,7 +30,7 @@ Bridge 1:
 _feel it and like it.  _Well get your lover and _reel and rock it. _Roll it over and
 | F7                   | E7no5 Db/Eb | Ab6               | C7#5  
 _move on up just a trifle _further _and _reel and rock it, _roll it over, roll
-| Db6                  | Db/Eb     E7no5 | Fm7 
+| Db6                  | Db/Eb     E7no5 | F7 
 _over Beethoven, _rocking in _two by _two. 
 
 Chorus:

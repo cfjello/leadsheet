@@ -40,6 +40,7 @@ export type ChordType = {
 // Vextab Rendering
 //
 export type VextabDefaults = { 
+    transpose:        number,
     quaterNoteTicks:  number, 
     currTicks:        number,
     currBarSize:      number,
@@ -75,6 +76,8 @@ export type   VextabSheetType = {
   sectionsCP: VextabSectionType,
   textOnly:   VextabSectionType,
   render:     RenderSectionType
+  transpose:  number,
+  sharpFlat:  string
 }
 
 
@@ -85,6 +88,8 @@ export type   VextabRestSheetType = {
   sectionsCP: VextabSectionArrType[]
   textOnly:   { [key: string]: string[] }
   render:     { [key: string]: RenderType }
+  transpose:  number,
+  sharpFlat:  string
 }
 
 export type ChordsAndDurationsType = {

@@ -35,32 +35,40 @@ const htmlRouter = Router();
 // GET home page.
 
 htmlRouter.get("/", (req, res, next) => {
-    const fileName = path.join(__dirname,"./html/LeadSheetVue.html").normalize()
-    console.log(`Server sends file: ${fileName}`)
-    res.set( { 'content-type': 'text/html'} )
-    res.sendFile(fileName)
+    try {
+      const fileName = path.join(__dirname,"./html/LeadSheetVue.html").normalize()
+      console.log(`Server sends file: ${fileName}`)
+      res.set( { 'content-type': 'text/html'} )
+      res.sendFile(fileName)
+    }
+    catch ( err ) {
+      console.error(`Get Main page Error: ${err}`)
+    }
 });
 
 htmlRouter.get("/html/favicon.png", (req, res, next) => {
-  const fileName = path.join(__dirname,"./html/favicon.png").normalize()
-  console.log(`Server sends file: ${fileName}`)
-  res.set( { 'content-type': 'image/svg+xml'} )
-  res.sendFile(fileName)
+    const fileName = path.join(__dirname,"./html/favicon.png").normalize()
+    console.log(`Server sends file: ${fileName}`)
+    res.set( { 'content-type': 'image/svg+xml'} )
+    res.sendFile(fileName)
 });
 
 // Serve Song Pages
 songRouter.get("/sheet/:name", async (req, res) => {
     console.log(`Server GOT request for Sheet`)
-  if ( ! req.params.name ) {  // TODO: check later - || ! LS.menuList.includes(req.params.name)
-      console.log(`Server Unknown Song Error for: ${req.params.name}`) 
-      res.setStatus(400).json({
+    if ( ! req.params.name ) {  // TODO: check later - || ! LS.menuList.includes(req.params.name)
+        console.log(`Server Unknown Song Error for: ${req.params.name}`) 
+        res.setStatus(400).json({
         success: "false",
         data: 'Unknown Song',
       });
   }
   else { // We have a song
-      console.log(`Server to send ${req.params.name} sheet data`)
-      const data = await LS.getRestSheet(req.params.name)
+      console.log(`Server reading query args: ${JSON.stringify(req.query)}`)
+      const transpose = parseInt(req.query.t)
+      const sharpFlat = req.query.sf
+      console.log(`Serving request for sheet: ${req.params.name}, with transpose: ${transpose}, sharpFlat: '${sharpFlat}'`)
+      const data = await LS.getRestSheet(req.params.name, transpose, sharpFlat)
       // Deno.writeTextFile('./log.txt',`${JSON.stringify(data, undefined, 2)}`, { append: false} )
       // res.set( { 'content-type': 'application/json'} )
       res.setStatus(200).json({
@@ -71,11 +79,11 @@ songRouter.get("/sheet/:name", async (req, res) => {
 });
 
 // Serve Menu Items
-songRouter.get("/menu", async (req, res) => {
+songRouter.get("/menu", (req, res) => {
     console.log(`Server GOT request for MenuItems`)
-  if ( ! LS.menuList) {
-      console.log(`Server cannot find the Menu List`) 
-      res.setStatus(400).json({
+    if ( ! LS.menuList) {
+        console.log(`Server cannot find the Menu List`) 
+        res.setStatus(400).json({
         success: "false",
         data: 'No Menu List',
       });
@@ -85,7 +93,7 @@ songRouter.get("/menu", async (req, res) => {
       // res.set( { 'content-type': 'application/json'} )
       res.setStatus(200).json({
         success: "true",
-        data: await LS.getMenuItems(),
+        data: LS.getMenuItems(),
       });
   }
 });

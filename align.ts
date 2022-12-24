@@ -92,11 +92,10 @@ export const align = (cmds: any[]) => {
         for ( let i = idx + 1; goOn; i++ ) {
             const c =cmds[i]
             if ( ! c.matched || (c.text === 'CHORD_NOTE' || c.text === 'always') && c.type === 'Token') continue
-            if ( ['CHORD_TYPE', 'CHORD_REPEAT', 'CHORD_EXT', 'CHORD_EXT2', 'CHORD_BASS', 'CHORD_INVERSION', 'CHORD_MINUS_NOTE'].includes(c.type) )    
-                if ( c.type === 'CHORD_BASS' ) 
-                    fullChord.push( `/${c.value}`)
-                else 
-                    fullChord.push(c.value)
+            if ( ['CHORD_TYPE', 'CHORD_REPEAT', 'CHORD_EXT', 'CHORD_EXT2', 'CHORD_BASS', 'CHORD_INVERSION', 'CHORD_MINUS_NOTE'].includes(c.type) ) {   
+                if ( c.type === 'CHORD_BASS' ) fullChord.push( `/`)
+                fullChord.push(c.value)
+            }
             else {
                 goOn = false
             }

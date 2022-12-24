@@ -1,5 +1,8 @@
 Title: Road to Cairo 
 Author: David Ackles 
+Key: D Minor
+Meter: 6/8
+
 Intro:       
 | Bbmaj7 | Dm add9 | Bbmaj7 | A7#5  |
 Verse 1:

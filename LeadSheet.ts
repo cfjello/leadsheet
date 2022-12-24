@@ -35,6 +35,7 @@ export class LeadSheet {
 
     // Parser
     parser = new Parser( LR, PR, 'reset')   
+    currVextab: Vextab | undefined
 
     constructor( 
         public sheetsDir = `${__dirname}/sheets`, 
@@ -82,13 +83,15 @@ export class LeadSheet {
 
     // Sheet header
     getSheet(sheetName: string): VextabSheetType {
-        if ( ! this.vexed.has(sheetName) ) this.renderVextab( sheetName )
+        // if ( ! this.vexed.has(sheetName) ) 
+        this.renderVextab( sheetName )
         return this.vexed.get(sheetName)!
     }
 
 
-    getRestSheet = async(sheetName: string): Promise<VextabRestSheetType> => {
-        if ( ! this.vexed.has(sheetName) ) await this.renderVextab( sheetName )
+    getRestSheet = async(sheetName: string, transpose = 0, sharpFlat = ''): Promise<VextabRestSheetType> => {
+        // if ( ! this.vexed.has(sheetName) || transpose !== 0 ) 
+        await this.renderVextab( sheetName, true, transpose, sharpFlat )
         // const parseTree = this.parsed.get(sheetName)
         // Deno.writeTextFile('./pars.txt',`${JSON.stringify(parseTree, undefined, 2)}`, { append: false} )
         return Promise.resolve( { 
@@ -97,7 +100,9 @@ export class LeadSheet {
             chords:     Array.from(this.vexed.get(sheetName)!.chords, ([name, value]) => ({ name, value })),
             sectionsCP: Array.from(this.vexed.get(sheetName)!.sectionsCP, ([name, value]) => ({ name, value })), 
             textOnly:   Object.fromEntries(this.vexed.get(sheetName)!.textOnly),
-            render:     Object.fromEntries(this.vexed.get(sheetName)!.render)
+            render:     Object.fromEntries(this.vexed.get(sheetName)!.render),
+            transpose:  transpose,
+            sharpFlat:  sharpFlat
         })
     }
 
@@ -169,15 +174,17 @@ export class LeadSheet {
         return Promise.resolve(ret)
     }
 
-    renderVextab = async (sheetName: string, force = false): Promise<void>  => {
-        if ( ! this.vexed.has(sheetName) || force ) {
+    renderVextab = async (sheetName: string, force = false, transpose = 0, sharpFlat = ''): Promise<void>  => {
+        // const vexed =  this.vexed.get(sheetName)
+        // if ( ! vexed || force || ( vexed.transpose !== 0 || vexed.sharpFlat !== sharpFlat ) ) {
             if ( ! this.parsed.has(sheetName) || force ) {
                 await this.parseSheet(sheetName, force)
             }
-            const vextab = new Vextab( this.parsed.get(sheetName), false )
-            vextab.render()
+            const vextab = new Vextab( this.parsed.get(sheetName), false, transpose, sharpFlat )
+            vextab.render(transpose,  )
             this.vexed.set( sheetName, _.cloneDeep(vextab.getSheet()) ) 
-        }
+            this.currVextab = vextab
+        // }
         return Promise.resolve()
     }
 }

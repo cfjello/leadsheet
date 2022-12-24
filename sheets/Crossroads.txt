@@ -19,9 +19,9 @@ Verse 2:
 | F#m7          B7sus4/E         | B7               | F#m7         B7sus4/E       | B7   
 _Standing at the _crossroads, _I tried to flag a _ ride _ _
 | Aadd2,2         Gmaj7,4+8  Dmaj7,8 | Dmaj7,t2   E7sus4/E  E7sus4/F | F#m7         B7sus4/E       | B7
-_Standing at the _crossro-_ oo- _oads, _           _I tried to _flag a _ride _ _
-| Aadd2                 B7         | C#aug7   Gmaj7b5 | | F#m7         G#m7       | Bsus2/D   E7sus4 
-_Nobody seemed to _know me-_e, _everybody passed me _by _ _ _
+_Standing at the _crossro-_ oo- _oads, _           _I tried to _flag a _ride _ _ No-
+| Aadd2                 B7         | C#aug7   Gmaj7b5 |  F#m7         G#m7       | Bsus2/D   E7sus4 
+_body seemed to _know me- _ee, everybody _passed me _by _ _ _ 
 
 Bridge: 
 | Fmaj7                        | Ebmaj7                          | Bbmaj7 | A7#5 

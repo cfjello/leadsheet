@@ -14,7 +14,7 @@
     <!-- script src="https://unpkg.com/vextab/releases/div.prod.js"></script -->
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"  id="bootstrap-css"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <script type="text/javascript"  id="VexTab" src="https://unpkg.com/vextab/releases/main.dev.js"></script>
@@ -23,9 +23,12 @@
          window.addEventListener("load", function(event) {
             new Vue({
             el: "#vueRoot",
+            self: this,
             data() {
                 return  {
                     transpose: 0,
+                    sharpFlat: 'b',
+                    currSheet: 'Default',
                     menu: [{ menuItem: 'Dummy', menuRef: 'Dummy' }],
                     sheet:  { 
                         header: { 
@@ -58,8 +61,8 @@
                 if ( this.sheet.header.title !== 'unknown' ) this.renderSheet()
             },
             methods: {
-                dummyFunc() {
-                    console.log(`I am this.dummyFunc()`)
+                doTranspose() {
+                    this.fetchSheet(this.currSheet)
                 },
                 fetchMenu() {
                     fetch('/api/v1/menu')
@@ -73,24 +76,25 @@
                 },
                 fetchSheet(name) {
                     name = name === undefined ? 'Default' : name
-                    console.log(`Vue to request Sheet: ${name} from server`)
-                        try {
-                            fetch( `/api/v1/sheet/${name}`)
-                            .then ( response => response.json() )
-                            .then ( resData => { 
-                                this.sheet = resData.data
-                                // console.log(`NEW SHEET: ${JSON.stringify(this.sheet)}`)
-                                // this.rendered = false
-                            })
-                            .catch(err => {
-                                console.log(err)
-                            })
-                        }
-                        catch (err) { console.log(err) }
+                    this.currSheet = name
+                    // console.log(`Vue to request Sheet: ${name} from server`)
+                    try {
+                        fetch( `/api/v1/sheet/${name}?t=${this.transpose}&sf=${this.sharpFlat === '#' ? '%23': 'b' }`)
+                        .then ( response => response.json() )
+                        .then ( resData => { 
+                            this.sheet = resData.data
+                            // console.log(`NEW SHEET: ${JSON.stringify(this.sheet)}`)
+                            // this.rendered = false
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
+                    }
+                    catch (err) { console.log(err) }
                 },
                 renderVextabSection( key, value ) {
                     try {
-                        console.log(`RENDER Section: "${key}" for: ${value}`)
+                        // console.log(`RENDER Section: "${key}" for: ${value}`)
                         const Renderer = Vex.Flow.Renderer;
                         // Create VexFlow Renderer from canvas element with id #boo
                         const target = document.getElementById(key)
@@ -117,10 +121,10 @@
                     // deno-lint-ignore no-this-alias
                     const self = this
                     try {
-                        console.log(`RENDER SHEET`)
+                        // console.log(`RENDER SHEET`)
                         this.sheet.sections.forEach( ( section )  => {
                             if ( section.value.length < 1 )  console.error(`renderSheet() has no notes entry for ${section}` )
-                            console.log(`RENDER SECTION: ${JSON.stringify(section, undefined, 2)}`)
+                            // console.log(`RENDER SECTION: ${JSON.stringify(section, undefined, 2)}`)
                             const render = this.sheet.render[section.name]
                             if ( render === 'textAndNotes' || render === 'notesOnly' ) {
                                 const vex = []
@@ -190,7 +194,14 @@
             font-weight: bold;
             font-size: 14px;
         }
-
+        .center {
+            width: 185px;
+            margin: 1px auto; 
+            font-size: 16px;      
+        }
+        #sideMenu {
+            text-decoration: none;
+        }
         ul.no-bullets {
             list-style-type: none; /* Remove bullets */
             padding: 0; /* Remove padding */
@@ -204,13 +215,13 @@
 </head>
 <body>
 <noscript>You need to enable JavaScript to run this app.</noscript>
-<div style="text-align: center; font-family: courier; font-size: 60px;background-color:lightseagreen;">
+<div style="text-align: center; font-family: courier; font-size: 60px;color: white; background-color: lightseagreen ;">
     <span style="font-size: 60px;">LeadSheet </span><span  style="font-size: 30px;">(v0.0.1)</span>
 </div>
 <div>
     <style>
         #sidebar-nav {
-            width: 160px;
+            width: 185px;
         }
     </style> 
     <div class="container-fluid" id="vueRoot">
@@ -234,7 +245,7 @@
 {comment: {{sheet.header.form.join(',')}} }
 <div v-for="sectionCP in sheet.sectionsCP" v-bind:key="sectionCP.name">
 {comment: {{sectionCP.name}} }
-{{sectionCP.value.join('\n')}}
+{{sectionCP.value.join('\n').replace(/79/mg, '7')}}
 </div>
 </pre>
                     </div>
@@ -256,6 +267,31 @@
                          rounded-0 text-sm-start 
                          min-vh-100">
                         <ul class="no-bullets" >
+                            <li>
+                                <div class="input-group center">     
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-danger btn-number" v-on:click="transpose = (transpose -1) % 12" data-type="minus">
+                                        <span class="center">-</span>
+                                        </button>
+                                    </span>
+                                    <input type="text" v-model="transpose" class="form-control input-number" min="0" max="11">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-success btn-number" v-on:click="transpose = (transpose +1) % 12" data-type="plus">
+                                            <span class="center">+</span>
+                                        </button>
+                                    </span>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-secondary btn-number" v-on:click="sharpFlat=sharpFlat === '#' ? 'b' : '#'" data-type="sf">
+                                            <span class="center">{{sharpFlat}}</span>
+                                        </button>
+                                    </span>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary btn-number" v-on:click="doTranspose()">
+                                        <span class="center">T</span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </li>
                             <li  v-for="item in Object.values(menu)" v-bind:key="item.menuRef">
                                 <div class="btn-group border-0" role="group" aria-label="song button group">
                                     <button type="button" data-bs-toggle="modal" data-bs-target="#CPModal"
@@ -281,11 +317,11 @@
                 </div>
             </div>
             <main class="col ps-md-2 pt-2">
-                <a  href="#" 
+                <a  href="#" id="sideMenu"
                     data-bs-target="#sidebar" 
                     data-bs-toggle="collapse"
-                    class="text-decoration-none">
-                    <i class="bi bi-list bi-lg py-3 p-1"></i> <b class="text-decoration-none">Menu </b>
+                    style="text-decoration: none;">
+                    <i class="bi bi-list bi--5xl"></i> <b>Menu</b>
                 </a>
                 <div id="vueHeader" class="page-header pt-3">
                     <h5>Title:  <span>{{sheet.header.title}}</span></h5>
