@@ -7,6 +7,8 @@ import { _ } from './lodash.ts';
 
 const __dirname = path.dirname(import.meta.url);
 
+console.debug(`__dirname: ${__dirname}`)
+
 // Initialize main page
 const LS = new LeadSheet()
 LS.debug = false
