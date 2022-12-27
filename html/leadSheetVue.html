@@ -74,12 +74,12 @@
                         console.log(err)
                     })
                 },
-                fetchSheet(name) {
+                fetchSheet(name, reload) {
                     name = name === undefined ? 'Default' : name
                     this.currSheet = name
                     // console.log(`Vue to request Sheet: ${name} from server`)
                     try {
-                        fetch( `/api/v1/sheet/${name}?t=${this.transpose}&sf=${this.sharpFlat === '#' ? '%23': 'b' }`)
+                        fetch( `/api/v1/sheet/${name}?t=${this.transpose}&sf=${this.sharpFlat === '#' ? '%23': 'b' }&rl=${reload !== undefined ? 'yes': 'no'}`)
                         .then ( response => response.json() )
                         .then ( resData => { 
                             this.sheet = resData.data
@@ -302,6 +302,14 @@
                                         data-bs-parent="#sidebar">
                                         <i class="bi bi-file-earmark-ppt"></i> 
                                     </button>
+                                    <button @click="fetchSheet(item.menuRef, 'reload')" 
+                                    class="btn btn-secondary p-1 list-group-item 
+                                    border-end-0 
+                                    d-inline-block 
+                                    text-truncate" 
+                                    data-bs-parent="#sidebar">
+                                    <i class="bi bi-file-earmark-arrow-up"></i> 
+                                </button>
                                     <button @click="fetchSheet(item.menuRef)" 
                                         class="btn btn-secondary p-1 btn-sm list-group-item 
                                         border-end-0 

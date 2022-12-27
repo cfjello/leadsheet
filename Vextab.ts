@@ -418,7 +418,7 @@ export class Vextab {
                             let keyNote =  e.fullKey[0]
                             const sharpFlat = transNote[1] ?? '' 
                             if ( this.sheet.transpose !== 0 || ( sharpFlat !== '' && sharpFlat !== this.sheet.sharpFlat ) ) {
-                                keyNote = this.transpose(transNote, this.sheet.transpose)
+                                keyNote = this.transpose(transNote, this.sheet.transpose, this.sheet.sharpFlat )
                             }
                             const key = keyNote + ' ' + e.fullKey.slice(1).join(' ')
                             e.transKey = key

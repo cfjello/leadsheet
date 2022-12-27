@@ -67,8 +67,9 @@ songRouter.get("/sheet/:name", async (req, res) => {
       console.log(`Server reading query args: ${JSON.stringify(req.query)}`)
       const transpose = parseInt(req.query.t)
       const sharpFlat = req.query.sf
+      const reload = req.query.rl === 'yes' ? true: false
       console.log(`Serving request for sheet: ${req.params.name}, with transpose: ${transpose}, sharpFlat: '${sharpFlat}'`)
-      const data = await LS.getRestSheet(req.params.name, transpose, sharpFlat)
+      const data = await LS.getRestSheet(req.params.name, transpose, sharpFlat, reload )
       // Deno.writeTextFile('./log.txt',`${JSON.stringify(data, undefined, 2)}`, { append: false} )
       // res.set( { 'content-type': 'application/json'} )
       res.setStatus(200).json({

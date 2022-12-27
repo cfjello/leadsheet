@@ -89,9 +89,9 @@ export class LeadSheet {
     }
 
 
-    getRestSheet = async(sheetName: string, transpose = 0, sharpFlat = ''): Promise<VextabRestSheetType> => {
+    getRestSheet = async(sheetName: string, transpose = 0, sharpFlat = '', reload = false): Promise<VextabRestSheetType> => {
         // if ( ! this.vexed.has(sheetName) || transpose !== 0 ) 
-        await this.renderVextab( sheetName, true, transpose, sharpFlat )
+        await this.renderVextab( sheetName, true, transpose, sharpFlat, reload )
         // const parseTree = this.parsed.get(sheetName)
         // Deno.writeTextFile('./pars.txt',`${JSON.stringify(parseTree, undefined, 2)}`, { append: false} )
         return Promise.resolve( { 
@@ -146,12 +146,12 @@ export class LeadSheet {
         catch( err ) { console.error(`Cannot read file: ${filePath} - ${err}`) }
     }
 
-    parseSheet = async ( sheetName: string, forceRead = false ): Promise<boolean> => {
+    parseSheet = async ( sheetName: string, reload = false ): Promise<boolean> => {
         let ret = false
         try {
             this.parser = new Parser( LR, PR, 'reset')  
             this.parser.debug = this.debug
-            if ( forceRead ) await this.loadNamedSheet(sheetName)
+            if ( reload ) await this.loadNamedSheet(sheetName)
             this.parser.reset(this.sheets.get(sheetName)!)
             const tree = this.parser.getParseTree()
             align(tree) 
@@ -174,14 +174,14 @@ export class LeadSheet {
         return Promise.resolve(ret)
     }
 
-    renderVextab = async (sheetName: string, force = false, transpose = 0, sharpFlat = ''): Promise<void>  => {
+    renderVextab = async (sheetName: string, force = false, transpose = 0, sharpFlat = '', reload = false): Promise<void>  => {
         // const vexed =  this.vexed.get(sheetName)
         // if ( ! vexed || force || ( vexed.transpose !== 0 || vexed.sharpFlat !== sharpFlat ) ) {
-            if ( ! this.parsed.has(sheetName) || force ) {
-                await this.parseSheet(sheetName, force)
+           if ( reload || force  || !this.parsed.has(sheetName) ) { 
+                await this.parseSheet(sheetName, reload )
             }
             const vextab = new Vextab( this.parsed.get(sheetName), false, transpose, sharpFlat )
-            vextab.render(transpose,  )
+            vextab.render(transpose, sharpFlat )
             this.vexed.set( sheetName, _.cloneDeep(vextab.getSheet()) ) 
             this.currVextab = vextab
         // }

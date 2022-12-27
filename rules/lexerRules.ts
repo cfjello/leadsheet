@@ -109,7 +109,7 @@ const LR: LexerRules = {
         }
     },
     CHORD_TYPE: XRegExp('(?<value>[S|s]us2|[S|s]us4|[D|d]im|[A|a]ug|[M|m]ajor|[M|m]aj|[M|m]inor|[Q|q]uatal|[M|m]in|M|m|Q|q|5)', 'ixg'),
-    CHORD_EXT:  XRegExp('(?<value>b5|#5|6|7|9|b9|#9|11|#11|b13|13)', 'g'),
+    CHORD_EXT:  XRegExp('(?<value>b5|#5|\\+|6|7|9|b9|#9|11|#11|b13|13)', 'g'),
     CHORD_EXT2: XRegExp('(?<value>add2|add#5|add9|sus2|sus4|add11|add#11|add13)', 'g'),
     CHORD_BASS: XRegExp('(?<token>\/)(?<value>[A|B|C|D|E|F|G|a|b|c|d|e|f|g][#|b]{0,1})', 'xg'),
     OCTAVE: XRegExp('(?<token>\/)(?<value>\\-2|\\-1|0|1|2|3|4|5|6)', 'xg'),
