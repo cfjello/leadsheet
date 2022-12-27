@@ -8,6 +8,9 @@ import { _ } from './lodash.ts';
 const __dirname = path.dirname(import.meta.url);
 
 console.debug(`__dirname: ${__dirname}`)
+for await (const dirEntry of Deno.readDir(__dirname)) {
+  console.log(JSON.stringify(dirEntry));
+}
 
 // Initialize main page
 const LS = new LeadSheet()
