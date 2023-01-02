@@ -50,13 +50,16 @@ export class LeadSheet {
     } as VextabDefaults) {}
 
     // Menu Items
-    getMenuItems = ( force = false ): ArgsObject[] => {
+    getMenuItems = async ( force = false ): Promise<ArgsObject[]> => {
         if ( this.menuList.length === 0 || force ) {
+            if ( this.fileEntries.size === 0 ) {
+                await this.loadSheetList()
+            }
             // deno-lint-ignore no-unused-vars
             for ( const [ key, entry] of this.fileEntries ) 
                 this.menuList.push({ menuItem: entry.name, menuRef: entry.baseName} as ArgsObject)
         }
-        return this.menuList
+        return Promise.resolve(this.menuList)
     }
 
     getMenuItemNames = (): string[] => {

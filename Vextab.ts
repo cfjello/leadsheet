@@ -385,6 +385,7 @@ export class Vextab {
         assert( transpose > -12 && transpose < 12, `Illegal transpose value: ${transpose} - must be between -11 and 11.` )
         try {
             this.cmds.forEach( (e, i)  => {
+                if ( i === 0 ) console.debug( `Rendering...`)
                 if ( ! handled.has(e.id) ) {
                     currElem = e
                     if ( e.type ===  'NL' ) {     

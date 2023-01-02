@@ -1,7 +1,7 @@
 
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png"" href="html/favicon.png" >
+    <link rel="icon" type="image/png"" href="/html/favicon.png" >
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -18,7 +18,7 @@
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <script type="text/javascript"  id="VexTab" src="https://unpkg.com/vextab/releases/main.dev.js"></script>
-    <script src="https://unpkg.com/vexflow@4.0.3/releases/vexflow-debug.js"></script>
+    <script src="https://unpkg.com/vexflow@4.1.0/releases/vexflow-debug.js"></script>
     <script>
          window.addEventListener("load", function(event) {
             new Vue({
@@ -69,7 +69,7 @@
                     .then ( response => response.json() )
                     .then ( resData => {
                         resData.data.forEach( (value, idx) => Vue.set( this.menu, idx, { menuItem: value.menuItem, menuRef: value.menuRef } ) )
-                        // console.log( `INIT Menu is now: ${JSON.stringify(this.menu)}`)
+                        console.log( `INIT Menu is now: ${JSON.stringify(this.menu)}`)
                     }).catch(err => {
                         console.log(err)
                     })
@@ -83,7 +83,7 @@
                         .then ( response => response.json() )
                         .then ( resData => { 
                             this.sheet = resData.data
-                            // console.log(`NEW SHEET: ${JSON.stringify(this.sheet)}`)
+                            console.log(`NEW SHEET: ${JSON.stringify(this.sheet)}`)
                             // this.rendered = false
                         })
                         .catch(err => {
@@ -144,7 +144,7 @@
                                     throw Error(`Section ${section.name} is "textOnly", but has no this.sheet.textOnly entry`)
                             }
                             else {
-                                throw Error(`renderSheet. undefide value for render: ${render} - should be "textOnly | notesOnly | textAndNotes"`)
+                                throw Error(`renderSheet. undefined value for render: ${render} - should be "textOnly | notesOnly | textAndNotes"`)
                             }
                         })
                     }
@@ -154,7 +154,7 @@
                     try {
                         console.log('Running Init()')
                         this.fetchMenu()
-                        this.fetchSheet('Default')
+                        this.fetchSheet('Default', 'yes')
                     }
                     catch (err) { console.log(err) }
                 }

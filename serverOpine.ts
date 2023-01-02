@@ -7,10 +7,12 @@ import { _ } from './lodash.ts';
 
 const __dirname = path.dirname(import.meta.url);
 
+/*
 console.debug(`__dirname: ${__dirname}`)
 for await (const dirEntry of Deno.readDir(__dirname)) {
   console.log(JSON.stringify(dirEntry));
 }
+*/
 
 // Initialize main page
 const LS = new LeadSheet()
@@ -85,7 +87,7 @@ songRouter.get("/sheet/:name", async (req, res) => {
 });
 
 // Serve Menu Items
-songRouter.get("/menu", (req, res) => {
+songRouter.get("/menu", async (req, res) => {
     console.log(`Server GOT request for MenuItems`)
     if ( ! LS.menuList) {
         console.log(`Server cannot find the Menu List`) 
@@ -99,7 +101,7 @@ songRouter.get("/menu", (req, res) => {
       // res.set( { 'content-type': 'application/json'} )
       res.setStatus(200).json({
         success: "true",
-        data: LS.getMenuItems(),
+        data: await LS.getMenuItems(),
       });
   }
 });
