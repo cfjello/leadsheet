@@ -71,7 +71,7 @@ export class LeadSheet {
         let entry: WalkEntryExt = {} as WalkEntryExt
         try {
             for (entry of await fileWalk(this.sheetsDir, this.matchPattern)) {
-                if ( entry.isFile && ! entry.isDirectory ) {
+                if ( entry.isFile && ! entry.isDirectory && entry.name.endsWith('.txt')) {
                     this.fileEntries.set(entry.baseName, entry)
                 }
             }
