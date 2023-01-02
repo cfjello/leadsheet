@@ -12,7 +12,8 @@ import align from "./align.ts";
 import * as path from "https://deno.land/std/path/mod.ts";
 import Vextab from "./Vextab.ts";
 
-const __dirname = path.dirname( path.fromFileUrl(new URL('./leadsheet', import.meta.url)) )
+// const __dirname = path.dirname( path.fromFileUrl(new URL('./leadsheet', import.meta.url)) )
+const __dirname = Deno.cwd()
 
 export class LeadSheet {   
    private _debug = false
