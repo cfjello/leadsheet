@@ -5,14 +5,7 @@ import * as path from "https://deno.land/std@0.128.0/path/mod.ts";
 import { LeadSheet } from "./LeadSheet.ts";
 import { _ } from './lodash.ts';
 
-const __dirname = path.dirname(import.meta.url);
-
-/*
-console.debug(`__dirname: ${__dirname}`)
-for await (const dirEntry of Deno.readDir(__dirname)) {
-  console.log(JSON.stringify(dirEntry));
-}
-*/
+// const __dirname = path.dirname(import.meta.url);
 
 // Initialize main page
 const LS = new LeadSheet()
@@ -34,27 +27,27 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(serveStatic(path.join(__dirname,"./html").normalize()))
+app.use(serveStatic(path.join(Deno.cwd(),"./html").normalize()))
 const songRouter = Router();
 const htmlRouter = Router();
-// const jsRouter =   Router();
 
 // GET home page.
 
 htmlRouter.get("/", (req, res, next) => {
     try {
-      const fileName = path.join(__dirname,"./html/LeadSheetVue.html").normalize()
-      console.log(`Server sends file: ${fileName}`)
-      res.set( { 'content-type': 'text/html'} )
-      res.sendFile(fileName)
+        const fileName = path.join(Deno.cwd(),"./html/LeadSheetVue.html").normalize()
+        // const fileName = "./html/LeadSheetVue.html"
+        // console.log(`Server sends file: ${fileName}`)
+        res.set( { 'content-type': 'text/html'} )
+        res.sendFile(fileName)
     }
     catch ( err ) {
-      console.error(`Get Main page Error: ${err}`)
+        console.error(`Get Main page Error: ${err}`)
     }
 });
 
 htmlRouter.get("/html/favicon.png", (req, res, next) => {
-    const fileName = path.join(__dirname,"./html/favicon.png").normalize()
+    const fileName = path.join(Deno.cwd(),"./html/favicon.png").normalize()
     console.log(`Server sends file: ${fileName}`)
     res.set( { 'content-type': 'image/svg+xml'} )
     res.sendFile(fileName)
