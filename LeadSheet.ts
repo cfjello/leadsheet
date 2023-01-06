@@ -5,14 +5,12 @@ import { WalkEntryExt } from "./fileWalk.ts";
 import { fileWalk } from "./fileWalk.ts";
 import { _ } from './lodash.ts';
 import { Parser } from "https://deno.land/x/parlexa/mod.ts";
-// import { Parser } from "../parlexa/mod.ts";
 import LR from "./rules/lexerRules.ts";
 import PR from "./rules/parserRules.ts";
 import align from "./align.ts";
 import * as path from "https://deno.land/std/path/mod.ts";
 import Vextab from "./Vextab.ts";
 
-// const __dirname = path.dirname( path.fromFileUrl(new URL('./leadsheet', import.meta.url)) )
 const __dirname = Deno.cwd()
 
 export class LeadSheet {   
@@ -86,8 +84,7 @@ export class LeadSheet {
     }
 
     // Sheet header
-    getSheet(sheetName: string): VextabSheetType {
-        // if ( ! this.vexed.has(sheetName) ) 
+    getSheet(sheetName: string): VextabSheetType { 
         this.renderVextab( sheetName )
         return this.vexed.get(sheetName)!
     }
@@ -179,8 +176,6 @@ export class LeadSheet {
     }
 
     renderVextab = async (sheetName: string, force = false, transpose = 0, sharpFlat = '', reload = false): Promise<void>  => {
-        // const vexed =  this.vexed.get(sheetName)
-        // if ( ! vexed || force || ( vexed.transpose !== 0 || vexed.sharpFlat !== sharpFlat ) ) {
            if ( reload || force  || !this.parsed.has(sheetName) ) { 
                 await this.parseSheet(sheetName, reload )
             }

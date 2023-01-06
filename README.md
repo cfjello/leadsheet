@@ -1,6 +1,8 @@
-# Leadsheet - Prototype/Proff of Concept
+# Leadsheet - First Prototype
 
-This package reads a text leadsheets and produces a Vextab representation on a webpage. The text representation that has the format:
+This package reads a text leadsheets and renders them as Vextab representations on a webpage. 
+
+A text representation of the format (work in progress):
 ```
 Title: Angie
 Author: Rolling Stones
@@ -30,38 +32,13 @@ _You can't _say we're satis-_fied
 _ Angie, _ Angie. _You _can't _say we _never _tri_ed
 ```
 
-Running the package, an example is supplied in `deno run -A main.ts`, produces a Vextab representation: 
+produces this type of Vextab representation: 
 
 ![alt text](page.png "Vextab Example")
 
-The `main.ts` program looks like this:
+# Demo
 
-```
-import { angie } from "./test/Angie.ts"                             // Lead Sheet
-import { Parser } from "https://deno.land/x/parlexa@v1.0.3/mod.ts"  // Parser (parlexa)
-import  LR  from "./lexerRules.ts"                                  // Lexer Rules
-import  PR from "./parserRules.ts"                                  // Parser Rules
-import align from "./align.ts"                                      // Post Processor
-import Vextab from "./Vextab.ts";                                   // Vextab Renderer
-
-const parser = new Parser( LR, PR, 'reset')                         // Instanciate parser
-parser.debug = false
-parser.reset(angie)                                                 // Parse input
-const tree = parser.getParseTree()                                  // Get parse tree
-align(tree)
-
-const encoder = new TextEncoder();
-const data = encoder.encode( JSON.stringify(tree, undefined, 2) );
-Deno.writeFile( './data.json',data )
-
-const html = new Vextab(tree)                                       // Instanciate Vextab
-
-html.render()                                                       // Render html
-
-const encoderHtml = new TextEncoder();
-const dataHtml = encoderHtml.encode( html.getSinglePage());
-Deno.writeFile( './page.html',dataHtml )
-```
+For a demo of this package as it is used in conjunction with 'Denoserver' HTTP server, click this Deno Deploy'ed link: https://cfjello-deno-server.deno.dev/
 
 
 
