@@ -38,7 +38,7 @@ produces this type of Vextab representation:
 
 # Demo
 
-For a demo of this package as it is used in conjunction with 'Denoserver' HTTP server, click this Deno Deploy'ed link: https://cfjello-deno-server.deno.dev/
+For a demo of this package, as it is used in conjunction with 'Denoserver' HTTP server, click this Deno Deploy'ed link: https://cfjello-deno-server.deno.dev/
 
 
 
