@@ -54,7 +54,7 @@ export class Vextab {
 
         }
         this.debug = debug
-        console.debug(`Vextab.constructor() - Transpose: ${this.sheet.transpose}, sharpFlat = ${this.sheet.sharpFlat}`)
+        if ( this.debug) console.debug(`Vextab.constructor() - Transpose: ${this.sheet.transpose}, sharpFlat = ${this.sheet.sharpFlat}`)
     }
 
     // Transposition: 
@@ -117,7 +117,7 @@ export class Vextab {
         _keys: string | string[] , 
         idx: number, 
         _ignore: string | string[] = ['WS','NL'],
-        _backStop: string | string[] = []  ): any => {
+        _backStop: string | string[] = []  ): unknown => {
         let res    = undefined
         const keys   = Array.isArray(_keys ) ? _keys : [_keys]
         const ignore = Array.isArray(_ignore ) ? _ignore : [_ignore]
@@ -378,14 +378,14 @@ export class Vextab {
         let firstChord = true
         let prevChord = 'unset'
         let prevDuration = [] as number[]
-        let barsInLastLine = false
+        let _barsInLastLine = false
         let sectionActive = false
         let sectionHasContent = false
         // this.html = []
         assert( transpose > -12 && transpose < 12, `Illegal transpose value: ${transpose} - must be between -11 and 11.` )
         try {
             this.cmds.forEach( (e, i)  => {
-                if ( i === 0 ) console.debug( `Rendering...`)
+                if ( i === 0 && this.debug ) console.debug( `Rendering...`)
                 if ( ! handled.has(e.id) ) {
                     currElem = e
                     if ( e.type ===  'NL' ) {     
@@ -395,20 +395,20 @@ export class Vextab {
                                 this.currChordsAndDurations = this.pushNotes(barNotes, proChords)
                                 barNotes  = []
                                 proChords = []
-                                barsInLastLine = true
+                                _barsInLastLine = true
                                 firstChord = true
                                 handled.set(e.id, true)
                             }
                         }
                     else if ( e.type === 'TITLE') {  
-                            barsInLastLine = false
+                            _barsInLastLine = false
                             sectionActive = false
                             this.currChordsAndDurations = undefined
                             this.sheet.header.title = e.value
                             handled.set(e.id, true)
                         }
                     else if ( e.type === 'AUTHOR' )  {
-                            barsInLastLine = false
+                            _barsInLastLine = false
                             sectionActive = false
                             this.currChordsAndDurations = undefined
                             this.sheet.header.author = e.value
@@ -435,7 +435,7 @@ export class Vextab {
                             handled.set(e.id, true)
                         }
                     else if ( e.type === 'FORM') {
-                            barsInLastLine = false
+                            _barsInLastLine = false
                             sectionActive = false
                             this.currChordsAndDurations = undefined
                             this.sheet.header.form =  e.formEntries
@@ -451,7 +451,7 @@ export class Vextab {
                                 console.debug(`NEW SECTION: ${e.value}`)
                             }
                             this.initSection(e.value)
-                            barsInLastLine = false
+                            _barsInLastLine = false
                             sectionActive  = true
                             sectionHasContent = false
                             handled.set(e.id, true)
@@ -493,25 +493,27 @@ export class Vextab {
                             const chordNoBass = chord.replace(/\/[A-G][b#]{0,1}/,'')
                             const prevNoBass = prevChord.replace(/\/[A-G][b#]{0,1}/,'')
                             
+                            let durationCh = duration === 1 ? 'w' : duration
                             if ( firstChord ) {
-                                barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
+                                barNotes.push(`:${durationCh}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
                                 firstChord = false
                             }
                             else if ( chord !== prevChord ) {
                                 if ( chordNoBass === prevNoBass ) {
                                     const bass = chord.replace(/^[^\/]+/,'')
-                                    barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.-${bass}${comment}${encoding}`)
+                                    barNotes.push(`:${durationCh}S ${e.tie}B/4 ${encoding}.big.-${bass}${comment}${encoding}`)
                                 }
                                 else
-                                    barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
+                                    barNotes.push(`:${durationCh}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
                             } 
                             else {            
-                                barNotes.push(`:${e.duration[0]}S ${e.tie}B/4`)
+                                barNotes.push(`:${durationCh}S ${e.tie}B/4`)
                             }
                             // add any tied note lengths
                             for( let i = 1 ; i < e.duration.length; i++ ) {
                                 duration += e.duration[i]
-                                barNotes.push(` :${e.duration[i]}S tB/4 `)
+                                durationCh = duration[i] === 1 ? 'w' : duration[i]
+                                barNotes.push(` :${durationCh}S tB/4 `)
                             }
                             proChords.push({ chord:chord, duration: duration })
                             prevChord = chord
@@ -521,22 +523,26 @@ export class Vextab {
                     else if ( e.type === 'REPEAT_CHORD' ) {
                             assert( prevChord !== 'unset', `A previous chord must exist to use '/' for Repeat Chord`)
                             let duration = prevDuration[0]
-                            barNotes.push(`:${duration}S B/4`)
+                            let prevDurationCh = duration === 1 ? 'w' : duration
+                            barNotes.push(`:${prevDurationCh}S B/4`)
                             // add any tied note lengths
                             for( let i = 1 ; i < prevDuration.length; i++ ) {
                                 duration += prevDuration[i]
-                                barNotes.push(` :${prevDuration[i]}S tB/4 `)
+                                prevDurationCh = prevDuration[i] === 1 ? 'w' : prevDuration[i]
+                                barNotes.push(` :${prevDurationCh}S tB/4 `)
                             }
                             proChords.push({ chord: prevChord, duration: duration })
                             handled.set(e.id, true)     
                         }                                                           
                     else if ( e.type === 'REST' ) {
                             let duration = e.duration[0]
-                            barNotes.push(`:${e.duration} ${e.tie}##`)
+                            let durationCh = duration === 1 ? 'w' : duration
+                            barNotes.push(`:${durationCh} ${e.tie}##`)
                             // add any tied note lengths
                             for( let i = 1 ; i < e.duration.length; i++ ) {
                                 duration += e.duration[i]
-                                barNotes.push(` :${e.duration[i]}S t## `)
+                                durationCh = duration[i] === 1 ? 'w' : duration[i]
+                                barNotes.push(` :${durationCh}S t## `)
                             }
                             proChords.push({chord: 'R', duration: duration })
                             handled.set(e.id, true) 
