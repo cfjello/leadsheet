@@ -441,7 +441,7 @@ export class Vextab {
                             this.sheet.header.form =  e.formEntries
                             handled.set(e.id, true)
                         }
-                    else if ( e.type === 'SECTION_HEAD' ||  
+                    else if ( e.type === 'SECTION_HEAD' || 
                               e.type === 'SECTION') {
                             if ( this.currSection !== '' ) {
                                 this.finalizeSection(this.currSection,sectionHasContent)
@@ -493,7 +493,7 @@ export class Vextab {
                             const chordNoBass = chord.replace(/\/[A-G][b#]{0,1}/,'')
                             const prevNoBass = prevChord.replace(/\/[A-G][b#]{0,1}/,'')
                             
-                            let durationCh = duration === 1 ? 'w' : duration
+                            let durationCh = duration   // duration === 1 ? 'w' : duration
                             if ( firstChord ) {
                                 barNotes.push(`:${durationCh}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
                                 firstChord = false
@@ -512,7 +512,7 @@ export class Vextab {
                             // add any tied note lengths
                             for( let i = 1 ; i < e.duration.length; i++ ) {
                                 duration += e.duration[i]
-                                durationCh = duration[i] === 1 ? 'w' : duration[i]
+                                durationCh = duration // duration[i] === 1 ? 'w' : duration[i]
                                 barNotes.push(` :${durationCh}S tB/4 `)
                             }
                             proChords.push({ chord:chord, duration: duration })
@@ -523,12 +523,12 @@ export class Vextab {
                     else if ( e.type === 'REPEAT_CHORD' ) {
                             assert( prevChord !== 'unset', `A previous chord must exist to use '/' for Repeat Chord`)
                             let duration = prevDuration[0]
-                            let prevDurationCh = duration === 1 ? 'w' : duration
+                            let prevDurationCh = duration // duration === 1 ? 'w' : duration
                             barNotes.push(`:${prevDurationCh}S B/4`)
                             // add any tied note lengths
                             for( let i = 1 ; i < prevDuration.length; i++ ) {
                                 duration += prevDuration[i]
-                                prevDurationCh = prevDuration[i] === 1 ? 'w' : prevDuration[i]
+                                prevDurationCh = prevDuration[i] // prevDuration[i] === 1 ? 'w' : prevDuration[i]
                                 barNotes.push(` :${prevDurationCh}S tB/4 `)
                             }
                             proChords.push({ chord: prevChord, duration: duration })
@@ -536,12 +536,12 @@ export class Vextab {
                         }                                                           
                     else if ( e.type === 'REST' ) {
                             let duration = e.duration[0]
-                            let durationCh = duration === 1 ? 'w' : duration
+                            let durationCh = duration // duration === 1 ? 'w' : duration
                             barNotes.push(`:${durationCh} ${e.tie}##`)
                             // add any tied note lengths
                             for( let i = 1 ; i < e.duration.length; i++ ) {
                                 duration += e.duration[i]
-                                durationCh = duration[i] === 1 ? 'w' : duration[i]
+                                durationCh = duration[i] // duration[i] === 1 ? 'w' : duration[i]
                                 barNotes.push(` :${durationCh}S t## `)
                             }
                             proChords.push({chord: 'R', duration: duration })

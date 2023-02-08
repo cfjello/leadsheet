@@ -33,7 +33,7 @@ Deno.test({
         await LS.loadAllSheets()
         await LS.renderVextab(`I'm a Mover`, true)
         const vexTree = LS.vexed.get(`I'm a Mover`)?.sections.get('Chorus')
-        assertEquals(vexTree![0], "notes | :wS B/4 $.top.$ $.big.Fmaj7$ | :wS B/4 $.big.Gmaj7$ |") 
+        assertEquals(vexTree![0], "notes | :1S B/4 $.top.$ $.big.Fmaj7$ | :1S B/4 $.big.Gmaj7$ |") 
                               //  "notes | :2S B/4 $.top.$ $.big.Gadd9$ :2S B/4 $.big.Am79$ | :2S B/4 $.big.Cmaj79$ :2S B/4 $.big.Bm7$ | :2S B/4 $.big.Gadd9$ :2S B/4 $.big.Am79$ | :8S B/4 $.big.Cmaj79$ :4S B/4 :8S B/4 $.big.D7sus4$ :2S tB/4 |"
     },
     sanitizeResources: false,
