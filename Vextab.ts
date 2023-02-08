@@ -289,7 +289,7 @@ export class Vextab {
 
                 assert( chords !== undefined , `chords for ${this.currSection} must be defined` )
                 let chordPro = ""
-                let offset = 0  // this.currChordPtr > 0 ? ++this.currChordPtr : 0
+                let offset = this.currChordPtr > 0 ? ++this.currChordPtr : 0
                 let indexMem = 0
                 textParts.forEach( ( value, index ) => {
                     // console.debug(`textPart: ${JSON.stringify(value)} `)
@@ -330,7 +330,7 @@ export class Vextab {
         return ret
     }
 
-    finalizeSection = ( sectionName: string, sectionHasContent: boolean) => {
+    finalizeSection = ( sectionName: string, _sectionHasContent: boolean) => {
         assert ( this.sheet.sections.has(sectionName), `finalizeSection() cannot find section: ${sectionName}`)
         
         /* TODO: Maybe add this 
