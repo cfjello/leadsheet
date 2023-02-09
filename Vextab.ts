@@ -488,63 +488,50 @@ export class Vextab {
 
                             // set the chord position and duration
                             const encoding = '$' 
-                            let duration = e.duration[0]
-
+                            
                             const chordNoBass = chord.replace(/\/[A-G][b#]{0,1}/,'')
                             const prevNoBass = prevChord.replace(/\/[A-G][b#]{0,1}/,'')
-                            
-                            let durationCh = duration   // duration === 1 ? 'w' : duration
                             if ( firstChord ) {
-                                barNotes.push(`:${durationCh}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
+                                barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.top.${encoding} ${encoding}.big.${chord}${comment}${encoding}`) 
                                 firstChord = false
                             }
                             else if ( chord !== prevChord ) {
                                 if ( chordNoBass === prevNoBass ) {
                                     const bass = chord.replace(/^[^\/]+/,'')
-                                    barNotes.push(`:${durationCh}S ${e.tie}B/4 ${encoding}.big.-${bass}${comment}${encoding}`)
+                                    barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.-${bass}${comment}${encoding}`)
                                 }
                                 else
-                                    barNotes.push(`:${durationCh}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
+                                    barNotes.push(`:${e.duration[0]}S ${e.tie}B/4 ${encoding}.big.${chord}${comment}${encoding}`)
                             } 
                             else {            
-                                barNotes.push(`:${durationCh}S ${e.tie}B/4`)
+                                barNotes.push(`:${e.duration[0]}S ${e.tie}B/4`)
                             }
                             // add any tied note lengths
                             for( let i = 1 ; i < e.duration.length; i++ ) {
-                                duration += e.duration[i]
-                                durationCh = duration // duration[i] === 1 ? 'w' : duration[i]
-                                barNotes.push(` :${durationCh}S tB/4 `)
+                                barNotes.push(` :${e.duration[i]}S tB/4 `)
                             }
-                            proChords.push({ chord:chord, duration: duration })
+                            proChords.push({ chord:chord, duration: e.duration })
                             prevChord = chord
                             prevDuration = e.duration
                             handled.set(e.id, true)        
                         }
                     else if ( e.type === 'REPEAT_CHORD' ) {
                             assert( prevChord !== 'unset', `A previous chord must exist to use '/' for Repeat Chord`)
-                            let duration = prevDuration[0]
-                            let prevDurationCh = duration // duration === 1 ? 'w' : duration
-                            barNotes.push(`:${prevDurationCh}S B/4`)
+                            barNotes.push(`:${prevDuration[0]}S B/4`)
                             // add any tied note lengths
                             for( let i = 1 ; i < prevDuration.length; i++ ) {
-                                duration += prevDuration[i]
-                                prevDurationCh = prevDuration[i] // prevDuration[i] === 1 ? 'w' : prevDuration[i]
-                                barNotes.push(` :${prevDurationCh}S tB/4 `)
+                                barNotes.push(` :${prevDuration[i]}S tB/4 `)
                             }
-                            proChords.push({ chord: prevChord, duration: duration })
+                            proChords.push({ chord: prevChord, duration: e.duration })
                             handled.set(e.id, true)     
                         }                                                           
                     else if ( e.type === 'REST' ) {
-                            let duration = e.duration[0]
-                            let durationCh = duration // duration === 1 ? 'w' : duration
-                            barNotes.push(`:${durationCh} ${e.tie}##`)
+                            barNotes.push(`:${e.duration[0]} ${e.tie}##`)
                             // add any tied note lengths
                             for( let i = 1 ; i < e.duration.length; i++ ) {
-                                duration += e.duration[i]
-                                durationCh = duration[i] // duration[i] === 1 ? 'w' : duration[i]
-                                barNotes.push(` :${durationCh}S t## `)
+                                barNotes.push(` :${e.duration[i]}S t## `)
                             }
-                            proChords.push({chord: 'R', duration: duration })
+                            proChords.push({chord: 'R', duration: e.duration })
                             handled.set(e.id, true) 
                         }                      
                     else if ( e.type === 'SCALE' ) {
