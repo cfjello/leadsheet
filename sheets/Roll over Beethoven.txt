@@ -1,14 +1,8 @@
 Title: Roll Over Beethoven 
 Key: F Minor
 Tempo: 66
-Form: 
-    - Intro
-    - Verse 1
-    - Bridge 1
-    - Chorus
-    - Verse 3
-    - Verse 4
-    - Chorus 1
+Form: Intro, Verse 1, Bridge 1, Chorus, Verse 3, Verse 4, Chorus 1
+
 Intro: 
 | Fm7 | Bb79 | Fm7 | Bb79 |
 
@@ -33,6 +27,11 @@ _move on up just a trifle _further _and _reel and rock it, _roll it over, roll
 | Db6                  | Db/Eb     E7no5 | F7 
 _over Beethoven, _rocking in _two by _two. 
 
+Solo: 
+| Fm7 [S:F Dorian] |Bb79       | Db79 [S:F Aeolian]    | Bb79 [S:F Dorian] 
+| Ab6            | Bb79     C7#5        | Fm7    | Bb79   
+| Db6 [S:F Aeolian]| Db/Eb E7no5 |  Fm7 [S: F Dorian]   | Bb79    [N:Reapeat] 
+
 Chorus:
 | Fm7/Bb  C7#5#9  | F79          | Fm7/Bb  C7#5#9  | F79  
 _Roll       _over Beet-_hoven   _Roll       _over Beet-_hoven
@@ -53,9 +52,4 @@ Chorus 1:
 | Fm7/Bb  C7#5#9  | F79        | Fm7/Bb  C7#5#9  | F79  
 _Roll       _over Beet-_hoven  _Roll       _over Beet-_hoven
 | Fm7/Bb  C7#5#9  | Db6       | Db/Eb    E7no5        | Fm7 [Note: Break]
-_Roll       _over Beet-_hoven  _Dig these _rhythm and  _blues _ 
-
-
-
-
-
+_Roll _over Beet-_hoven  _Dig these _rhythm and  _blues

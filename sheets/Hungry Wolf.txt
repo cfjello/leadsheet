@@ -1,16 +1,7 @@
 Title: Hungry Wolf
 Author: J. T. Funny Paper Smith 
 Key: G Minor
-Form: 
-    - Intro
-    - Verse 1
-    - Verse 2 Mod.
-    - Verse 3
-    - Verse 4 Mod.
-    - Solo
-    - Verse 5 Mod.
-    - Verse 6
-    - Verse 7 Mod.
+Form: Intro, Verse 1, Verse 2 Mod., Verse 3, Verse 4 Mod., Solo, Verse 5 Mod., Verse 6, Verse 7 Mod.
 Tempo: 113 
 Meter: 4/4
 

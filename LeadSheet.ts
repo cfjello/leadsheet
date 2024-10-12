@@ -1,26 +1,29 @@
-// import { ArgsObject } from "https://deno.land/x/parlexa/interfaces.ts";
-import { ArgsObject } from "https://deno.land/x/parlexa/interfaces.ts";
-import { ArgsObjectArray, VextabDefaults, VextabHeaderType, VextabRestSheetType, VextabSheetType } from "./interfaces.ts";
+// Purpose: LeadSheet class for parsing and rendering lead sheets
+import { Parser, Debug } from "./imports.ts";
+import { ArgsObjectArray, DebugType, VextabDefaults, VextabHeaderType, VextabRestSheetType, VextabSheetType } from "./types.ts";
 import { WalkEntryExt } from "./fileWalk.ts";
 import { fileWalk } from "./fileWalk.ts";
 import { _ } from './lodash.ts';
-import { Parser } from "https://deno.land/x/parlexa/mod.ts";
 import LR from "./rules/lexerRules.ts";
-import PR from "./rules/parserRules.ts";
+import { PR, LexerTokens, Tokens }  from "./rules/parserRules.ts";
 import align from "./align.ts";
 import * as path from "https://deno.land/std/path/mod.ts";
 import Vextab from "./Vextab.ts";
 
 const __dirname = Deno.cwd()
 
+// deno-lint-ignore no-explicit-any
+type UserData = Map<string, any>
+
+
 export class LeadSheet {   
-   private _debug = false
+   private _debug: DebugType = 'off'
     public get debug() {
         return this._debug
     }
     public set debug(value) {
         this._debug = value
-        this.parser.debug = value
+        this.parser.debug = value === 'off' || value === 'validate' ? false : true
     }
 
     // Data Structures
@@ -33,7 +36,7 @@ export class LeadSheet {
     menuList: ArgsObjectArray = []
 
     // Parser
-    parser = new Parser( LR, PR, 'reset')   
+    parser = new Parser<LexerTokens, Tokens, UserData>( LR, PR, 'reset')   
     currVextab: Vextab | undefined
 
     constructor( 
@@ -98,7 +101,7 @@ export class LeadSheet {
         return Promise.resolve( { 
             header:     _.clone(this.vexed.get(sheetName)!.header), 
             sections:   Array.from(this.vexed.get(sheetName)!.sections, ([name, value]) => ({ name, value })), 
-            chords:     Array.from(this.vexed.get(sheetName)!.chords, ([name, value]) => ({ name, value })),
+            // chords:     Array.from(this.vexed.get(sheetName)!.chords, ([name, value]) => ({ name, value })),
             sectionsCP: Array.from(this.vexed.get(sheetName)!.sectionsCP, ([name, value]) => ({ name, value })), 
             textOnly:   Object.fromEntries(this.vexed.get(sheetName)!.textOnly),
             render:     Object.fromEntries(this.vexed.get(sheetName)!.render),
@@ -110,8 +113,8 @@ export class LeadSheet {
     loadSheet = async ( entry: WalkEntryExt, force = false ): Promise<string> => {
         let sheet = ''
         if ( entry.isFile  && ( ! this.sheets.has(entry.baseName) || force ) ) {
-            sheet = (await Deno.readTextFile(entry.path)).replace(/\r/mg, '')  
-            this.sheets.set( entry.baseName, _.cloneDeep(sheet) )
+            sheet = '\n' + (await Deno.readTextFile(entry.path)).replace(/\r/mg, '')  
+            this.sheets.set( entry.baseName, _.clone(sheet) )
             sheet = this.sheets.get(entry.baseName)!
         }
         return Promise.resolve(sheet)
@@ -127,7 +130,7 @@ export class LeadSheet {
                 if ( entry.isFile && ! entry.isDirectory ) {
                     await Deno.readTextFile(entry.path)
                     .then( file => file.replace(/\r/mg, ''))
-                    .then ( sheet =>   this.sheets.set(entry.baseName, _.cloneDeep(sheet)) )
+                    .then ( sheet =>   this.sheets.set(entry.baseName, '\n' + _.clone(sheet)) )
                 }
             }
             Promise.resolve()
@@ -151,7 +154,7 @@ export class LeadSheet {
         let ret = false
         try {
             this.parser = new Parser( LR, PR, 'reset')  
-            this.parser.debug = this.debug
+            this.parser.debug = this.debug === 'off' ? false : true
             if ( reload ) await this.loadNamedSheet(sheetName)
             this.parser.reset(this.sheets.get(sheetName)!)
             const tree = this.parser.getParseTree()
@@ -179,7 +182,7 @@ export class LeadSheet {
            if ( reload || force  || !this.parsed.has(sheetName) ) { 
                 await this.parseSheet(sheetName, reload )
             }
-            const vextab = new Vextab( this.parsed.get(sheetName), false, transpose, sharpFlat )
+            const vextab = new Vextab( this.parsed.get(sheetName), this.debug, transpose, sharpFlat )
             vextab.render(transpose, sharpFlat )
             this.vexed.set( sheetName, _.cloneDeep(vextab.getSheet()) ) 
             this.currVextab = vextab

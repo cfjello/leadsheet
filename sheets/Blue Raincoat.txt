@@ -1,16 +1,7 @@
 Title: Famous Blue Raincoat 
 Author: Leonard Cohen
-Form:
-  - Intro
-  - Verse 1
-  - Chorus
-  - Verse 2
-  - Chorus 2
-  - Synth Solo over Verse
-  - Guitar Solo over Chorus
-  - Verse 3 
-  - Chorus 3
-  Key: G Minor
+Form: Intro, Verse 1, Chorus, Verse 2, Chorus 2. Solo over Verse, Verse 3, Chorus 3
+Key: G Minor
 Meter: 6/8
 Tempo: 78
 
@@ -67,14 +58,14 @@ _ ke.  _ She
 _sends her re- _ gards _
 
 Solo:
-| Gm7 [S:G Aeolian]  | Ebmaj79
-| Cm79           | Dm7
-| Gm7            | Ebmaj79
-| Cm79           | Dm7
-| Gm7 Abmaj79 [S:Ab Major]    | Am7 [S:G Dorian/A Aeolian]                  
-| Gm7 [S:G Aeolian] Abmaj79 [S:Ab Major]    | Fsus4/Db            
-| Cmadd2 [S:Bb Major]        | Dm7 
-| Ebmaj79        | Dm79 |
+| Gm6 [S:G Harmonic Minor]  | Em7b5
+| C79            | D79
+| Gm6            | Em7b5
+| C79            | D79
+| Gm7   F#7#5    | Am7
+| Gm7   F#7#5    | Am7
+| C79            | D79
+| Em7b5          | D79                
 
 Verse 3 [Use: Verse 1, textOnly]:
 _What can I tell my  _brother my killer

@@ -27,7 +27,6 @@
             "runtimeExecutable": "C:\\Users\\claus\\.deno\\bin\\deno.exe",
             "runtimeArgs": [
                 "run",
-                "--unstable",
                 "--inspect-brk=127.0.0.1:9229",
                 "--allow-all",
                 "./server.ts"
@@ -35,7 +34,7 @@
             "attachSimplePort": 9229
         },
         {
-            "name": "Deno TEST <file>",
+            "name": "TEST01 <file>",
             "type": "node",
             "request": "launch",
             "runtimeExecutable": "deno",
@@ -43,10 +42,58 @@
                 "test", 
                 "--inspect-brk=127.0.0.1:9201",  
                 "-A", 
-                "--unstable", 
                 "${file}"
             ],
             "attachSimplePort": 9201
+        },
+        {
+            "name": "TEST02 <file>",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "deno",
+            "runtimeArgs": [
+                "test", 
+                "--inspect-brk=127.0.0.1:9202",  
+                "-A", 
+                "${file}"
+            ],
+            "attachSimplePort": 9202
+        },       {
+            "name": "TEST03 <file>",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "deno",
+            "runtimeArgs": [
+                "test", 
+                "--inspect-brk=127.0.0.1:9203",  
+                "-A", 
+                "${file}"
+            ],
+            "attachSimplePort": 9203
+        },       {
+            "name": "TEST04 <file>",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "deno",
+            "runtimeArgs": [
+                "test", 
+                "--inspect-brk=127.0.0.1:9204",  
+                "-A", 
+                "${file}"
+            ],
+            "attachSimplePort": 9204
+        },       {
+            "name": "TEST05 <file>",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "deno",
+            "runtimeArgs": [
+                "test", 
+                "--inspect-brk=127.0.0.1:9205",  
+                "-A", 
+                "${file}"
+            ],
+            "attachSimplePort": 9205
         },
     ],
 }

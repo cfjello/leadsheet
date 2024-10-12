@@ -1,12 +1,7 @@
+
 Title: I'm a Mover
 Author: Free
-Form:  
-  - Intro 
-  - Verse 1
-  - Verse 2
-  - Solo
-  - Verse 3
-  - Coda
+Form: Intro, Verse 1, Verse 2, Solo, Verse 3, Coda
 Key: G
 Meter  : 4/4
 Tempo  : 86           
@@ -16,27 +11,27 @@ Intro:
 
 Verse 1:
 | Gadd9          Am79 | Cmaj79             Bm7                | 
-_I was born by the _river. _Just like this _river I been
+.I was born by the .river. .Just like this .river I been
 | Em               Baug/D#    | Fsus2/D            G7         |
-_Moving ever _since.          _Ain’t got no-_one
+.Moving ever .since.          .Ain’t got no-.one
 | Cmaj79,2          Cm6,2  | Gadd9/B,2       Am79,2  | 
-     _to call my _own,     _you know I been _moving since the         
+     .to call my .own,     .you know I been .moving since the         
 | Am79        E7#9/G#   | Gm6           C79   |
-   _day I was _born.     _ Ye-e-s      _I'm    a    
+   .day I was .born.     . Ye-e-s      .I'm    a    
 
 Chorus:
 | Fmaj7             | Gmaj7     | 
-_Mover babe. I’m a   _mover  
-|   F6,2              E7,8 E7,4  Ebmaj79,8   | Ebmaj79 |
-_Nothing seems to    _slow _me _down _ 
+.Mover babe. I’m a   .mover  
+|   F6,2              E7,8 E7,4  Ebmaj79,8   | Ebmaj79,t1 |
+.Nothing seems to    .slow .me .down . 
 | Am7b5,2             Abmaj79,8  Abmaj79,4 G,8    | G,t2        D79sus4,2 |
-_Nothing seems to _hold _me      _back _ 
+.Nothing seems to .hold .me      .back . 
 
 Verse 2 [use: Verse 1, textOnly]: 
-_Following in the _footpath _one fine _day,
-_When I asked the _wise man _which was the _way. _He said
-_Follow your _heart and _look for your-_self,
-_And come back and _tell me _what you have _learned. I'm a
+.Following in the .footpath .one fine .day,
+.When I asked the .wise man .which was the .way. .He said
+.Follow your .heart and .look for your-.self,
+.And come back and .tell me .what you have .learned; I'm a
 
 Chorus 2 [use: Chorus, textAndNotes]:
 
@@ -47,10 +42,10 @@ Solo:
 | Am79  [S:A Aeolian]      E7/G# [S:A Harm. Minor]  | Gm6 [S:C Mixo/F Major]  C79 |
 
 Verse 3  [use: Verse 1, textOnly]: 
-_Went back and _told him I'd _found me a _wife,
-_Eleven _children and a _real good _life,
-_Told him I'd _left _this happy _home. Cause I
-_need to re-_turn to the _long winding _road. I'm a
+.Went back and .told him I'd .found me a .wife,
+.Eleven .children and a .real good .life,
+.Told him I'd .left .this happy .home. Cause I
+.need to re-.turn to the .long winding .road; I'm a
 
 Chorus 3 [use: Chorus, textAndNotes]:
 

@@ -1,18 +1,18 @@
 import { assert } from "https://deno.land/std/testing/asserts.ts";
-import { VextabHeaderType, VextabDefaults, VextabSectionType, VextabSheetType, ChordType, VextabSectionChordType, ChordsAndDurationsType,  RenderSectionType } from "./interfaces.ts"
+import { VextabHeaderType, VextabDefaults, VextabSectionType, VextabSheetType, ChordType, VextabSectionChordType, ChordsAndDurationsType,  RenderSectionType, DebugType } from "./types.ts"
 // import { reserved, Templating } from "./Templating.ts";
 import { _ } from './lodash.ts';
 import objStringify from "./objStringify.js";
 
 export class Vextab {
-    private _debug = false;
-    currChordsAndDurations: ChordsAndDurationsType | undefined
+    private _debug: DebugType = 'off'
     public get debug() {
-        return this._debug;
+        return this._debug
     }
     public set debug(value) {
-        this._debug = value;
+        this._debug = value
     }
+    currChordsAndDurations: ChordsAndDurationsType | undefined
     html: string[] = []
     sheet: VextabSheetType
     // sections    = new Map<string, string[]>()
@@ -22,11 +22,11 @@ export class Vextab {
     currLineCounter = -1
     currUseNotes: string[] = []
     currUseDurations: string[][] = []
-    currChordPtr    = 0
+    currChordPtr = 0
 
 
     // deno-lint-ignore no-explicit-any
-    constructor( public cmds: any[], debug = false, _transpose = 0, _sharpFlat = '',  public conf = { 
+    constructor( public cmds: any[], debug: DebugType = 'off', _transpose = 0, _sharpFlat = '',  public conf = { 
         quaterNoteTicks:  420, 
         currTicks:        0,
         currBarSize:      4 * 420 ,
@@ -54,7 +54,7 @@ export class Vextab {
 
         }
         this.debug = debug
-        if ( this.debug) console.debug(`Vextab.constructor() - Transpose: ${this.sheet.transpose}, sharpFlat = ${this.sheet.sharpFlat}`)
+        if ( this.debug === 'debug' ) console.debug(`Vextab.constructor() - Transpose: ${this.sheet.transpose}, sharpFlat = ${this.sheet.sharpFlat}`)
     }
 
     // Transposition: 
@@ -169,7 +169,7 @@ export class Vextab {
         this.sheet.sections.set(sectionName, [])
         this.sheet.sectionsCP.set(sectionName, [])
         this.sheet.textOnly.set(sectionName, [])
-        this.sheet.chords.set(sectionName, [] as ChordType[])
+        this.sheet.chords.set(sectionName, [] as ChordType[][])
         // Init USE directive 
         this.currChordsAndDurations = undefined
         this.currUseSection = ''  
@@ -189,12 +189,12 @@ export class Vextab {
     pushNotes = ( barNotes: string[] = [], proChords: ChordType[] = [] ): ChordsAndDurationsType | undefined => {
         let ret: ChordsAndDurationsType | undefined
         if ( barNotes.length > 0 ) {
-            if ( this.debug ) console.debug(`notes ${barNotes.join(' ')} `)
+            if ( this.debug === 'debug' ) console.debug(`notes ${barNotes.join(' ')} `)
             this.sheet.sections.get(this.currSection)!.push('notes ' + barNotes.join(' '))
-            const currChords =  this.sheet.chords.get(this.currSection)!
-            this.currChordPtr = (this.sheet.chords.get( this.currSection) ?? []).length
+            // const currChords =  this.sheet.chords.get(this.currSection)!
+            // this.currChordPtr = (this.sheet.chords.get( this.currSection) ?? []).length
             
-            this.sheet.chords.set( this.currSection, _.concat(currChords, proChords) )
+            this.sheet.chords.get( this.currSection)!.push(proChords)
             ret = this.getDurationsInLine(barNotes.join(' '))
         }
         return ret
@@ -235,8 +235,8 @@ export class Vextab {
         try {
             const notesLines = this.sheet.sections.get(sectionSource)?.filter( ln => ln.startsWith('notes ') )!
             const notesLine = notesLines[lineIdx]
-            if ( this.debug ) console.debug(`PUSH ${sectionSource}[${lineIdx}] ==> ${sectionTarget}: ${notesLine}`);
-            if ( this.debug ) console.debug('---------------------------------')
+            if ( this.debug === 'debug' ) console.debug(`PUSH ${sectionSource}[${lineIdx}] ==> ${sectionTarget}: ${notesLine}`);
+            if ( this.debug === 'debug' ) console.debug('---------------------------------')
             // TODO: Remove this check later 
             if ( ! this.sheet.sections.has(sectionTarget) ) this.sheet.sections.set(sectionTarget, [])
             this.sheet.sections.get(sectionTarget)!.push(notesLine)
@@ -271,36 +271,34 @@ export class Vextab {
             if ( textNotes.length > 0 ) {
                 if ( ! this.sheet.sections.has(this.currSection) ) this.sheet.sections.set(this.currSection, [])
                 if ( ! this.sheet.sectionsCP.has(this.currSection) ) this.sheet.sectionsCP.set(this.currSection, [])
-                
-                // console.debug(`text ${JSON.stringify(textNotes)} `)
-                
                 this.sheet.sections.get(this.currSection)!.push('text ' + textNotes.join(' '))
                 //
                 // Generate the ChordPro text and chords
                 //
-                const chords: ChordType[] = this.sheet.chords.get(this.currSection)!
+                const chords: ChordType[] = this.sheet.chords.get(this.currSection)![this.currLineCounter]
                 
-                if ( this.debug ) {
-                    console.debug(`Section: ${this.currSection}, num. of chords and Bars: ${chords.length} `)
-                    const chordsArr = chords.filter(e => e.chord !== '|')
-                    console.debug(`Section: ${this.currSection}, num. of chords: ${chordsArr.length} `)
-                    console.debug(`Section: ${this.currSection}, num. of text parts: ${textParts.length} `)
-                }
+                // console.debug(`Section: ${this.currSection}, num. of chords and Bars: ${chords.length} `)
 
                 assert( chords !== undefined , `chords for ${this.currSection} must be defined` )
                 let chordPro = ""
-                let offset = this.currChordPtr > 0 ? ++this.currChordPtr : 0
+                let offset   = 0
                 let indexMem = 0
                 textParts.forEach( ( value, index ) => {
-                    // console.debug(`textPart: ${JSON.stringify(value)} `)
+                    if ( this.debug === 'validate' ) console.debug(`-----\nSECTION: ${this.currSection}\nTEXT: ${JSON.stringify(value)}`)
                     indexMem = index
-                    assert( index + offset < chords.length, `chords[${index + offset}] is out of range: 0-${chords.length} for '${value}'` )
-                    if ( chords[index + offset].chord.startsWith('|') || chords[index + offset].chord.endsWith('|') ) {
-                        chordPro += `[${chords[index + offset].chord}]`
-                        offset++
+                    if ( index + offset < chords.length ) {
+                        if ( chords[index + offset].chord.startsWith('|') || chords[index + offset].chord.endsWith('|') ) {
+                            offset++
+                        }
+                        if ( this.debug === 'validate' ) console.debug(`CHORD: ${chords[index + offset].chord}`)
+                        chordPro += `[${chords[index + offset].chord}]${value}`
                     }
-                    if ( this.debug ) console.debug(`CHORD: ${chords[index + offset].chord} for: '${value}'`)
-                    chordPro += `[${chords[index + offset].chord}]${value}`
+                    else if ( this.debug === 'validate') {
+                        if ( this.debug === 'validate' ) console.debug(`CHORD: MISSING CHORD for: '${value}'`)
+                    }
+                    else {
+                        throw Error(`Missing Chord for: '${value}'`)
+                    }
                 })
 
                 if ( this.currChordsAndDurations !== undefined ) {
@@ -312,7 +310,7 @@ export class Vextab {
                     }
                 }
                 else {
-                    if ( this.debug ) console.debug(`ChordPro CHORD: ${objStringify(chords, undefined,2)}`);
+                    if ( this.debug === 'debug' ) console.debug(`ChordPro CHORD: ${objStringify(chords, undefined,2)}`);
                     if ( chords.length > textParts.length + offset ) {
                         for( let i = textParts.length + offset; i < chords.length; i++) {
                             chordPro += ` [${chords[i].chord}]`
@@ -345,7 +343,6 @@ export class Vextab {
             }
         }
         */ 
-
         if ( this.sheet.sectionsCP.get( sectionName )!.length === 0 ) {
             let  noteLines: string[] = []
             noteLines = this.sheet.sections.get(sectionName)!.filter( ln => ln.startsWith('notes ') )
@@ -363,7 +360,7 @@ export class Vextab {
                 })
                 chordPro.push( chords.join(' ') )
             })
-            if ( this.debug ) console.debug(`ChordPro finalized chords: ${chordPro}`)
+            if ( this.debug === 'debug' ) console.debug(`ChordPro finalized chords: ${chordPro}`)
             this.sheet.sectionsCP.set( sectionName, chordPro )
         }
     }
@@ -385,7 +382,7 @@ export class Vextab {
         assert( transpose > -12 && transpose < 12, `Illegal transpose value: ${transpose} - must be between -11 and 11.` )
         try {
             this.cmds.forEach( (e, i)  => {
-                if ( i === 0 && this.debug ) console.debug( `Rendering...`)
+                if ( i === 0 && this.debug === 'debug' ) console.debug( `Rendering...`)
                 if ( ! handled.has(e.id) ) {
                     currElem = e
                     if ( e.type ===  'NL' ) {     
@@ -446,9 +443,10 @@ export class Vextab {
                             if ( this.currSection !== '' ) {
                                 this.finalizeSection(this.currSection,sectionHasContent)
                             }
-                            if ( this.debug ) {
-                                console.debug( '------------------------------')
+                            if ( this.debug === 'validate' ) {
+                                console.debug( '=======================')
                                 console.debug(`NEW SECTION: ${e.value}`)
+                                console.debug( '=======================')
                             }
                             this.initSection(e.value)
                             _barsInLastLine = false
@@ -460,7 +458,7 @@ export class Vextab {
                             const bar = e.REPEAT_COUNT !== undefined ? '=|:' : '|'
                             const proBar = e.REPEAT_COUNT !== undefined ? '|:' : '|'
                             barNotes.push(bar)
-                            proChords.push({ chord: proBar, duration: 0 })
+                            proChords.push({ chord: proBar, duration: [0] })
                             handled.set(e.id, true)  
                         }                                    
                     else if ( e.type === 'CHORD_NOTE' ) {
@@ -522,7 +520,7 @@ export class Vextab {
                             for( let i = 1 ; i < prevDuration.length; i++ ) {
                                 barNotes.push(` :${prevDuration[i]}S tB/4 `)
                             }
-                            proChords.push({ chord: prevChord, duration: e.duration })
+                            proChords.push({ chord: prevChord, duration: prevDuration })
                             handled.set(e.id, true)     
                         }                                                           
                     else if ( e.type === 'REST' ) {
@@ -595,13 +593,13 @@ export class Vextab {
                                 assert ( this.sheet.sections.has( e.value) , `USE ${e.value} does not refer to a known Section`)
                                 assert (  e.value !== this.currSection , `USE ${e.value} must not be equal to current Section`)
                                 assert (  this.sheet.chords.get(e.value) !== undefined , `USE Section ${e.value} must have some actual chords`)
-                                if ( this.debug ) console.debug(`USE SECTION: ${e.value} ==> ${this.currSection}`)
-                                if ( this.debug ) console.debug(`USE only: ${e.only}`)
+                                if ( this.debug === 'debug' ) console.debug(`USE SECTION: ${e.value} ==> ${this.currSection}`)
+                                if ( this.debug === 'debug' ) console.debug(`USE only: ${e.only}`)
                                 if ( this.currChordPtr === 0 ) { // Initialize at the beginning of a section
                                     this.currUseSection  = e.value
                                     this.currLineCounter = -1
                                     this.sheet.chords.set( this.currSection, this.sheet.chords.get(this.currUseSection)! )
-                                    if (this.debug ) console.debug(`Render for ${this.currSection} is set to: ${e.only}`) 
+                                    if (this.debug === 'debug' ) console.debug(`Render for ${this.currSection} is set to: ${e.only}`) 
                                     if ( e.only === 'notesOnly' ) {
                                         this.pushNotesOnly(this.currSection, this.currUseSection)
                                         this.sheet.render.set(this.currSection, 'notesOnly')
@@ -621,9 +619,10 @@ export class Vextab {
                     else if ( e.type === 'TEXT') {
                             const textParts = []
                             assert( sectionActive, `Cannot insert text aligned with chords outside a section`)
+                            this.currLineCounter++
                             // Handle setup for the USE of another section
                             if ( this.currUseSection !== '' ) {    
-                                this.currChordsAndDurations = this.pushUseSectionLine(this.currSection, this.currUseSection, ++this.currLineCounter)     
+                                this.currChordsAndDurations = this.pushUseSectionLine(this.currSection, this.currUseSection, this.currLineCounter)     
                                 // Construct the durations from the USE section
                                 e.textDurations = _.clone(this.currChordsAndDurations!.durations)
                             }         
@@ -665,5 +664,4 @@ export class Vextab {
         }
     }
 }
-
 export default Vextab

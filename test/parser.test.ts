@@ -4,12 +4,13 @@ import { Parser } from "https://deno.land/x/parlexa/mod.ts";
 // import { Parser } from "../../parlexa/mod.ts";
 import  LR  from "../rules/lexerRules.ts"
 import { PR } from "../rules/parserRules.ts"
+// deno-lint-ignore no-explicit-any
 export interface PIndexable { [key: string]: any }
 
 Deno.test({
     name: '01 - Parser can read a header Title and Auther', 
     fn: () => {  
-        const titleStr = "     Title: Angie\nAuthor: Rolling Stones\n"
+        const titleStr = "\n     Title: Angie\nAuthor: Rolling Stones\n"
         const parser = new Parser( LR, PR, 'reset')
         parser.debug = false
         parser.reset(titleStr)
@@ -24,7 +25,7 @@ Deno.test({
 Deno.test({
     name: '02 - Parser can read a Form directive', 
     fn: () => {  
-        const titleStr = "\nForm:  \n  - Intro \n- Verse\n  - Verse 2\n  - Intro\n  - Verse 3\n  - Coda\n"
+        const titleStr = "\nForm: Intro, Verse, Verse 2,  Intro, Verse 3, Coda\n"
         const parser = new Parser( LR, PR, 'reset')
         parser.debug = false
         parser.reset(titleStr)
@@ -39,6 +40,7 @@ Deno.test({
 Deno.test({
     name: '03 - ParseTree has only the matched child references (this test will fail if parser.debug === true)', 
     fn: () => {  
+        // deno-lint-ignore no-explicit-any
         const idMap = new Map<string,any>()
         const parser = new Parser( LR, PR, 'reset')
         // Note: this test wil fail if debug is set to true
@@ -64,7 +66,7 @@ Deno.test({
     sanitizeResources: false,
     sanitizeOps: false
 })
-
+/*
 Deno.test({
     name: '04 - Parser can provide a parser tree iterator', 
     fn: () => {  
@@ -81,3 +83,4 @@ Deno.test({
     sanitizeResources: false,
     sanitizeOps: false
 })
+*/

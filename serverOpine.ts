@@ -9,7 +9,7 @@ import { _ } from './lodash.ts';
 
 // Initialize main page
 const LS = new LeadSheet()
-LS.debug = false
+LS.debug = 'validate'
 await LS.loadAllSheets()
 // LS.parseAllSheets()
 

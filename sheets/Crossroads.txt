@@ -11,7 +11,7 @@ Verse 1:
 | F#m7          B7sus4/E         | B7               | F#m7         B7sus4/E       | B7   
 _down to the _crossroads         _fell down on my   _knees  _   _
 | Aadd2,2         Gmaj7,4+8  Dmaj7,8 | Dmaj7,t2   E7sus4/E  E7sus4/F | F#m7         B7sus4/E       | B7 
-_down to the _crossro-_oo-    _oads    _         _fell down _on my     _knees _ _ I went
+_down to the _crossro-_oo-    _oads    _         fell down _on my     _knees _ _ I went
 | Aadd2,2                 B7,4+8      C#aug7,8   | C#aug7,t4   Gmaj7b5,8 Gmaj7b5,t4 F#m7,8| F#m7,t2         G#m7       | Bsus2/D [Note:break] 
 _Asked the lord for _mercy - _y- _y,                   _ safe me    _if you     _please _ _
 
@@ -19,7 +19,7 @@ Verse 2:
 | F#m7          B7sus4/E         | B7               | F#m7         B7sus4/E       | B7   
 _Standing at the _crossroads, _I tried to flag a _ ride _ _
 | Aadd2,2         Gmaj7,4+8  Dmaj7,8 | Dmaj7,t2   E7sus4/E  E7sus4/F | F#m7         B7sus4/E       | B7
-_Standing at the _crossro-_ oo- _oads, _           _I tried to _flag a _ride _ _ No-
+_Standing at the _crossro-_ oo- _oads, I tried to _flag _a _ride _ _ No-
 | Aadd2                 B7         | C#aug7   Gmaj7b5 |  F#m7         G#m7       | Bsus2/D   E7sus4 
 _body seemed to _know me- _ee, everybody _passed me _by _ _ _ 
 
@@ -41,7 +41,7 @@ Solo Verse:
 
 Solo Bridge:
 | Fmaj7 [S:F Major] | Ebmaj7 [S:Bb Major] | Bbmaj7 | A7#5 [S: Bb Mel. Minor]
-| Dm79 [S:D Dorian] | G7   | Asus2 [S:A Mixo/D Major] | B7sus2sus4 [S:B Mixo/E Major] |  B7sus2sus4 |
+| Dm79 [S:D Dorian] | G7   | Asus2 [S:A Mixo/D Major] | B7sus2sus4 [S:B Mixo/E Major] |  B7sus2sus4 
 
 Bridge 2 [use: Bridge, textOnly]: 
 _Going down to Rosedale's, _take my rider by my _ side  _           

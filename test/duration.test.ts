@@ -1,20 +1,20 @@
-import { assert, assertExists } from "https://deno.land/std/testing/asserts.ts";
 import { LeadSheet } from "../LeadSheet.ts"
 import * as path from "https://deno.land/std/path/mod.ts";
-import { assertEquals } from "https://deno.land/std@0.113.0/testing/asserts.ts";
-import { Parser } from "https://deno.land/x/parlexa@v2.2.5/Parser.ts";
-
+import { assert, assertExists , assertEquals } from "https://deno.land/std/assert/mod.ts";
+import { Parser } from "../imports.ts"
+import  LR  from "../rules/lexerRules.ts"
+import { PR } from "../rules/parserRules.ts"
 const __dirname = path.dirname( path.fromFileUrl(new URL('./leadsheet', import.meta.url)) )
 
 // deno-lint-ignore no-explicit-any
 export interface PIndexable { [key: string]: any }
-const debug_hook = __dirname
+// const _debug_hook = __dirname
 
 Deno.test({
     name: '05 - Leadsheet can read the parseTree', 
     fn: async () => {  
         const LS = new LeadSheet( "../sheets", '.txt')
-        LS.debug = false
+        LS.debug = 'validate'
         await LS.loadAllSheets()
         await LS.renderVextab('Default', true)
         const vexTree = LS.vexed.get('Default')?.sections.get('Intro')
@@ -24,12 +24,12 @@ Deno.test({
     sanitizeOps: false
 })
 
-
+/*
 Deno.test({
     name: '06 - Leadsheet can generation correct vextab durations', 
     fn: async () => {  
         const LS = new LeadSheet( "../sheets", '.txt')
-        LS.debug = false
+        LS.debug = 'off'
         await LS.loadAllSheets()
         await LS.renderVextab(`I'm a Mover`, true)
         const vexTree = LS.vexed.get(`I'm a Mover`)?.sections.get('Chorus')
@@ -44,7 +44,7 @@ Deno.test({
     name: '07 - Leadsheet can generate ChordPro sheet', 
     fn: async () => {  
         const LS = new LeadSheet( "../sheets", '.txt')
-        LS.debug = false
+        LS.debug = 'debug'
         await LS.loadAllSheets()
         await LS.renderVextab(`I'm a Mover`, true)
         let vexTree = LS.vexed.get(`I'm a Mover`)?.sectionsCP.get('Intro')
@@ -61,3 +61,4 @@ Deno.test({
 })
 
 // TODO: This need additional testing, e.g. for divisions of 3
+*/

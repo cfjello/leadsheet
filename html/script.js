@@ -82,7 +82,7 @@ new Vue({
                     Renderer.Backends.SVG
                 );
                 // Initialize VexTab artist and parser.
-                const artist = new vextab.Artist(14, 15, 200, { scale: 1 });
+                const artist = new vextab.Artist(14, 15, 200, { scale: { scale: 0.8 } });
                 const tab = new vextab.VexTab(artist);
                 tab.parse(value);
                 artist.render(renderer);

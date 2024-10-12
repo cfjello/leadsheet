@@ -30,10 +30,12 @@ Sheet:
 */ 
 
 
+export type DebugType = 'off' | 'on' | 'debug'  | 'validate'
+
 
 export type ChordType = {
   chord: string,
-  duration: number
+  duration: number[]
 }
 
 //
@@ -61,7 +63,7 @@ export type VextabHeaderType = {
 export type VextabSectionType = Map<string, string[]>
 export type VextabSectionArrType  = { name: string, value: string[] }
 
-export type VextabSectionChordType     = Map<string, ChordType[]>
+export type VextabSectionChordType     = Map<string, ChordType[][]>
 export type VextabSectionChordArrType  = { name: string, value: ChordType[] }
 
 export type RenderType = 'textOnly' | 'notesOnly' | 'textAndNotes'
@@ -84,7 +86,7 @@ export type   VextabSheetType = {
 export type   VextabRestSheetType = {
   header:     VextabHeaderType, 
   sections:   VextabSectionArrType[]
-  chords:     VextabSectionChordArrType[]
+  // chords:     VextabSectionChordArrType[]
   sectionsCP: VextabSectionArrType[]
   textOnly:   { [key: string]: string[] }
   render:     { [key: string]: RenderType }
